@@ -17,8 +17,8 @@
 				<div class="row">
 					<div class="col-3 align-self-center">
 						<c:choose>
-							<c:when test="${not empty sessionScope.member.avatar}">
-								<span class="img-person" style="background-image: url('${pageContext.request.contextPath}/uploads/member/${sessionScope.member.avatar}');"></span>
+							<c:when test="${not empty sessionScope.member.profilePhoto}">
+								<span class="img-person" style="background-image: url('${pageContext.request.contextPath}/uploads/member/${sessionScope.member.profilePhoto}');"></span>
 							</c:when>
 							<c:otherwise>
 								<span class="img-person" style="background-image: url('${pageContext.request.contextPath}/dist/images/avatar.png');"></span>
