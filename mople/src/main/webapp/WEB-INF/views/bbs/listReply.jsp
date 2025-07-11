@@ -14,7 +14,7 @@
 				<div class="row reply-writer">
 					<div class="col-1"><i class="bi bi-person-circle text-muted icon"></i></div>
 					<div class="col-auto align-self-center">
-						<div class="name">${vo.userName}</div>
+						<div class="name">${vo.userNickName}</div>
 						<div class="date">${vo.reg_date}</div>
 					</div>
 				</div>				
@@ -23,18 +23,14 @@
 				<span class="reply-dropdown"><i class="bi bi-three-dots-vertical"></i></span>
 				<div class="reply-menu d-none">
 					<c:choose>
-						<c:when test="${sessionScope.member.userId == vo.userId }">
+						<c:when test="${sessionScope.member.memberIdx == vo.memberIdx }">
 							<div class="deleteReply reply-menu-item" data-replyNum="${vo.replyNum}" data-pageNo="${pageNo}">삭제</div>
 							<div class="hideReply reply-menu-item" data-replyNum="${vo.replyNum}" data-showReply="${vo.showReply}">${vo.showReply ==1?"비공개":"공개"}</div>
 						</c:when>
-						<c:when test="${sessionScope.member.userLevel >= 51 }">
+						<c:when test="${sessionScope.member.role < 1 }">
 							<div class="deleteReply reply-menu-item" data-replyNum="${vo.replyNum}" data-pageNo="${pageNo}">삭제</div>
-							<div class="blockReply reply-menu-item">차단</div>
+							<div class="blockReply reply-menu-item">숨기기</div>
 						</c:when>
-						<c:otherwise>
-							<div class="notifyReply reply-menu-item">신고</div>
-							<div class="blockReply reply-menu-item">차단</div>
-						</c:otherwise>
 					</c:choose>
 				</div>
 			</td>

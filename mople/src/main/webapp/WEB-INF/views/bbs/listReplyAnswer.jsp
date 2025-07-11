@@ -9,7 +9,7 @@
 				<div class="row reply-writer">
 					<div class="col-1"><i class="bi bi-person-circle text-muted icon"></i></div>
 					<div class="col ms-2 align-self-center">
-						<div class="name">${vo.userName}</div>
+						<div class="name">${vo.userNickName}</div>
 						<div class="date">${vo.reg_date }</div>
 					</div>
 				</div>
@@ -18,18 +18,14 @@
 				<span class="reply-dropdown"><i class="bi bi-three-dots-vertical"></i></span>
 				<div class="reply-menu d-none">
 					<c:choose>
-						<c:when test="${sessionScope.member.userId == vo.userId}">
+						<c:when test="${sessionScope.member.memberIdx == vo.memberIdx}">
 							<div class="deleteReplyAnswer reply-menu-item" data-replyNum="${vo.replyNum}" data-parentNum="${vo.parentNum}">삭제</div>
 							<div class="hideReplyAnswer reply-menu-item" data-replyNum="${vo.replyNum}" data-showReply="${vo.showReply}">${vo.showReply ==1?"비공개":"공개"}</div>						
 						</c:when>
-						<c:when test="${sessionScope.member.userLevel > 50}">
+						<c:when test="${sessionScope.member.role < 0}">
 							<div class="deleteReplyAnswer reply-menu-item" data-replyNum="${vo.replyNum}" data-parentNum="${vo.parentNum}">삭제</div>
-							<div class="blocknotifyReplyAnswer reply-menu-item">차단</div>
+							<div class="blocknotifyReplyAnswer reply-menu-item">숨김</div>
 						</c:when>
-						<c:otherwise>
-							<div class="notifyReplyAnswer reply-menu-item">신고</div>
-							<div class="blockReplyAnswer reply-menu-item">차단</div>
-						</c:otherwise>
 					</c:choose>
 				</div>
 			</div>
