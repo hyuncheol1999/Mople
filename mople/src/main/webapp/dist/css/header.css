@@ -1,0 +1,242 @@
+/*
+use class - header.css
+- .header
+- .container
+- .logo
+- .nav
+- .nav-link
+- .auth-section
+- .btn
+- .btn-small
+- .btn-outline
+- .btn-primary
+- .loader
+*/
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8fafc;
+}
+
+.container {
+  max-width: 2560px;
+  min-width: 720px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+
+.header {
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  top: 0;
+  position: sticky;
+  z-index: 100;
+}
+
+.header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 10px;
+}
+
+
+.main .hero .container {
+  max-width: 2560px;
+  min-width: 320px;
+  margin: 0 auto;
+  padding: 0 30px;
+}
+
+
+.logo img {
+  height: 60px;
+}
+
+.nav {
+  display: flex;
+  gap: 3rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #3b82f6;
+}
+
+.nav-tab {
+  background: none;
+  border: none;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #64748b;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.nav-tab.active,
+.nav-tab:hover {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+.nav-tab {
+    flex: 1;
+    min-width: 120px;
+}
+
+.auth-section {
+  justify-content: flex-end;
+  width: 15%;
+  display: flex;
+  gap: 1rem;
+  margin-right: 7px;
+}
+
+.auth-section a {
+  font-size: 14px;	
+}
+
+.auth-section span {
+  font-size: 14px;	
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background: #fff;
+  color: #020715;
+  border: 1px solid #020715;
+}
+
+.btn-primary:hover {
+  background: #212121;
+  color: #fff;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #020715;
+  border: 1px solid #020715;
+}
+
+.btn-outline:hover {
+  background: #020715;
+  color: white;
+}
+
+.btn-large {
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+}
+
+.btn-small {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* 반응형 디자인: 모바일 환경 (@media (max-width: 768px)) */
+@media (max-width: 768px) {
+
+  .header {
+  top: 0;
+  position: static;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+	
+  /* .header 내부 컨테이너 */
+  .header .container {
+    flex-direction: column; /* 요소들을 세로로 정렬 */
+    align-items: center;    /* 가운데 정렬 */
+    padding: 1rem 15px;     /* 패딩 조정 */
+  }
+
+  /* 로고 */
+  .logo {
+    margin-bottom: 1rem; /* 로고 아래에 여백 추가 */
+  }
+
+  /* 네비게이션 메뉴 */
+  .nav {
+    flex-direction: column; /* 메뉴 항목들을 세로로 정렬 */
+    width: 100%;            /* 전체 너비 차지 */
+    gap: 1rem;              /* 메뉴 항목 간격 조정 */
+    margin-bottom: 1rem;    /* 메뉴 아래에 여백 추가 */
+  }
+
+  .nav-link {
+    padding: 0.2rem 0;      /* 링크 패딩 조정 */
+    text-align: center;     /* 텍스트 가운데 정렬 */
+  }
+
+  .nav-link:last-child {
+    border-bottom: none; /* 마지막 링크에는 구분선 제거 */
+  }
+
+  /* 인증 섹션 (로그인/회원가입) */
+  .auth-section {
+    width: 100%;            /* 전체 너비 차지 */
+    justify-content: center; /* 버튼들을 가운데 정렬 */
+    gap: 2rem;            /* 버튼 간 간격 조정 */
+    margin-right: 0;        /* 기존 margin-right 제거 */
+    padding-top: 1rem;      /* 상단 패딩 추가 */
+    border-top: 1px solid #eee; /* 메뉴와 구분되는 선 추가 */
+    line-height: 10px;
+  }
+
+  .auth-section a{
+    font-size: 13px; /* 폰트 크기 미세 조정 */
+
+  }
+  .auth-section span {
+   	display: none;
+  }
+
+}
+
+/* AJAX loading */
+.loader {
+  border: 17px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 17px solid blue;
+  border-right: 17px solid green;
+  border-bottom: 17px solid red;
+  border-left: 17px solid pink;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
