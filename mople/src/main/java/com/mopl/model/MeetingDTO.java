@@ -9,6 +9,21 @@ public class MeetingDTO {
 	private int regionIdx;
 	private int sportIdx;
 	
+	private String regionName;
+	private String sportName;
+	
+	public String getRegionName() {
+		return regionName;
+	}
+	public void setRegionName(String regionName) {
+		this.regionName = regionName;
+	}
+	public String getSportName() {
+		return sportName;
+	}
+	public void setSportName(String sportName) {
+		this.sportName = sportName;
+	}
 	private int photoNum;
 	private String imageFileName;
 	private String content;

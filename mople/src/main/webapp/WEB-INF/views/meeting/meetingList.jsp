@@ -26,7 +26,7 @@
 					<div class="meetings-content">
 						<div>
 							<h1>모임</h1>
-							<button class="btn btn-primary">Create New Meeting</button>
+							<button class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingCreate'">Create New Meeting</button>
 						</div>
 
 						<div class="meetings-grid" id="meetingsGrid">
