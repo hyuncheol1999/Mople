@@ -18,7 +18,7 @@
 
     <main class="main">
         <div class="container">
-            <div class="meeting-detail">
+            <div class="meeting-detail" data-contextPath="${pageContext.request.contextPath}">
                 <div class="meeting-header">
                     <div class="meeting-info">
                         <img src="${pageContext.request.contextPath}/dist/images/test1.png" alt="Group Profile" class="group-avatar">
@@ -31,14 +31,16 @@
                             </div>
                         </div>
                     </div>
+					
                     <button class="btn btn-primary">Join Meeting</button>
+
                 </div>
 
                 <nav class="meeting-nav">
 				  <button class="nav-tab" onclick="showTabAjax('meetingHome')">홈</button>
-				  <button class="nav-tab" onclick="showTabAjax('meetingBbs')">모임&nbsp;게시판</button>
 				  <button class="nav-tab" onclick="showTabAjax('meetingSchedule')">정모&nbsp;일정</button>
 				  <button class="nav-tab" onclick="showTabAjax('meetingAlbum')">사진첩</button>
+				  <button class="nav-tab" onclick="location.href='${pageContext.request.contextPath}/main'">모임&nbsp;게시판</button>
 				</nav>
 
                 <div class="meeting-content"></div>
@@ -49,7 +51,6 @@
         <jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
     </footer>
     <jsp:include page="/WEB-INF/views/layout/footerResources.jsp" />
-     <script>const contextPath = "${pageContext.request.contextPath}";</script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/dist/js/meeting-detail.js"></script>
 </body>
 </html>

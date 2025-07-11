@@ -37,6 +37,7 @@ function sendAjaxRequest(url, method, params, responseType, fn, file = false) {
 }
 
 function showTabAjax(tabName) {
+	const contextPath = document.querySelector('div.meeting-detail').getAttribute('data-contextPath');
     const url = `${contextPath}/meeting/${tabName}`;
     sendAjaxRequest(url,'GET',null,'html', function(data) {
             const meetingContentArea = document.querySelector(".meeting-content");
