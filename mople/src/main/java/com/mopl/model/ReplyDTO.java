@@ -10,7 +10,7 @@ public class ReplyDTO {
 	private int replyLike;
 	private int showReply;
 	private String profile_photo;
-	
+	private long memberIdx;
 	private int answerCount;
 	private int likeCount;
 	private int disLikeCount;
@@ -33,6 +33,12 @@ public class ReplyDTO {
 	}
 	public void setUserNickName(String userNickName) {
 		this.userNickName = userNickName;
+	}
+	public long getMemberIdx() {
+		return memberIdx;
+	}
+	public void setMemberIdx(long memberIdx) {
+		this.memberIdx = memberIdx;
 	}
 	public String getContent() {
 		return content;

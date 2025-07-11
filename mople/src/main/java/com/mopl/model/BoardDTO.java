@@ -2,6 +2,7 @@ package com.mopl.model;
 
 public class BoardDTO {
 	private long num;
+	private long memberIdx;
 	private String userNickName;
 	private String subject;
 	private String content;
@@ -16,12 +17,19 @@ public class BoardDTO {
 	public void setNum(long num) {
 		this.num = num;
 	}
+	public long getMemberIdx() {
+		return memberIdx;
+	}
+	public void setMemberIdx(long memberIdx) {
+		this.memberIdx = memberIdx;
+	}
 	public String getUserNickName() {
 		return userNickName;
 	}
 	public void setUserNickName(String userNickName) {
 		this.userNickName = userNickName;
 	}
+	
 	public String getSubject() {
 		return subject;
 	}
