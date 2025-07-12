@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
-<div class="container">
+<div class="footerContainer">
 	<p>&copy; 2025 Mople. All rights reserved.</p>
 </div>
 

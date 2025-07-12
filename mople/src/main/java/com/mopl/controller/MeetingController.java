@@ -1,6 +1,8 @@
 package com.mopl.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,11 +17,15 @@ import com.mopl.mvc.annotation.RequestMapping;
 import com.mopl.mvc.annotation.RequestMethod;
 import com.mopl.mvc.annotation.ResponseBody;
 import com.mopl.mvc.view.ModelAndView;
+import com.mopl.util.FileManager;
+import com.mopl.util.MyMultipartFile;
+import com.mopl.util.MyUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 @Controller
 public class MeetingController {
@@ -27,6 +33,67 @@ public class MeetingController {
 	@RequestMapping(value = "/meeting/meetingList", method = RequestMethod.GET)
 	public ModelAndView meetingList(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("meeting/meetingList");
+		
+		MeetingDAO dao = new MeetingDAO();
+		MyUtil util = new MyUtil();
+		
+		try {
+			String page = req.getParameter("page");
+			int current_page = 1;
+			
+			// 처음 접속
+			if(page != null) {
+				current_page = Integer.parseInt(page);
+			}
+			
+			int sportCategory = Integer.parseInt(req.getParameter("sportCategory"));
+			int regionCategory = Integer.parseInt(req.getParameter("regionCategory"));
+			String sortBy = req.getParameter("sortBy");
+			
+			int dataCount;
+			if(sportCategory == 0 && regionCategory == 0) {
+				dataCount = dao.dataCount();
+			} else {
+				dataCount = dao.dataCount(sportCategory, regionCategory);
+			}
+			
+			int size = 18;
+			int total_page = util.pageCount(dataCount, size);
+			
+			if(current_page > total_page) {
+				current_page = total_page;
+			}
+			
+			int offset = (current_page - 1) * size;
+			if(offset < 0) offset = 0;
+			
+			List<MeetingDTO> list = dao.findAllMeetings(offset, size, sportCategory, regionCategory, sortBy);
+			
+			String query = "sportCategory=" + sportCategory + "&regionCategory=" + regionCategory + "&sortBy=" + sortBy;
+			
+			String cp = req.getContextPath();
+			
+			String listUrl = cp + "/meeting/meetingList?" + query;
+			String articleUrl = cp + "/meeting/meetingDetail?page=" + current_page + "&" + query;
+			
+			String paging = util.paging(current_page, total_page, listUrl);
+			
+			mav.addObject("list", list);
+			mav.addObject("dataCount", dataCount);
+			mav.addObject("size", size);
+			mav.addObject("page", current_page);
+			mav.addObject("total_page", total_page);
+			mav.addObject("articleUrl", articleUrl);
+			
+			mav.addObject("paging", paging);
+			
+			mav.addObject("sportCategory", sportCategory);
+			mav.addObject("regionCategory", regionCategory);
+			mav.addObject("sortBy", sortBy);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return mav;
 	}	
@@ -42,7 +109,12 @@ public class MeetingController {
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
 
+		// meetingIdx 파라미터가 없을 경우
 		String param = req.getParameter("meetingIdx");
+		if (param == null) {
+			return new ModelAndView("meeting/deletedMeeting");
+		}
+		
 		if (param != null && !param.isEmpty()) {
 			Long meetingIdx = Long.parseLong(param);
 			mav.addObject("meetingIdx", meetingIdx);
@@ -70,6 +142,8 @@ public class MeetingController {
 	public ModelAndView meetingHome(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("meeting/meetingHome");
 		
+		
+		
 		return mav;
 	}	
 
@@ -83,10 +157,6 @@ public class MeetingController {
 
 			try {
 				String meetingIdxParam = req.getParameter("meetingIdx");
-				if (meetingIdxParam == null || meetingIdxParam.trim().isEmpty()) {
-					System.out.println("meetingIdx 파라미터 없음");
-					return new ModelAndView("redirect:/");
-				}
 
 				Long meetingIdx = Long.parseLong(meetingIdxParam);
 				Long memberIdx = (info != null) ? info.getMemberIdx() : 0;
@@ -188,22 +258,32 @@ public class MeetingController {
 	@RequestMapping(value = "/meeting/meetingCreate", method = RequestMethod.POST)
 	public ModelAndView meetingCreateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		MeetingDAO dao = new MeetingDAO();
+		FileManager fileManager = new FileManager();
 		
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		
+		String root = session.getServletContext().getRealPath("/");
+		String pathname = root + "uploads" + File.separator + "meetingProfilePhoto";
 		
 		try {
 			MeetingDTO dto = new MeetingDTO();
 			dto.setMeetingName(req.getParameter("meetingName"));
 			dto.setMeetingDesc(req.getParameter("meetingDesc"));
-			dto.setMeetingProfilePhoto(req.getParameter("meetingProfilePhoto"));
-			dto.setRegionIdx(Integer.parseInt(req.getParameter("regionIdx")));
-			dto.setSportIdx(Integer.parseInt(req.getParameter("sportIdx")));
+			dto.setSportIdx(Integer.parseInt(req.getParameter("sportCategoryNo")));
+			dto.setRegionIdx(Integer.parseInt(req.getParameter("regionCategoryNo")));
 			
 			dto.setMemberIdx(info.getMemberIdx());
 			dto.setRole(0);
 			
-			dao.insertMeeting(dto);
+			Part p = req.getPart("meetingProfilePhoto");
+			MyMultipartFile multiFile = fileManager.doFileUpload(p, pathname);
+			
+			if(multiFile != null) {
+				dto.setMeetingProfilePhoto(multiFile.getSaveFilename());
+			}
+			
+			dao.insertMeeting(dto);			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -211,6 +291,11 @@ public class MeetingController {
 		return new ModelAndView("redirect:/meeting/meetingList");
 	}	
 	
+	@RequestMapping(value = "/meeting/deletedMeeting", method = RequestMethod.GET)
+	public ModelAndView deletedMeeting(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		return new ModelAndView("redirect:/meeting/deletedMeeting");
+	}
 	
+
 
 }

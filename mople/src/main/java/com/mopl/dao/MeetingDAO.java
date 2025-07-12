@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mopl.model.MeetingDTO;
-import com.mopl.model.MemberDTO;
 import com.mopl.util.DBConn;
 import com.mopl.util.DBUtil;
 
@@ -95,8 +94,6 @@ public class MeetingDAO {
 		try {
 			sb.append("SELECT COUNT(*) FROM meeting ");
 			 
-			pstmt = conn.prepareStatement(sb.toString());
-			
 			if(sportCategory != 0 && regionCategory != 0) {
 				sb.append("WHERE sportCategory = ? AND regionCategory = ?");	
 			} else if(sportCategory == 0) {
@@ -104,6 +101,8 @@ public class MeetingDAO {
 			} else if(regionCategory == 0) {
 				sb.append("WHERE sportCategory = ?");				
 			}
+			
+			pstmt = conn.prepareStatement(sb.toString());
 			
 			if(sportCategory != 0 && regionCategory != 0) {
 				pstmt.setInt(1, sportCategory);
@@ -130,8 +129,95 @@ public class MeetingDAO {
 		return result;
 	}
 	
-	// 유저가 참여한 미팅 리스트
-	public List<MeetingDTO> findByUserIdx(long memberIdx) {
+	// 전체 모임 리스트
+	public List<MeetingDTO> findAllMeetings(int offset, int size, int sportCategory, int regionCategory, String sortBy) {
+		List<MeetingDTO> list = new ArrayList<MeetingDTO>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append("SELECT m1.meetingIdx, meetingName, meetingDesc, TO_CHAR(createdDate, 'YYYY-MM-DD') createdDate,");
+			sb.append("  meetingProfilePhoto, regionName, sportName, COUNT(m2.memberIdx) currentMembers ");			
+			sb.append("FROM meeting m1 ");
+			sb.append("LEFT OUTER JOIN memberOfMeeting m2 ON m1.meetingIdx = m2.meetingIdx ");
+			sb.append("LEFT OUTER JOIN sportCategory sc ON m1.sportIdx = sc.sportIdx ");
+			sb.append("LEFT OUTER JOIN regionCategory rc ON m1.regionIdx = rc.regionIdx ");
+			if(sportCategory != 0 && regionCategory != 0) {
+				sb.append("WHERE sportIdx = ? AND regionIdx = ? ");	
+			} else if(sportCategory == 0 && regionCategory == 0) {
+				
+			} else if(sportCategory == 0) {
+				sb.append("WHERE m1.regionIdx = ? ");
+			} else if(regionCategory == 0) {
+				sb.append("WHERE m1.sportIdx = ? ");				
+			}
+			
+			sb.append("GROUP BY m1.meetingIdx, m1.meetingName, m1.meetingDesc, m1.createdDate,");
+	        sb.append("  m1.meetingProfilePhoto, rc.regionName, sc.sportName ");
+	        
+	        // 정렬 기준
+	        if(sortBy == null) {
+	        	sb.append("ORDER BY m1.createdDate DESC ");
+	        } else if(sortBy.equals("popular")) {
+	        	// 인원수 기준
+	        	sb.append("ORDER BY currentMembers DESC "); 
+	        } else {
+	        	sb.append("ORDER BY m1.createdDate DESC ");	        	
+	        }
+	        
+			sb.append("OFFSET ? ROWS FETCH FIRST ? ROWS ONLY");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			if(sportCategory != 0 && regionCategory != 0) {
+				pstmt.setInt(1, sportCategory);
+				pstmt.setInt(2, regionCategory);
+				pstmt.setInt(3, offset);
+				pstmt.setInt(4, size);
+			} else if(sportCategory == 0 && regionCategory == 0) {
+				pstmt.setInt(1, offset);
+				pstmt.setInt(2, size);
+			} else if(sportCategory == 0) {
+				pstmt.setInt(1, regionCategory);
+				pstmt.setInt(2, offset);
+				pstmt.setInt(3, size);				
+			} else if(regionCategory == 0) {
+				pstmt.setInt(1, sportCategory);			
+				pstmt.setInt(2, offset);
+				pstmt.setInt(3, size);
+			}
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				MeetingDTO dto = new MeetingDTO();
+				dto.setMeetingIdx(rs.getLong("meetingIdx"));
+				dto.setMeetingName(rs.getString("meetingName"));
+				dto.setMeetingDesc(rs.getString("meetingDesc"));
+				dto.setCreatedDate(rs.getString("createdDate"));
+				dto.setMeetingProfilePhoto(rs.getString("meetingProfilePhoto"));
+				dto.setRegionName(rs.getString("regionName"));
+				dto.setSportName(rs.getString("sportName"));
+				dto.setCurrentMembers(rs.getInt("currentMembers"));
+				
+				list.add(dto);
+			}
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return list;
+		
+	}
+	
+	
+	// 유저가 참여한 모임 리스트
+	public List<MeetingDTO> findByMemberIdx(long memberIdx) {
 		List<MeetingDTO> list = new ArrayList<MeetingDTO>();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -139,11 +225,11 @@ public class MeetingDAO {
 		
 		try {
 			sb.append("SELECT m1.meetingIdx, meetingName, meetingDesc, createdDate, meetingProfilePhoto,");
-			sb.append("  regionName, sportName");			
-			sb.append("FROM meeting m1");
-			sb.append("LEFT OUTER JOIN memberOfMeeting m2 ON m1.meetingIdx = m2.meetingIdx");
-			sb.append("LEFT OUTER JOIN sportCategory sc ON m1.sportIdx = sc.sportIdx");
-			sb.append("LEFT OUTER JOIN regionCategory rc ON m1.regionIdx = rc.regionIdx");
+			sb.append("  regionName, sportName ");			
+			sb.append("FROM meeting m1 ");
+			sb.append("LEFT OUTER JOIN memberOfMeeting m2 ON m1.meetingIdx = m2.meetingIdx ");
+			sb.append("LEFT OUTER JOIN sportCategory sc ON m1.sportIdx = sc.sportIdx ");
+			sb.append("LEFT OUTER JOIN regionCategory rc ON m1.regionIdx = rc.regionIdx ");
 			sb.append("WHERE memberIdx = ?");
 			pstmt = conn.prepareStatement(sb.toString());
 			
@@ -153,11 +239,16 @@ public class MeetingDAO {
 			
 			while(rs.next()) {
 				MeetingDTO dto = new MeetingDTO();
+
 				dto.setMeetingIdx(rs.getLong("meetingIdx"));
+				dto.setMeetingName(rs.getString("meetingName"));
+				dto.setMeetingDesc(rs.getString("meetingDesc"));
+				dto.setCreatedDate(rs.getString("createdDate"));
+				dto.setMeetingProfilePhoto(rs.getString("meetingProfilePhoto"));
 				dto.setRegionName(rs.getString("regionName"));
 				dto.setSportName(rs.getString("sportName"));
 				
-				// 작성중
+				list.add(dto);
 			}
 			
 		} catch (SQLException e) {

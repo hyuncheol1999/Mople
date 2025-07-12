@@ -1,0 +1,58 @@
+/* 삭제된 페이지 CSS */
+
+html, body {
+	height: 100%; /* html과 body의 높이를 viewport 전체로 설정 */
+	margin: 0;
+	padding: 0;
+}
+	
+.wrap { /* 전체 페이지를 감싸는 최상위 컨테이너 */
+    min-height: 100vh; /* viewport 높이만큼 최소 높이 설정 */
+    display: flex;
+    flex-direction: column;
+}
+
+.deleted-meeting-container {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: 80px auto 50px auto;
+}
+
+.deleted-meeting-container h3 {
+    color: #dc3545;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    font-weight: 700;
+}
+
+.deleted-meeting-container p {
+    color: #6c757d;
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.deleted-meeting-container .button-group {
+    display: flex;
+    justify-content: center; /* 버튼을 중앙으로 정렬 */
+    gap: 15px; /* 버튼 사이 간격 */
+}
+
+
+@media (max-width: 768px) {
+    .deleted-meeting-container {
+        padding: 30px 15px;
+        margin: 40px auto;
+    }
+    .deleted-meeting-container h2 {
+        font-size: 1.8em;
+    }
+    .deleted-meeting-container p {
+        font-size: 1em;
+    }
+
+}

@@ -8,9 +8,12 @@ public class MeetingDTO {
 	private String meetingProfilePhoto;
 	private int regionIdx;
 	private int sportIdx;
+	private String sortBy;
 	
 	private String regionName;
 	private String sportName;
+	
+	private int currentMembers;
 	
 	public String getRegionName() {
 		return regionName;
@@ -101,5 +104,17 @@ public class MeetingDTO {
 	}
 	public void setRole(int role) {
 		this.role = role;
+	}
+	public int getCurrentMembers() {
+		return currentMembers;
+	}
+	public void setCurrentMembers(int currentMembers) {
+		this.currentMembers = currentMembers;
+	}
+	public String getSortBy() {
+		return sortBy;
+	}
+	public void setSortBy(String sortBy) {
+		this.sortBy = sortBy;
 	}
 }

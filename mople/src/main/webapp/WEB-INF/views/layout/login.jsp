@@ -27,11 +27,8 @@
 								autocomplete="off" placeholder="패스워드">
 						</div>
 						<div>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox"
-									id="rememberMeModal"> <label class="form-check-label"
-									for="rememberMeModal"> 아이디 저장</label>
-							</div>
+							<input type="checkbox" id="rememberMeModal"> <label
+								class="form-check-label" for="rememberMeModal"> 아이디 저장</label>
 						</div>
 						<div>
 							<button type="button" class="btn btn-primary w-100"
@@ -60,35 +57,34 @@
 
 <!-- Login Modal -->
 <script type="text/javascript">
-
 	function dialogLogin() {
 		$('form[name=modalLoginForm] input[name=userId]').val('');
 		$('form[name=modalLoginForm] input[name=userPwd]').val('');
-	    
-		const loginModalElement = document.getElementById('loginModal');
-	    const loginModal = new bootstrap.Modal(loginModalElement);
-	    loginModal.show();
 
-	    $('form[name=modalLoginForm] input[name=userId]').focus();
+		const loginModalElement = document.getElementById('loginModal');
+		const loginModal = new bootstrap.Modal(loginModalElement);
+		loginModal.show();
+
+		$('form[name=modalLoginForm] input[name=userId]').focus();
 	}
-	
+
 	function sendModalLogin() {
-	    const f = document.modalLoginForm;
+		const f = document.modalLoginForm;
 		let str;
-		
+
 		str = f.userId.value;
-	    if(!str) {
-	        f.userId.focus();
-	        return;
-	    }
-	
-	    str = f.userPwd.value;
-	    if(!str) {
-	        f.userPwd.focus();
-	        return;
-	    }
-	
-	    f.action = '${pageContext.request.contextPath}/member/login';
-	    f.submit();
+		if (!str) {
+			f.userId.focus();
+			return;
+		}
+
+		str = f.userPwd.value;
+		if (!str) {
+			f.userPwd.focus();
+			return;
+		}
+
+		f.action = '${pageContext.request.contextPath}/member/login';
+		f.submit();
 	}
 </script>

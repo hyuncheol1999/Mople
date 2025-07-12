@@ -1,0 +1,209 @@
+/* General Form Styling */
+.meetingContainer {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    font-family: 'Pretendard', sans-serif; /* 더 현대적인 폰트 사용 */
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 35px;
+    font-size: 2em;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Form Group Styling */
+.form-group {
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    color: #555;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+/* Input and Textarea Styling */
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1.05em;
+    color: #333;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+input[type="text"]::placeholder,
+textarea::placeholder {
+    color: #a0a0a0;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    border-color: #f08979; /* 모던한 보라색 강조 */
+    box-shadow: 0 0 0 3px rgba(240, 137, 121, 0.2);
+    outline: none;
+}
+
+textarea {
+    resize: none; /* 세로 크기 조절만 가능 */
+    min-height: 200px;
+    line-height: 1.6;
+}
+
+/* File Input Custom Styling */
+
+/* 기본 input file 숨기기 */
+input[type="file"] {
+    display: none; 
+}
+
+.form-group input[type="file"] + .file-name-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 12px 18px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #777;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="file"] + .file-name-display::after {
+    content: '파일 선택'; /* pseudo element - 버튼 텍스트 추가 */
+    background-color: #fff;
+    border: 1px solid #f08979;
+    color: #f08979;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.form-group input[type="file"] + .file-name-display:hover::after {
+    background-color: #f08979;
+    color: white;
+}
+
+/* Category Select Wrapper (Flexbox for Input & List) */
+.category-select-wrapper {
+    position: relative;
+    display: flex; /* input과 리스트를 나란히 배치 */
+    flex-direction: column; /* 세로로 쌓이도록 */
+    gap: 10px; /* input과 리스트 사이 간격 */
+}
+
+.category-search-input {
+    flex-grow: 1; /* 인풋창이 남은 공간을 차지하도록 */
+    /* 위 input[type="text"] 스타일이 적용됨 */
+}
+
+/* Category List Styling (Scrollable) */
+.category-list {
+    max-height: 200px; /* 스크롤을 위한 최대 높이 */
+    overflow-y: auto; /* 내용이 넘치면 스크롤바 생성 */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+    z-index: 10; /* 다른 요소 위에 표시 */
+    display: none; /* 기본적으로 숨김 */
+}
+
+.category-list.active {
+    display: block; /* 검색창 클릭 시 보이도록 */
+}
+
+.category-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-list li {
+    padding: 12px 18px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f0f0f0; /* 각 항목 구분선 */
+    color: #444;
+}
+
+.category-list li:last-child {
+    border-bottom: none; /* 마지막 항목은 구분선 없음 */
+}
+
+.category-list li:hover {
+    background-color: #f5f0ff; /* 호버 시 배경색 변경 */
+    color: #f08979;
+}
+
+.category-list li.selected {
+    background-color: #e0d0ff; /* 선택된 항목 강조 */
+    color: #f08979;
+    font-weight: 600;
+}
+
+/* Selected Category Display */
+.selected-category {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    color: #555;
+    font-size: 0.95em;
+    display: none; /* 선택 전에는 숨김 */
+}
+
+.selected-category.active {
+    display: block;
+}
+
+/* Error Message Styling */
+.error-message {
+    color: #ff5555;
+    font-size: 0.85em;
+    margin-top: 5px;
+    display: none; /* 기본적으로 숨김 */
+}
+
+.error-message.active {
+    display: block;
+}
+
+/* Button Group Styling */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 40px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        font-size: 1em;
+    }
+}
