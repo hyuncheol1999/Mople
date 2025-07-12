@@ -16,7 +16,23 @@ public class RegularMeetingDTO {
 	private Long meetingIdx;
 	private Long memberIdx;
 	
+	private int currentCnt;
+    private boolean joined;
+
 	
+	
+	public int getCurrentCnt() {
+		return currentCnt;
+	}
+	public void setCurrentCnt(int currentCnt) {
+		this.currentCnt = currentCnt;
+	}
+	public boolean isJoined() {
+		return joined;
+	}
+	public void setJoined(boolean joined) {
+		this.joined = joined;
+	}
 	public Long getRegularMeetingIdx() {
 		return regularMeetingIdx;
 	}

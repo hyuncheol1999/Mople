@@ -31,7 +31,7 @@
 
 						<div class="meetings-grid" id="meetingsGrid">
 							<div class="meeting-card"
-								onclick="location.href='${pageContext.request.contextPath}/meeting/meetingDetail'">
+								onclick="location.href='${pageContext.request.contextPath}/meeting/meetingDetail?meetingIdx=1'">
 								<div class="meeting-card-header">
 									<img
 										src="${pageContext.request.contextPath}/dist/images/test1.png"
