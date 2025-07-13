@@ -29,19 +29,30 @@
 					<div class="meeting-header">
 						<div class="meeting-info">
 							<img
-								src="${pageContext.request.contextPath}/dist/images/test1.png"
-								alt="Group Profile" class="group-avatar">
+								src=
+								<c:choose>					
+									<c:when test="${not empty meetingProfilePhoto}">						
+										'${pageContext.request.contextPath}/uploads/meetingProfilePhoto/${meetingProfilePhoto}'
+									</c:when>
+									<c:otherwise>
+										'${pageContext.request.contextPath}/dist/images/defaultMeetingProfilePhoto.png'	
+									</c:otherwise>
+								</c:choose>
+								 alt="Group Profile" class="group-avatar">
 							<div class="meeting-meta">
-								<h2 class="meetingTitle" id="meetingTitle">힐링런</h2>
+								<h2 class="meetingTitle" id="meetingTitle">${meetingName}</h2>
 								<div class="meeting-tags">
-									<span class="tag" id="sportTag">농구</span> <span class="tag"
-										id="regionTag">서울시 강서구</span> <span class="tag"
-										id="membersTag">인원수 12/20</span>
+									<span class="tag" id="sportTag">${sportName}</span> <span class="tag"
+										id="regionTag">${regionName}</span> <span class="tag"
+										id="membersTag">인원수 ${currentMembers}명</span>
 								</div>
 							</div>
 						</div>
-
-						<button class="btn btn-primary">Join Meeting</button>
+						<c:forEach var="dto" items="${memberOfMeetingList}" varStatus="status">
+							<c:if test="${sessionScope.member.memberIdx!=dto.memberIdx}">
+								<button class="btn btn-primary">Join Meeting</button>
+							</c:if>
+						</c:forEach>
 					</div>
 
 					<nav class="meeting-nav">

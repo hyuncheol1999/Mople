@@ -86,7 +86,7 @@ public class MeetingDAO {
 
 	// 검색에서의 데이터 개수
 	// 검색 조건 : 스포츠 카테고리, 지역별 카테고리
-	public int dataCount(int sportCategory, int regionCategory) {
+	public int dataCount(int sportIdx, int regionIdx) {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -94,24 +94,24 @@ public class MeetingDAO {
 		try {
 			sb.append("SELECT COUNT(*) FROM meeting ");
 			 
-			if(sportCategory != 0 && regionCategory != 0) {
-				sb.append("WHERE sportCategory = ? AND regionCategory = ?");	
-			} else if(sportCategory == 0) {
-				sb.append("WHERE regionCategory = ?");
-			} else if(regionCategory == 0) {
-				sb.append("WHERE sportCategory = ?");				
+			if(sportIdx != 0 && regionIdx != 0) {
+				sb.append("WHERE sportIdx = ? AND regionIdx = ?");	
+			} else if(sportIdx == 0) {
+				sb.append("WHERE regionIdx = ?");
+			} else if(regionIdx == 0) {
+				sb.append("WHERE sportIdx = ?");				
 			}
 			
 			pstmt = conn.prepareStatement(sb.toString());
 			
-			if(sportCategory != 0 && regionCategory != 0) {
-				pstmt.setInt(1, sportCategory);
-				pstmt.setInt(2, regionCategory);
-			} else if(sportCategory == 0) {
-				pstmt.setInt(1, regionCategory);
+			if(sportIdx != 0 && regionIdx != 0) {
+				pstmt.setInt(1, sportIdx);
+				pstmt.setInt(2, regionIdx);
+			} else if(sportIdx == 0) {
+				pstmt.setInt(1, regionIdx);
 				
-			} else if(regionCategory == 0) {
-				pstmt.setInt(1, sportCategory);			
+			} else if(regionIdx == 0) {
+				pstmt.setInt(1, sportIdx);			
 			}
 			
 			rs = pstmt.executeQuery();
@@ -137,16 +137,16 @@ public class MeetingDAO {
 		StringBuilder sb = new StringBuilder();
 		
 		try {
-			sb.append("SELECT m1.meetingIdx, meetingName, meetingDesc, TO_CHAR(createdDate, 'YYYY-MM-DD') createdDate,");
-			sb.append("  meetingProfilePhoto, regionName, sportName, COUNT(m2.memberIdx) currentMembers ");			
+			sb.append("SELECT m1.meetingIdx, m1.meetingName, m1.meetingDesc, TO_CHAR(m1.createdDate, 'YYYY-MM-DD') createdDate,");
+			sb.append("  m1.meetingProfilePhoto, regionName, sportName, COUNT(m2.memberIdx) currentMembers ");			
 			sb.append("FROM meeting m1 ");
 			sb.append("LEFT OUTER JOIN memberOfMeeting m2 ON m1.meetingIdx = m2.meetingIdx ");
 			sb.append("LEFT OUTER JOIN sportCategory sc ON m1.sportIdx = sc.sportIdx ");
 			sb.append("LEFT OUTER JOIN regionCategory rc ON m1.regionIdx = rc.regionIdx ");
 			if(sportCategory != 0 && regionCategory != 0) {
-				sb.append("WHERE sportIdx = ? AND regionIdx = ? ");	
+				sb.append("WHERE m1.sportIdx = ? AND m1.regionIdx = ? ");	
 			} else if(sportCategory == 0 && regionCategory == 0) {
-				
+				// 전체 선택 시 조건 X
 			} else if(sportCategory == 0) {
 				sb.append("WHERE m1.regionIdx = ? ");
 			} else if(regionCategory == 0) {
@@ -225,12 +225,14 @@ public class MeetingDAO {
 		
 		try {
 			sb.append("SELECT m1.meetingIdx, meetingName, meetingDesc, createdDate, meetingProfilePhoto,");
-			sb.append("  regionName, sportName ");			
+			sb.append("  regionName, sportName, COUNT(m2.memberIdx) currentMembers ");			
 			sb.append("FROM meeting m1 ");
 			sb.append("LEFT OUTER JOIN memberOfMeeting m2 ON m1.meetingIdx = m2.meetingIdx ");
 			sb.append("LEFT OUTER JOIN sportCategory sc ON m1.sportIdx = sc.sportIdx ");
 			sb.append("LEFT OUTER JOIN regionCategory rc ON m1.regionIdx = rc.regionIdx ");
 			sb.append("WHERE memberIdx = ?");
+			sb.append("GROUP BY m1.meetingIdx, m1.meetingName, m1.meetingDesc, m1.createdDate,");
+	        sb.append("  m1.meetingProfilePhoto, rc.regionName, sc.sportName ");
 			pstmt = conn.prepareStatement(sb.toString());
 			
 			pstmt.setLong(1, memberIdx);
@@ -247,6 +249,7 @@ public class MeetingDAO {
 				dto.setMeetingProfilePhoto(rs.getString("meetingProfilePhoto"));
 				dto.setRegionName(rs.getString("regionName"));
 				dto.setSportName(rs.getString("sportName"));
+				dto.setCurrentMembers(rs.getInt("currentMembers"));
 				
 				list.add(dto);
 			}
@@ -257,4 +260,46 @@ public class MeetingDAO {
 		
 		return list;
 	}
+	
+	// 모임 정보
+	public MeetingDTO findByMeeetingIdx(long memberIdx) {
+		MeetingDTO dto = new MeetingDTO();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append("SELECT m1.meetingIdx, meetingName, meetingDesc, createdDate, meetingProfilePhoto,");
+			sb.append("  regionName, sportName, COUNT(m2.memberIdx) currentMembers ");			
+			sb.append("FROM meeting m1 ");
+			sb.append("LEFT OUTER JOIN memberOfMeeting m2 ON m1.meetingIdx = m2.meetingIdx ");
+			sb.append("LEFT OUTER JOIN sportCategory sc ON m1.sportIdx = sc.sportIdx ");
+			sb.append("LEFT OUTER JOIN regionCategory rc ON m1.regionIdx = rc.regionIdx ");
+			sb.append("WHERE m1.meetingIdx = ?");
+			sb.append("GROUP BY m1.meetingIdx, m1.meetingName, m1.meetingDesc, m1.createdDate,");
+	        sb.append("  m1.meetingProfilePhoto, rc.regionName, sc.sportName ");
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setLong(1, memberIdx);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				dto.setMeetingIdx(rs.getLong("meetingIdx"));
+				dto.setMeetingName(rs.getString("meetingName"));
+				dto.setMeetingDesc(rs.getString("meetingDesc"));
+				dto.setCreatedDate(rs.getString("createdDate"));
+				dto.setMeetingProfilePhoto(rs.getString("meetingProfilePhoto"));
+				dto.setRegionName(rs.getString("regionName"));
+				dto.setSportName(rs.getString("sportName"));
+				dto.setCurrentMembers(rs.getInt("currentMembers"));
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return dto;
+	}
+	
 }

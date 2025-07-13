@@ -8,10 +8,16 @@ import java.util.List;
 import java.util.Map;
 
 import com.mopl.dao.MeetingDAO;
+import com.mopl.dao.MemberOfMeetingDAO;
+import com.mopl.dao.RegionCategoryDAO;
 import com.mopl.dao.RegularMeetingDAO;
+import com.mopl.dao.SportCategoryDAO;
 import com.mopl.model.MeetingDTO;
+import com.mopl.model.MemberOfMeetingDTO;
+import com.mopl.model.RegionCategoryDTO;
 import com.mopl.model.RegularMeetingDTO;
 import com.mopl.model.SessionInfo;
+import com.mopl.model.SportCategoryDTO;
 import com.mopl.mvc.annotation.Controller;
 import com.mopl.mvc.annotation.RequestMapping;
 import com.mopl.mvc.annotation.RequestMethod;
@@ -33,6 +39,82 @@ public class MeetingController {
 	@RequestMapping(value = "/meeting/meetingList", method = RequestMethod.GET)
 	public ModelAndView meetingList(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("meeting/meetingList");
+		
+		MeetingDAO dao = new MeetingDAO();
+		SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
+		RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
+		MyUtil util = new MyUtil();
+		
+		try {
+			String page = req.getParameter("page");
+			int current_page = 1;
+			
+			// 처음 접속
+			if(page != null) {
+				current_page = Integer.parseInt(page);
+			}
+			
+			int sportCategory = Integer.parseInt(req.getParameter("sportCategory"));
+			int regionCategory = Integer.parseInt(req.getParameter("regionCategory"));
+			String sortBy = req.getParameter("sortBy");
+			
+			int dataCount;
+			if(sportCategory == 0 && regionCategory == 0) {
+				dataCount = dao.dataCount();
+			} else {
+				dataCount = dao.dataCount(sportCategory, regionCategory);
+			}
+			
+			int size = 18;
+			int total_page = util.pageCount(dataCount, size);
+			
+			if(current_page > total_page) {
+				current_page = total_page;
+			}
+			
+			int offset = (current_page - 1) * size;
+			if(offset < 0) offset = 0;
+			
+			List<MeetingDTO> list = dao.findAllMeetings(offset, size, sportCategory, regionCategory, sortBy);
+			
+			List<SportCategoryDTO> sportCategoryList = sportCategoryDao.findAllSportCategory();
+			List<RegionCategoryDTO> regionCategoryList = regionCategoryDao.findAllRegionCategory();
+			
+			String query = "sportCategory=" + sportCategory + "&regionCategory=" + regionCategory + "&sortBy=" + sortBy;
+			
+			String cp = req.getContextPath();
+			
+			String listUrl = cp + "/meeting/meetingList?" + query;
+			String articleUrl = cp + "/meeting/meetingDetail?page=" + current_page + "&" + query;
+			
+			String paging = util.paging(current_page, total_page, listUrl);
+			
+			mav.addObject("list", list);
+			mav.addObject("sportCategoryList", sportCategoryList);
+			mav.addObject("regionCategoryList", regionCategoryList);
+			mav.addObject("dataCount", dataCount);
+			mav.addObject("size", size);
+			mav.addObject("page", current_page);
+			mav.addObject("total_page", total_page);
+			mav.addObject("articleUrl", articleUrl);
+			
+			mav.addObject("paging", paging);
+			
+			mav.addObject("sportCategory", sportCategory);
+			mav.addObject("regionCategory", regionCategory);
+			mav.addObject("sortBy", sortBy);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return mav;
+	}	
+	
+	// 모임 리스트 - AJAX:TEXT
+	@RequestMapping(value = "/meeting/meetingLayout", method = RequestMethod.GET)
+	public ModelAndView meetingLayout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		ModelAndView mav = new ModelAndView("meeting/meetingLayout");
 		
 		MeetingDAO dao = new MeetingDAO();
 		MyUtil util = new MyUtil();
@@ -69,14 +151,18 @@ public class MeetingController {
 			
 			List<MeetingDTO> list = dao.findAllMeetings(offset, size, sportCategory, regionCategory, sortBy);
 			
+			for(MeetingDTO dto : list) {
+				dto.setMeetingName(util.htmlSymbols(dto.getMeetingName()));
+				dto.setContent(util.htmlSymbols(dto.getContent()));
+			}
+			
 			String query = "sportCategory=" + sportCategory + "&regionCategory=" + regionCategory + "&sortBy=" + sortBy;
 			
 			String cp = req.getContextPath();
 			
-			String listUrl = cp + "/meeting/meetingList?" + query;
 			String articleUrl = cp + "/meeting/meetingDetail?page=" + current_page + "&" + query;
 			
-			String paging = util.paging(current_page, total_page, listUrl);
+			String paging = util.pagingMethod(current_page, total_page, "listPage");
 			
 			mav.addObject("list", list);
 			mav.addObject("dataCount", dataCount);
@@ -106,6 +192,11 @@ public class MeetingController {
 		// 정모장인지아닌지 확인
 		ModelAndView mav = new ModelAndView("meeting/meetingDetail");
 		MeetingDAO dao = new MeetingDAO();
+		MemberOfMeetingDAO memberOfMeetingDao = new MemberOfMeetingDAO();
+		
+		MeetingDTO meetingDto = null;
+		List<MemberOfMeetingDTO> memberOfMeetingList = null;
+		
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
 
@@ -116,14 +207,26 @@ public class MeetingController {
 		}
 		
 		if (param != null && !param.isEmpty()) {
+			// 모임 정보
 			Long meetingIdx = Long.parseLong(param);
+			meetingDto = dao.findByMeeetingIdx(meetingIdx);
+			memberOfMeetingList = memberOfMeetingDao.findMeetingIdx(meetingIdx);
+			
 			mav.addObject("meetingIdx", meetingIdx);
+			mav.addObject("meetingName", meetingDto.getMeetingName());
+			mav.addObject("sportName", meetingDto.getSportName());
+			mav.addObject("regionName", meetingDto.getRegionName());
+			mav.addObject("currentMembers", meetingDto.getCurrentMembers());
+			mav.addObject("meetingProfilePhoto", meetingDto.getMeetingProfilePhoto());
+
+			mav.addObject("memberOfMeetingList", memberOfMeetingList);
 			
 			if (info != null) {
 				try {
 					RegularMeetingDAO rDao = new RegularMeetingDAO();
 					boolean isLeader = rDao.isMeetingMember(meetingIdx, info.getMemberIdx());
 					mav.addObject("isLeader", isLeader);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 					mav.addObject("isLeader", false);
@@ -141,9 +244,25 @@ public class MeetingController {
 	@RequestMapping(value = "/meeting/meetingHome", method = RequestMethod.GET)
 	public ModelAndView meetingHome(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("meeting/meetingHome");
+		MeetingDAO meetingDao = new MeetingDAO();
+		MemberOfMeetingDAO memberOfMeetingDao = new MemberOfMeetingDAO();
+		MeetingDTO meetingDto = null;
+		List<MemberOfMeetingDTO> memberOfMeetingList = null;
 		
-		
-		
+		try {
+			long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
+			meetingDto = meetingDao.findByMeeetingIdx(meetingIdx);
+			memberOfMeetingList = memberOfMeetingDao.findMeetingIdx(meetingIdx);
+			
+			mav.addObject("meetingDesc", meetingDto.getMeetingDesc());
+			mav.addObject("regionName", meetingDto.getRegionName());
+			mav.addObject("currentMembers", meetingDto.getCurrentMembers());
+			
+			mav.addObject("memberOfMeetingList", memberOfMeetingList);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return mav;
 	}	
 

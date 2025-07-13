@@ -191,6 +191,145 @@ html, body {
     justify-content: center; /* 카드들이 그리드 내에서 중앙 정렬되도록 */
 }
 
+/* Empty Meeting List Container */
+.meeting-empty-container {
+    display: flex;
+    flex-direction: column; /* 요소들을 세로로 정렬 */
+    align-items: center; /* 가운데 정렬 */
+    justify-content: center; /* 세로 가운데 정렬 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+    padding: 60px 20px; /* 상하좌우 패딩 */
+    background-color: #f8fAfC; /* 아주 연한 배경색 */
+    border-radius: 12px; /* 둥근 모서리 */
+    width: 100%;
+    margin: 50px auto; /* 가운데 정렬 */
+    color: #555; /* 기본 텍스트 색상 */
+}
+
+.meeting-empty-container h3 {
+    font-size: 2.2em; /* 큰 제목 */
+    color: #333; /* 제목 색상 */
+    margin-bottom: 20px; /* 아래 여백 */
+    font-weight: 700; /* 볼드 */
+}
+
+.meeting-empty-container p {
+    font-size: 1.1em; /* 본문 텍스트 크기 */
+    line-height: 1.6; /* 줄 간격 */
+    margin-bottom: 30px; /* 아래 여백 */
+    color: #666; /* 텍스트 색상 */
+}
+
+.meeting-empty-container p br {
+    display: block; /* 줄바꿈 강제 */
+    margin-bottom: 5px; /* 줄바꿈 간격 */
+}
+
+/* 페이징 처리 CSS */
+.page-navigation {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  
+  padding: 20px 0;
+}
+
+.paginate {
+  display: flex;
+  align-content: center;
+  flex-wrap: wrap;
+  
+  font-size: 14px;	
+}
+
+.paginate a,
+.paginate span {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  margin-left: -1px;
+  line-height: 1.25;
+  color: #333333;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+}
+
+.paginate a {
+  cursor: pointer;
+  text-decoration: none;  
+}
+
+.paginate a:hover, 
+.paginate a:focus {
+  z-index: 2;
+  color: #f6c3bb;  
+}
+
+.paginate span {
+  z-index: 3;
+  color: #ffffff;
+  background-color: #f08979;
+  border-color: #f08979;
+}
+
+.paginate :first-child {
+  margin-left: 0;
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.paginate :last-child {
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+
+/* Button Group inside Empty Container */
+.meeting-empty-container .button-group {
+    display: flex; /* 버튼들을 가로로 정렬 */
+    gap: 15px; /* 버튼 사이 간격 */
+    margin-top: 20px; /* 위 여백 */
+    flex-wrap: wrap; /* 작은 화면에서 줄바꿈 */
+    justify-content: center; /* 버튼 가운데 정렬 */
+}
+
+/* empty-Image Styling */
+.meeting-empty-container img {
+	width: 70%;
+    height: auto; /* 비율 유지 */
+    display: block;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* 은은한 그림자 */
+    margin-top: 40px; /* 위 여백 */
+    opacity: 0.9; /* 살짝 투명하게 */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .meeting-empty-container {
+        padding: 40px 15px;
+        margin: 30px auto;
+    }
+
+    .meeting-empty-container h3 {
+        font-size: 1.8em;
+    }
+
+    .meeting-empty-container p {
+        font-size: 1em;
+    }
+
+    .meeting-empty-container img {
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .meeting-empty-container .button-group {
+        flex-direction: column; /* 버튼을 세로로 정렬 */
+        align-items: center; /* 세로 정렬 시 가운데 정렬 */
+    }
+}
+
 /* 태블릿 (768px 이상): 2열 */
 @media (min-width: 768px) {
   .meetings-grid {
@@ -445,16 +584,25 @@ p.meetingDesc {
 }
 
 .member-card {
-  text-align: center;
+  min-width: 180px;
+  text-align: left;
   border-radius: 8px;
   background: #f8fafc;
 }
 
+
 .member-card img {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  margin-bottom: 0.5rem;
+  margin: 0.5rem;
+  margin-left: 0.7rem;
+}
+img.managerLogo {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-left: 2px;
 }
 
 /* BBS Section */
