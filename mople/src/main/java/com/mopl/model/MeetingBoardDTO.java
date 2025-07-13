@@ -4,16 +4,26 @@ public class MeetingBoardDTO {
 	private long num;
 	private long memberIdx;
 	private long meetingIdx;
+
 	private String subject;
 	private String content;
 	private String filter;
 	private String reg_date;
+	private String userNickName;
 
 	private long fileNum;
 	private String imageFileName;
 
 	private long replyNum;
 	private long parentNum;
+
+	public String getUserNickName() {
+		return userNickName;
+	}
+
+	public void setUserNickName(String userNickName) {
+		this.userNickName = userNickName;
+	}
 
 	public long getFileNum() {
 		return fileNum;
