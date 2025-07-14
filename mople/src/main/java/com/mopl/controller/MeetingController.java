@@ -2,16 +2,17 @@ package com.mopl.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mopl.dao.MeetingAlbumDAO;
 import com.mopl.dao.MeetingDAO;
 import com.mopl.dao.MemberOfMeetingDAO;
 import com.mopl.dao.RegionCategoryDAO;
 import com.mopl.dao.RegularMeetingDAO;
 import com.mopl.dao.SportCategoryDAO;
+import com.mopl.model.MeetingAlbumDTO;
 import com.mopl.model.MeetingDTO;
 import com.mopl.model.MemberOfMeetingDTO;
 import com.mopl.model.RegionCategoryDTO;
@@ -185,7 +186,6 @@ public class MeetingController {
 	}	
 
 	// 모임 상세
-	// 1. 모임 참여 버튼 - 모임 인원 / 관리자는 볼 수 없게 수정
 	@RequestMapping(value = "/meeting/meetingDetail", method = RequestMethod.GET)
 	public ModelAndView meetingDetail(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -196,6 +196,9 @@ public class MeetingController {
 		
 		MeetingDTO meetingDto = null;
 		List<MemberOfMeetingDTO> memberOfMeetingList = null;
+		
+		// 유저의 모임 참가 여부
+		String userStatus = "NOT_JOINED";
 		
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
@@ -210,7 +213,6 @@ public class MeetingController {
 			// 모임 정보
 			Long meetingIdx = Long.parseLong(param);
 			meetingDto = dao.findByMeeetingIdx(meetingIdx);
-			memberOfMeetingList = memberOfMeetingDao.findMeetingIdx(meetingIdx);
 			
 			mav.addObject("meetingIdx", meetingIdx);
 			mav.addObject("meetingName", meetingDto.getMeetingName());
@@ -218,8 +220,21 @@ public class MeetingController {
 			mav.addObject("regionName", meetingDto.getRegionName());
 			mav.addObject("currentMembers", meetingDto.getCurrentMembers());
 			mav.addObject("meetingProfilePhoto", meetingDto.getMeetingProfilePhoto());
-
-			mav.addObject("memberOfMeetingList", memberOfMeetingList);
+			
+			memberOfMeetingList = memberOfMeetingDao.findMeetingIdx(meetingIdx);
+			
+			for(MemberOfMeetingDTO dto : memberOfMeetingList) {
+				if(dto.getMemberIdx() == info.getMemberIdx()) {
+					if(dto.getRole() == 0) {
+						userStatus = "HOST";
+						break;
+					}
+					userStatus = "JOINED";
+					break;
+				}
+			}
+			
+			mav.addObject("userStatus", userStatus);
 			
 			if (info != null) {
 				try {
@@ -361,6 +376,23 @@ public class MeetingController {
 	@RequestMapping(value = "/meeting/meetingAlbum", method = RequestMethod.GET)
 	public ModelAndView meetingAlbum(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("meeting/meetingAlbum");
+		MeetingAlbumDAO meetingAlbumDao = new MeetingAlbumDAO();
+		MemberOfMeetingDAO memberOfMeetingDao = new MemberOfMeetingDAO();
+		List<MemberOfMeetingDTO> memberOfMeetingList = null;
+		List<MeetingAlbumDTO> meetingAlbumList = null;
+		
+		try {
+			long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
+			
+			memberOfMeetingList = memberOfMeetingDao.findMeetingIdx(meetingIdx);
+			meetingAlbumList = meetingAlbumDao.findByMeeetingIdx(meetingIdx);
+			
+			mav.addObject("meetingIdx", meetingIdx);
+			mav.addObject("memberOfMeetingList", memberOfMeetingList);
+			mav.addObject("meetingAlbumList", meetingAlbumList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return mav;
 	}	
@@ -369,7 +401,20 @@ public class MeetingController {
 	@RequestMapping(value = "/meeting/meetingCreate", method = RequestMethod.GET)
 	public ModelAndView meetingCreateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("meeting/meetingCreate");
-		mav.addObject("mode", "meetingCreate");
+		SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
+		RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
+		
+		try {
+			List<SportCategoryDTO> sportCategoryList = sportCategoryDao.findAllSportCategory();
+			List<RegionCategoryDTO> regionCategoryList = regionCategoryDao.findAllRegionCategory();
+			
+			mav.addObject("sportCategoryList", sportCategoryList);
+			mav.addObject("regionCategoryList", regionCategoryList);
+			mav.addObject("mode", "meetingCreate");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		return mav;
 	}	
 	
@@ -410,6 +455,57 @@ public class MeetingController {
 		return new ModelAndView("redirect:/meeting/meetingList");
 	}	
 	
+	// 모임 상세 - 사진첩 - 등록 폼
+	@RequestMapping(value = "/meeting/meetingAlbumUpload", method = RequestMethod.GET)
+	public ModelAndView meetingAlbumForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		ModelAndView mav = new ModelAndView("meeting/meetingAlbumUpload");
+		mav.addObject("mode", "insert");
+		return mav;
+	}	
+	
+	// 모임 상세 - 사진첩 - 사진 등록
+	@RequestMapping(value = "/meeting/meetingAlbumUpload", method = RequestMethod.POST)
+	public ModelAndView meetingAlbumSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		MeetingAlbumDAO dao = new MeetingAlbumDAO();
+		FileManager fileManager = new FileManager();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		
+		String root = session.getServletContext().getRealPath("/");
+		String pathname = root + "uploads" + File.separator + "meetingAlbum";
+		String query = "meetingIdx=";
+		
+		try {
+			MeetingAlbumDTO dto = new MeetingAlbumDTO();
+			
+			String meetingIdxStr = req.getParameter("meetingIdx");
+			System.out.println(meetingIdxStr);
+			query += meetingIdxStr;
+			
+			dto.setMeetingIdx(Long.parseLong(meetingIdxStr));
+			dto.setContent(req.getParameter("content"));
+			
+			// 사진 등록 멤버
+			dto.setMemberIdx(info.getMemberIdx());
+			
+			Part p = req.getPart("meetingAlbumImage");
+			MyMultipartFile multiFile = fileManager.doFileUpload(p, pathname);
+			
+			if(multiFile != null) {
+				dto.setImageFileName(multiFile.getSaveFilename());
+			}
+			
+			dao.insertAlbum(dto);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return new ModelAndView("redirect:/meeting/meetingDetail?" + query);
+	}	
+	
+	
+	// 이미 삭제된 모임 클릭시 페이지 전환
 	@RequestMapping(value = "/meeting/deletedMeeting", method = RequestMethod.GET)
 	public ModelAndView deletedMeeting(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		return new ModelAndView("redirect:/meeting/deletedMeeting");

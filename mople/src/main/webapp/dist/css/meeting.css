@@ -717,10 +717,21 @@ img.managerLogo {
   transition: transform 0.2s;
 }
 
+.photos-header {
+	display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.photos-header .btn {
+  padding: 0.5rem 1.75rem;
+  font-size: 1.1rem;
+}
+
 .photo:hover {
   transform: scale(1.05);
 }
-
 
 .close {
   position: absolute;
@@ -763,7 +774,17 @@ img.managerLogo {
   align-items: center;
 }
 
+.albumModal-userNickName {
+  text-align: left;	
+}
 
+.albumModal-content {
+  text-align: left;	
+}
+
+.albumPhotoInModal {
+	
+}
 
 /* 반응형 디자인 고려 (모바일에서는 고정 해제) */
 @media (max-width: 768px) {

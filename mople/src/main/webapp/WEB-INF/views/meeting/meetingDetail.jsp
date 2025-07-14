@@ -48,11 +48,18 @@
 								</div>
 							</div>
 						</div>
-						<c:forEach var="dto" items="${memberOfMeetingList}" varStatus="status">
-							<c:if test="${sessionScope.member.memberIdx!=dto.memberIdx}">
-								<button class="btn btn-primary">Join Meeting</button>
-							</c:if>
-						</c:forEach>
+						<c:choose>
+						    <c:when test="${userStatus eq 'NOT_JOINED'}">
+						        <button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingJoin'">모임 참여</button>
+						    </c:when>
+						    <c:when test="${userStatus eq 'HOST'}">
+						        <button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingRemove'">모임 삭제</button>
+						    </c:when>
+						    <c:when test="${userStatus eq 'JOINED'}">
+						    </c:when>
+						    <c:otherwise>
+						    </c:otherwise>
+						</c:choose>
 					</div>
 
 					<nav class="meeting-nav">
@@ -74,6 +81,8 @@
 		<jsp:include page="/WEB-INF/views/layout/footerResources.jsp" />
 		<script type="text/javascript"
 			src="${pageContext.request.contextPath}/dist/js/meeting-detail.js"></script>
+		<script type="text/javascript"
+			src="${pageContext.request.contextPath}/dist/js/meeting-album.js"></script>
 	</div>
 </body>
 </html>

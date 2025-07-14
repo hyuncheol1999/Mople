@@ -49,16 +49,9 @@
 		                    <input type="hidden" id="sportCategoryNo" name="sportCategoryNo">
 		                    <div class="category-list" id="sportCategoryList">
 		                        <ul>
-		                            <li data-category-no="1">축구</li>
-		                            <li data-category-no="2">농구</li>
-		                            <li data-category-no="3">야구</li>
-		                            <li data-category-no="4">배드민턴</li>
-		                            <li data-category-no="5">테니스</li>
-		                            <li data-category-no="6">등산</li>
-		                            <li data-category-no="7">요가 🧘‍♀️</li>
-		                            <li data-category-no="8">수영 🏊</li>
-		                            <li data-category-no="9">사이클 🚴</li>
-		                            <li data-category-no="10">볼링 🎳</li>
+		                        	<c:forEach var="sDto" items="${sportCategoryList}" varStatus="status">
+			                            <li data-category-no="${sDto.sportIdx}">${sDto.sportName}</li>
+		                            </c:forEach>
 		                        </ul>
 		                    </div>
 		                </div>
@@ -72,14 +65,9 @@
 		                    <input type="hidden" id="regionCategoryNo" name="regionCategoryNo">
 		                    <div class="category-list" id="regionCategoryList">
 		                        <ul>
-		                            <li data-category-no="11">서울특별시</li>
-		                            <li data-category-no="1002">서울 강남구</li>
-		                            <li data-category-no="1003">서울 송파구</li>
-		                            <li data-category-no="1004">경기 성남시</li>
-		                            <li data-category-no="1005">경기 수원시</li>
-		                            <li data-category-no="1006">부산 해운대구</li>
-		                            <li data-category-no="1007">대전 유성구</li>
-		                            <li data-category-no="1008">대구 수성구</li>
+		                        	<c:forEach var="rDto" items="${regionCategoryList}" varStatus="status">
+			                            <li data-category-no="${rDto.regionIdx}">${rDto.regionName}</li>
+		                            </c:forEach>
 		                        </ul>
 		                    </div>
 		                </div>

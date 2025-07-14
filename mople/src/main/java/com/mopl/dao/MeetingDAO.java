@@ -49,9 +49,11 @@ public class MeetingDAO {
 			pstmt.executeUpdate();
 			
 			conn.commit();
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			throw e;
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			DBUtil.close(pstmt);
 			try {
@@ -74,7 +76,7 @@ public class MeetingDAO {
 			if(rs.next()) {
 				result = rs.getInt(1);
 			}
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -119,6 +121,8 @@ public class MeetingDAO {
 			if(rs.next()) {
 				result = rs.getInt(1);
 			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -204,6 +208,8 @@ public class MeetingDAO {
 				list.add(dto);
 			}
 		
+		} catch (SQLException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -262,7 +268,7 @@ public class MeetingDAO {
 	}
 	
 	// 모임 정보
-	public MeetingDTO findByMeeetingIdx(long memberIdx) {
+	public MeetingDTO findByMeeetingIdx(long meetingIdx) {
 		MeetingDTO dto = new MeetingDTO();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -280,7 +286,7 @@ public class MeetingDAO {
 	        sb.append("  m1.meetingProfilePhoto, rc.regionName, sc.sportName ");
 			pstmt = conn.prepareStatement(sb.toString());
 			
-			pstmt.setLong(1, memberIdx);
+			pstmt.setLong(1, meetingIdx);
 			
 			rs = pstmt.executeQuery();
 			

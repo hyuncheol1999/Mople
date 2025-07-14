@@ -11,7 +11,7 @@
 
 <div class="meeting-stats">
     <div class="stat-card">
-        <h4>장소</h4>
+        <h4>지역</h4>
         <p>${regionName}</p>
     </div>
     <div class="stat-card">
