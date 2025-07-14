@@ -108,7 +108,7 @@
 	    		
 			        <h2>공지사항 관리</h2>
 			
-			        <a href="/admin/notice/write"><button class="btn">+ 새 공지사항 등록</button></a>
+			        <a href="${pageContext.request.contextPath}/admin/notice/write"><button class="btn">+ 새 공지사항 등록</button></a>
 			
 			        <table class="notice-table">
 			            <thead>
