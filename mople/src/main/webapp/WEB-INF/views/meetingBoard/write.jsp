@@ -58,7 +58,7 @@
 					class="form-control" placeholder="내용을 입력하세요">${dto.content}</textarea>
 			</div>
 
-			<!-- 버튼 영역 -->
+			<!-- 버튼 -->
 			<div class="write-btn">
 				<button type="submit" class="btn btn-primary">${mode == 'update' ? '수정 완료' : '등록 완료'}
 				</button>

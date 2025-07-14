@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${dto.subject}-모임소식</title>
+<title>${dto.subject}-모임 소식</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css">
@@ -18,6 +18,14 @@
 
 	<main class="view-container">
 
+		<!-- 돌아가기 -->
+		<div class="view-footer back-btn-left">
+			<a
+				href="${pageContext.request.contextPath}/meetingBoard/list?meetingIdx=${meetingIdx}"
+				class="btn btn-outline"> ← </a>
+		</div>
+
+
 		<!-- 제목 -->
 		<h1 class="view-title">${dto.subject}</h1>
 
@@ -26,7 +34,7 @@
 			<div class="profile-circle"></div>
 			<div>
 				<div class="nickname">${dto.userNickName}</div>
-				<div class="meta">${dto.reg_date}·조회수10</div>
+				<div class="meta">${dto.reg_date} · 조회 10</div>
 			</div>
 		</div>
 
@@ -43,10 +51,9 @@
 		<!-- 좋아요 버튼 -->
 		<button type="button" class="btnSendBoardLike like-icon-btn"
 			data-liked="${liked}" data-num="${dto.num}">
-			<i class="bi ${liked ? 'bi-heart-fill heart-liked' : 'bi-heart'}"></i> <span
-				id="boardLikeCount">${likeCount}</span>
+			<i class="bi ${liked ? 'bi-heart-fill heart-liked' : 'bi-heart'}"></i>
+			<span id="boardLikeCount">${likeCount}</span>
 		</button>
-
 
 		<!-- 수정/삭제 -->
 		<c:if test="${dto.userNickName == sessionScope.member.userNickName}">
@@ -61,15 +68,38 @@
 
 		<!-- 댓글 영역 -->
 		<div class="comment-section">
-			<p>아직 댓글이 없습니다.</p>
+			<p class="comment-text">아직 댓글이 없습니다.</p>
 			<button class="btn comment-write">댓글 쓰기</button>
 		</div>
 
-		<!-- 예: meetingBoard/view.jsp -->
-		<div class="view-footer">
-			<a
-				href="${pageContext.request.contextPath}/meetingBoard/list?meetingIdx=${meetingIdx}"
-				class="btn btn-outline"> ← 글 리스트로 </a>
+		<!-- 이전 글 -->
+		<div class="nav-item">
+			이전&nbsp;
+			<c:choose>
+				<c:when test="${not empty prevDto}">
+					<a
+						href="${pageContext.request.contextPath}/meetingBoard/view?${query}&num=${prevDto.num}">
+						${prevDto.subject} </a>
+				</c:when>
+				<c:otherwise>
+					<span>이전 글 없음</span>
+				</c:otherwise>
+			</c:choose>
+		</div>
+
+		<!-- 다음 글 -->
+		<div class="nav-item">
+			다음&nbsp;
+			<c:choose>
+				<c:when test="${not empty nextDto}">
+					<a
+						href="${pageContext.request.contextPath}/meetingBoard/view?${query}&num=${nextDto.num}">
+						${nextDto.subject} </a>
+				</c:when>
+				<c:otherwise>
+					<span>다음 글 없음</span>
+				</c:otherwise>
+			</c:choose>
 		</div>
 
 

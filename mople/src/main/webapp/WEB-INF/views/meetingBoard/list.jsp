@@ -19,7 +19,17 @@
 	<jsp:include page="/WEB-INF/views/layout/login.jsp" />
 
 	<main class="board-wrapper mt-5">
-		<h3 class="board-title">${meetingName}모임소식</h3>
+
+		<!-- 돌아가기 버튼 (왼쪽 정렬) -->
+		<div class="back-btn-left-list">
+			<a
+				href="${pageContext.request.contextPath}/meeting/view?idx=${meetingIdx}"
+				class="btn btn-outline">←</a>
+		</div>
+
+
+
+		<h3 class="board-title">${meetingName} 모임 소식</h3>
 
 		<div class="category-tabs">
 			<a href="?meetingIdx=${meetingIdx}"
@@ -66,11 +76,6 @@
 				글쓰기</button>
 		</div>
 
-		<div class="view-footer">
-			<a
-				href="${pageContext.request.contextPath}/meeting/view?idx=${meetingIdx}"
-				class="btn btn-outline"> ← 모임으로 돌아가기 </a>
-		</div>
 	</main>
 
 

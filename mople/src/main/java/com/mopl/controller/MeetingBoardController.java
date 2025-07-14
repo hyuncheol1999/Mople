@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class MeetingBoardController {
 
-	// 글 리스트
+	// 글 목록 조회
 	@RequestMapping(value = "/meetingBoard/list", method = RequestMethod.GET)
 	public ModelAndView list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("/meetingBoard/list");
@@ -48,11 +48,14 @@ public class MeetingBoardController {
 			String schType = req.getParameter("schType");
 			String kwd = req.getParameter("kwd");
 
-			if (schType == null || kwd == null || kwd.trim().isEmpty()) {
-				schType = "all";
+			if (kwd == null || kwd.trim().isEmpty()) {
 				kwd = "";
+				schType = "all";
 			} else {
 				kwd = util.decodeUrl(kwd);
+				if (schType == null || schType.trim().isEmpty()) {
+	                schType = "all";
+	            }
 			}
 
 			String filter = req.getParameter("filter");
@@ -62,30 +65,11 @@ public class MeetingBoardController {
 			if (offset < 0)
 				offset = 0;
 
-			int dataCount = 0;
-			List<MeetingBoardDTO> list = null;
+			// 데이터 수, 리스트 조회
+			int dataCount = dao.dataCount(meetingIdx, filter, schType, kwd);
+			List<MeetingBoardDTO> list = dao.searchBoard(meetingIdx, offset, size, filter, schType, kwd);
 
-			// 검색 + 필터
-			if (!kwd.trim().isEmpty()) {
-				if (filter != null && !filter.isEmpty()) {
-					dataCount = dao.dataCount(meetingIdx, schType, kwd);
-					list = dao.listMeetingBoardFilter(meetingIdx, filter, offset, size, schType, kwd);
-				} else {
-					dataCount = dao.dataCount(meetingIdx, schType, kwd);
-					list = dao.listMeetingBoard(meetingIdx, offset, size, schType, kwd);
-				}
-			}
-			// 필터만
-			else if (filter != null && !filter.isEmpty()) {
-				dataCount = dao.dataCount(meetingIdx, filter);
-				list = dao.listMeetingBoardFilter(meetingIdx, filter, offset, size, schType, kwd);
-			}
-			// 기본 목록
-			else {
-				dataCount = dao.dataCount(meetingIdx);
-				list = dao.listMeetingBoard(meetingIdx, offset, size);
-			}
-
+			// 페이징 계산
 			int total_page = util.pageCount(dataCount, size);
 			if (current_page > total_page) {
 				current_page = total_page;
@@ -208,6 +192,10 @@ public class MeetingBoardController {
 			}
 
 			dto.setContent(util.htmlSymbols(dto.getContent()));
+			
+			// 이전 글, 다음 글
+			MeetingBoardDTO prevDto = dao.findByPrev(dto.getNum(), schType, kwd);
+			MeetingBoardDTO nextDto = dao.findByNext(dto.getNum(), schType, kwd);
 
 			// 좋아요 여부 확인
 			HttpSession session = req.getSession();
@@ -225,8 +213,10 @@ public class MeetingBoardController {
 			mav.addObject("meetingIdx", meetingIdx);
 			mav.addObject("page", page);
 			mav.addObject("query", query);
-			mav.addObject("liked", liked); 
-			mav.addObject("likeCount", likeCount); 
+			mav.addObject("liked", liked);
+			mav.addObject("likeCount", likeCount);
+			mav.addObject("prevDto", prevDto);
+			mav.addObject("nextDto", nextDto);
 
 			return mav;
 
@@ -239,7 +229,7 @@ public class MeetingBoardController {
 		return new ModelAndView("redirect:/meetingBoard/list");
 	}
 
-	// 글 수정
+	// 글 수정 폼
 	@RequestMapping(value = "/meetingBoard/update", method = RequestMethod.GET)
 	public ModelAndView updateForm(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -277,7 +267,7 @@ public class MeetingBoardController {
 		return new ModelAndView("redirect:/meetingBoard/list?meetingIdx=" + meetingIdx + "&page=" + page);
 	}
 
-	// 수정 완료
+	// 수정 처리
 	@RequestMapping(value = "/meetingBoard/update", method = RequestMethod.POST)
 	public ModelAndView updateSubmit(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -348,7 +338,7 @@ public class MeetingBoardController {
 		return new ModelAndView("redirect:/meetingBoard/list?" + query);
 	}
 
-	// 게시글 공감 저장
+	// 좋아요 AJAX 처리
 	@ResponseBody
 	@RequestMapping(value = "/meetingBoardLike", method = RequestMethod.POST)
 	public Map<String, Object> insertMeetingBoardLike(HttpServletRequest req, HttpServletResponse resp)

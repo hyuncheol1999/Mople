@@ -40,68 +40,9 @@ public class MeetingBoardDAO {
 			DBUtil.close(pstmt);
 		}
 	}
-	
-	// 기본 게시글 수 조회 (검색/필터 없이)
-	public int dataCount(long meetingIdx) {
-		int result = 0;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String sql;
 
-		try {
-			sql = "SELECT COUNT(*) FROM meetingBoard WHERE meetingIdx = ?";
-
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setLong(1, meetingIdx);
-
-			rs = pstmt.executeQuery();
-
-			if (rs.next()) {
-				result = rs.getInt(1);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			DBUtil.close(rs);
-			DBUtil.close(pstmt);
-		}
-
-		return result;
-	}
-
-	// 데이터 개수
-	public int dataCount(long meetingIdx, String filter) {
-		int result = 0;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String sql;
-
-		try {
-			sql = "SELECT COUNT(*) FROM meetingBoard mb WHERE meetingIdx = ? AND filter = ?";
-
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setLong(1, meetingIdx);
-			pstmt.setString(2, filter);
-
-			rs = pstmt.executeQuery();
-
-			if (rs.next()) {
-				result = rs.getInt(1);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			DBUtil.close(rs);
-			DBUtil.close(pstmt);
-		}
-
-		return result;
-	}
-
-	// 검색 데이터 수
-	public int dataCount(long meetingIdx, String schType, String kwd) {
+	// 게시글 총 개수 (필터, 검색 조건 포함)
+	public int dataCount(long meetingIdx, String filter, String schType, String kwd) {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -113,23 +54,53 @@ public class MeetingBoardDAO {
 			sb.append("JOIN member1 m ON mb.memberIdx = m.memberIdx ");
 			sb.append("WHERE mb.meetingIdx = ? ");
 
-			if (schType.equals("all")) {
-				sb.append("AND (INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1) ");
-			} else if (schType.equals("reg_date")) {
-				kwd = kwd.replaceAll("(\\-|\\.|\\/)", "");
-				sb.append("AND TO_CHAR(reg_date, 'YYYYMMDD') = ? ");
-			} else {
-				sb.append("AND INSTR(" + schType + ", ?) >= 1 ");
+			if (filter != null && !filter.trim().isEmpty()) {
+				sb.append(" AND mb.filter = ? ");
+			}
+
+			if (kwd != null && !kwd.trim().isEmpty()) {
+				if (schType.equals("all")) {
+					sb.append("   AND ( INSTR(mb.subject, ?) >= 1 OR INSTR(mb.content, ?) >= 1 ) ");
+				} else if (schType.equals("reg_date")) {
+					kwd = kwd.replaceAll("(\\-|\\.|\\/)", "");
+					sb.append("   AND TO_CHAR(mb.reg_date, 'YYYYMMDD') = ? ");
+				} else {
+					sb.append("   AND INSTR(" + schType + ", ?) >= 1 ");
+				}
 			}
 
 			pstmt = conn.prepareStatement(sb.toString());
 			pstmt.setLong(1, meetingIdx);
 
-			if (schType.equals("all")) {
-				pstmt.setString(2, kwd);
-				pstmt.setString(3, kwd);
+			if (filter != null && !filter.trim().isEmpty()) {
+				if (kwd != null && !kwd.trim().isEmpty()) {
+					if ("all".equals(schType)) {
+						pstmt.setLong(1, meetingIdx);
+						pstmt.setString(2, filter);
+						pstmt.setString(3, kwd);
+						pstmt.setString(4, kwd);
+					} else {
+						pstmt.setLong(1, meetingIdx);
+						pstmt.setString(2, filter);
+						pstmt.setString(3, kwd);
+					}
+				} else {
+					pstmt.setLong(1, meetingIdx);
+					pstmt.setString(2, filter);
+				}
 			} else {
-				pstmt.setString(2, kwd);
+				if (kwd != null && !kwd.trim().isEmpty()) {
+					if ("all".equals(schType)) {
+						pstmt.setLong(1, meetingIdx);
+						pstmt.setString(2, kwd);
+						pstmt.setString(3, kwd);
+					} else {
+						pstmt.setLong(1, meetingIdx);
+						pstmt.setString(2, kwd);
+					}
+				} else {
+					pstmt.setLong(1, meetingIdx);
+				}
 			}
 
 			rs = pstmt.executeQuery();
@@ -146,69 +117,25 @@ public class MeetingBoardDAO {
 		return result;
 	}
 
-	// 전체 리스트 조회
-	public List<MeetingBoardDTO> listMeetingBoard(long meetingIdx, int offset, int size) {
-		List<MeetingBoardDTO> list = new ArrayList<MeetingBoardDTO>();
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		StringBuilder sb = new StringBuilder();
-
-		try {
-			sb.append(" SELECT mb.num, mb.memberIdx, mb.meetingIdx, mb.subject, mb.content, mb.filter, ");
-			sb.append(" TO_CHAR(mb.reg_date, 'YYYY-MM-DD') reg_date, m.userNickName ");
-			sb.append(" FROM meetingBoard mb ");
-			sb.append(" JOIN member1 m ON mb.memberIdx = m.memberIdx ");
-			sb.append(" WHERE mb.meetingIdx = ? ");
-			sb.append(" ORDER BY mb.num DESC ");
-			sb.append(" OFFSET ? ROWS FETCH FIRST ? ROWS ONLY");
-
-			pstmt = conn.prepareStatement(sb.toString());
-
-			pstmt.setLong(1, meetingIdx);
-			pstmt.setInt(2, offset);
-			pstmt.setInt(3, size);
-
-			rs = pstmt.executeQuery();
-
-			while (rs.next()) {
-				MeetingBoardDTO dto = new MeetingBoardDTO();
-
-				dto.setNum(rs.getLong("num"));
-				dto.setMemberIdx(rs.getLong("memberIdx"));
-				dto.setMeetingIdx(rs.getLong("meetingIdx"));
-				dto.setSubject(rs.getString("subject"));
-				dto.setContent(rs.getString("content"));
-				dto.setFilter(rs.getString("filter"));
-				dto.setReg_date(rs.getString("reg_date"));
-				dto.setUserNickName(rs.getString("userNickName"));
-
-				list.add(dto);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			DBUtil.close(rs);
-			DBUtil.close(pstmt);
-		}
-
-		return list;
-	}
-
-	// 리스트 + 검색
-	public List<MeetingBoardDTO> listMeetingBoard(long meetingIdx, int offset, int size, String schType, String kwd) {
+	// 게시글 리스트 조회 ((필터, 검색, 페이징)
+	public List<MeetingBoardDTO> searchBoard(long meetingIdx, int offset, int size, String filter, String schType,
+			String kwd) {
 		List<MeetingBoardDTO> list = new ArrayList<>();
 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		StringBuilder sb = new StringBuilder();
 
 		try {
+			StringBuilder sb = new StringBuilder();
+
 			sb.append("SELECT mb.num, mb.memberIdx, mb.meetingIdx, mb.subject, mb.content, mb.filter, ");
 			sb.append("TO_CHAR(mb.reg_date, 'YYYY-MM-DD') reg_date, m.userNickName ");
 			sb.append("FROM meetingBoard mb ");
 			sb.append("JOIN member1 m ON mb.memberIdx = m.memberIdx ");
 			sb.append("WHERE mb.meetingIdx = ? ");
+			if (filter != null && !filter.trim().isEmpty()) {
+				sb.append(" AND mb.filter = ? ");
+			}
 
 			if (kwd != null && !kwd.trim().isEmpty()) {
 				if (schType.equals("all")) {
@@ -228,98 +155,45 @@ public class MeetingBoardDAO {
 
 			if (kwd != null && !kwd.trim().isEmpty()) {
 				if (schType.equals("all")) {
-					pstmt.setLong(1, meetingIdx);
-					pstmt.setString(2, kwd);
-					pstmt.setString(3, kwd);
-					pstmt.setLong(4, offset);
-					pstmt.setLong(5, size);
-
+					if (filter != null && !filter.trim().isEmpty()) {
+						pstmt.setLong(1, meetingIdx);
+						pstmt.setString(2, filter);
+						pstmt.setString(3, kwd);
+						pstmt.setString(4, kwd);
+						pstmt.setInt(5, offset);
+						pstmt.setInt(6, size);
+					} else {
+						pstmt.setLong(1, meetingIdx);
+						pstmt.setString(2, kwd);
+						pstmt.setString(3, kwd);
+						pstmt.setInt(4, offset);
+						pstmt.setInt(5, size);
+					}
 				} else {
-					pstmt.setLong(1, meetingIdx);
-					pstmt.setString(2, kwd);
-					pstmt.setLong(3, offset);
-					pstmt.setLong(4, size);
+					if (filter != null && !filter.trim().isEmpty()) {
+						pstmt.setLong(1, meetingIdx);
+						pstmt.setString(2, filter);
+						pstmt.setString(3, kwd);
+						pstmt.setInt(4, offset);
+						pstmt.setInt(5, size);
+					} else {
+						pstmt.setLong(1, meetingIdx);
+						pstmt.setString(2, kwd);
+						pstmt.setInt(3, offset);
+						pstmt.setInt(4, size);
+					}
 				}
 			} else {
-				pstmt.setLong(1, meetingIdx);
-				pstmt.setInt(2, offset);
-				pstmt.setInt(3, size);
-			}
-
-			rs = pstmt.executeQuery();
-
-			while (rs.next()) {
-				MeetingBoardDTO dto = new MeetingBoardDTO();
-
-				dto.setNum(rs.getLong("num"));
-				dto.setMemberIdx(rs.getLong("memberIdx"));
-				dto.setMeetingIdx(rs.getLong("meetingIdx"));
-				dto.setSubject(rs.getString("subject"));
-				dto.setContent(rs.getString("content"));
-				dto.setFilter(rs.getString("filter"));
-				dto.setReg_date(rs.getString("reg_date"));
-				dto.setUserNickName(rs.getString("userNickName"));
-
-				list.add(dto);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			DBUtil.close(rs);
-			DBUtil.close(pstmt);
-		}
-
-		return list;
-	}
-
-	// 필터 조회
-	public List<MeetingBoardDTO> listMeetingBoardFilter(long meetingIdx, String filter, int offset, int size,
-			String schType, String kwd) {
-		List<MeetingBoardDTO> list = new ArrayList<>();
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		StringBuilder sb = new StringBuilder();
-
-		try {
-			sb.append("SELECT mb.num, mb.memberIdx, mb.meetingIdx, mb.subject, mb.content, mb.filter, ");
-			sb.append("TO_CHAR(mb.reg_date, 'YYYY-MM-DD') reg_date, m.userNickName ");
-			sb.append("FROM meetingBoard mb ");
-			sb.append("JOIN member1 m ON mb.memberIdx = m.memberIdx ");
-			sb.append("WHERE mb.meetingIdx = ? AND mb.filter = ? ");
-
-			if (kwd != null && !kwd.trim().isEmpty()) {
-				if (schType.equals("all")) {
-					sb.append("   AND ( INSTR(mb.subject, ?) >= 1 OR INSTR(mb.content, ?) >= 1 ) ");
-				} else if (schType.equals("reg_date")) {
-					kwd = kwd.replaceAll("(\\-|\\.|\\/)", "");
-					sb.append("   AND TO_CHAR(mb.reg_date, 'YYYYMMDD') = ? ");
+				if (filter != null && !filter.trim().isEmpty()) {
+					pstmt.setLong(1, meetingIdx);
+					pstmt.setString(2, filter);
+					pstmt.setInt(3, offset);
+					pstmt.setInt(4, size);
 				} else {
-					sb.append("   AND INSTR(" + schType + ", ?) >= 1 ");
+					pstmt.setLong(1, meetingIdx);
+					pstmt.setInt(2, offset);
+					pstmt.setInt(3, size);
 				}
-			}
-
-			sb.append("ORDER BY mb.num DESC ");
-			sb.append("OFFSET ? ROWS FETCH FIRST ? ROWS ONLY");
-
-			pstmt = conn.prepareStatement(sb.toString());
-
-			pstmt.setLong(1, meetingIdx);
-			pstmt.setString(2, filter);
-
-			if (kwd != null && !kwd.trim().isEmpty()) {
-				if (schType.equals("all")) {
-					pstmt.setString(3, kwd);
-					pstmt.setString(4, kwd);
-					pstmt.setInt(5, offset);
-					pstmt.setInt(6, size);
-				} else {
-					pstmt.setString(3, kwd);
-					pstmt.setInt(4, offset);
-					pstmt.setInt(5, size);
-				}
-			} else {
-				pstmt.setInt(3, offset);
-				pstmt.setInt(4, size);
 			}
 
 			rs = pstmt.executeQuery();
@@ -358,7 +232,7 @@ public class MeetingBoardDAO {
 		try {
 			sql = "SELECT mb.num, mb.memberIdx, mb.meetingIdx, mb.subject, mb.content, "
 					+ "mb.filter, TO_CHAR(mb.reg_date, 'YYYY-MM-DD') AS reg_date, m.userNickName "
-					+ "FROM meetingBoard mb " + "JOIN member1 m ON mb.memberIdx = m.memberIdx " + "WHERE mb.num = ?";
+					+ "FROM meetingBoard mb " + "JOIN member1 m ON mb.memberIdx = m.memberIdx WHERE mb.num = ?";
 
 			pstmt = conn.prepareStatement(sql);
 
@@ -380,6 +254,136 @@ public class MeetingBoardDAO {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return dto;
+	}
+
+	// 이전 글
+	public MeetingBoardDTO findByPrev(long num, String schType, String kwd) {
+		MeetingBoardDTO dto = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			if (kwd != null && !kwd.trim().isEmpty()) {
+				sb.append(" SELECT mb.num, mb.subject ");
+				sb.append(" FROM meetingBoard mb ");
+				sb.append(" JOIN member1 m ON mb.userId = m.userId ");
+				sb.append(" WHERE mb.num > ? ");
+
+				if (schType.equals("all")) {
+					sb.append("   AND ( INSTR(mb.subject, ?) >= 1 OR INSTR(mb.content, ?) >= 1 ) ");
+				} else if (schType.equals("reg_date")) {
+					kwd = kwd.replaceAll("(\\-|\\.|\\/)", "");
+					sb.append("   AND TO_CHAR(mb.reg_date, 'YYYYMMDD') = ? ");
+				} else {
+					sb.append("   AND INSTR(" + schType + ", ?) >= 1 ");
+				}
+
+				sb.append(" ORDER BY mb.num ASC ");
+				sb.append(" FETCH FIRST 1 ROWS ONLY ");
+
+				pstmt = conn.prepareStatement(sb.toString());
+
+				pstmt.setLong(1, num);
+				if (schType.equals("all")) {
+					pstmt.setString(2, kwd);
+					pstmt.setString(3, kwd);
+				} else {
+					pstmt.setString(2, kwd);
+				}
+			} else {
+				sb.append(" SELECT num, subject ");
+				sb.append(" FROM meetingBoard ");
+				sb.append(" WHERE num > ?");
+				sb.append(" ORDER BY num ASC ");
+				sb.append(" FETCH FIRST 1 ROWS ONLY");
+
+				pstmt = conn.prepareStatement(sb.toString());
+
+				pstmt.setLong(1, num);
+			}
+
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				dto = new MeetingBoardDTO();
+				dto.setNum(rs.getLong("num"));
+				dto.setSubject(rs.getString("subject"));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return dto;
+	}
+
+	// 다음 글
+	public MeetingBoardDTO findByNext(long num, String schType, String kwd) {
+		MeetingBoardDTO dto = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			if (kwd != null && !kwd.trim().isEmpty()) {
+				sb.append(" SELECT mb.num, mb.subject ");
+				sb.append(" FROM meetingBoard mb ");
+				sb.append(" JOIN member1 m ON mb.userId = m.userId ");
+				sb.append(" WHERE mb.num < ? ");
+
+				if (schType.equals("all")) {
+					sb.append("   AND ( INSTR(mb.subject, ?) >= 1 OR INSTR(mb.content, ?) >= 1 ) ");
+				} else if (schType.equals("reg_date")) {
+					kwd = kwd.replaceAll("(\\-|\\.|\\/)", "");
+					sb.append("   AND TO_CHAR(mb.reg_date, 'YYYYMMDD') = ? ");
+				} else {
+					sb.append("   AND INSTR(" + schType + ", ?) >= 1 ");
+				}
+
+				sb.append(" ORDER BY mb.num DESC ");
+				sb.append(" FETCH FIRST 1 ROWS ONLY ");
+
+				pstmt = conn.prepareStatement(sb.toString());
+
+				pstmt.setLong(1, num);
+				if (schType.equals("all")) {
+					pstmt.setString(2, kwd);
+					pstmt.setString(3, kwd);
+				} else {
+					pstmt.setString(2, kwd);
+				}
+			} else {
+				sb.append(" SELECT num, subject ");
+				sb.append(" FROM meetingBoard ");
+				sb.append(" WHERE num < ?");
+				sb.append(" ORDER BY num DESC ");
+				sb.append(" FETCH FIRST 1 ROWS ONLY");
+
+				pstmt = conn.prepareStatement(sb.toString());
+
+				pstmt.setLong(1, num);
+			}
+
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				dto = new MeetingBoardDTO();
+				dto.setNum(rs.getLong("num"));
+				dto.setSubject(rs.getString("subject"));
+			}
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -433,6 +437,38 @@ public class MeetingBoardDAO {
 		} finally {
 			DBUtil.close(pstmt);
 		}
+	}
+
+	// 모임 멤버 여부
+	public boolean isMeetingMember(long meetingIdx, long memberIdx) {
+		boolean result = false;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "SELECT meetingIdx, memberIdx FROM meetingBoard WHERE meetingIdx = ? AND memberIdx = ? ";
+
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.setLong(1, meetingIdx);
+			pstmt.setLong(2, memberIdx);
+
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				result = true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return result;
+
 	}
 
 	// 로그인 유저 좋아요 여부
