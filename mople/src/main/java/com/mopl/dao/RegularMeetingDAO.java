@@ -169,4 +169,93 @@ public class RegularMeetingDAO {
 			DBUtil.close(pstmt);
 		}
 	}
+	
+// 정모장이 할것	
+	// 정모 추가 
+	public void insertRegularMeeting(RegularMeetingDTO dto) throws SQLException {
+		PreparedStatement pstmt = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append("INSERT INTO regularMeeting(regularMeetingIdx, startDate, place, capacity, subject, ");
+			sb.append(" status, isBungaeMeeting, sportIdx, regionIdx, meetingIdx, memberIdx) ");
+			sb.append(" VALUES(regularMeeting_seq.NEXTVAL, TO_CHAR(?, 'YYYY-MM-DD'), TO_CHAR(?, 'YYYY-MM-DD'), ?, ?, ?, ?, 0, 0, ?, ?, ?, ?");			
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setString(1, dto.getStartDate());
+			pstmt.setString(2, dto.getPlace());
+			pstmt.setInt(3, dto.getCapacity());
+			pstmt.setString(4, dto.getSubject());
+			pstmt.setInt(5, dto.getSportIdx());
+			pstmt.setInt(6, dto.getRegionIdx());
+			pstmt.setLong(7, dto.getMeetingIdx());
+			pstmt.setLong(8, dto.getMemberIdx());
+			
+			pstmt.executeUpdate();
+			
+			pstmt.close();
+			pstmt = null;
+			
+			sb.append("INSERT INTO memberOfRegularMeeting(regularMeetingIdx, memberIdx ");
+			sb.append(" VALUES(regularMeeting_seq.CURRVAL, ?");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setLong(1, dto.getMemberIdx());
+			
+			pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			DBUtil.close(pstmt);
+		}
+	}
+	
+	// 정모 수정 
+	public void updateRegularMeeting(RegularMeetingDTO dto) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+	
+			
+			pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			DBUtil.close(pstmt);
+		}
+	}
+	
+	// 정모 삭제 
+	public void deleteRegularMeeting(long meetingIdx, long regularMeetingIdx) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "DELETE FROM regularMeeting WHERE meetingIdx=? AND regularMeetingIdx=?";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, meetingIdx);
+			pstmt.setLong(2, regularMeetingIdx);
+			
+			pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			DBUtil.close(pstmt);
+		}
+	}
 }

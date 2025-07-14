@@ -91,7 +91,7 @@ function joinSchedule(id) {
 	          res=>{
 	              if(res && res.success){
 	                  Swal.fire('참여 완료!','','success');
-	                  refreshScheduleTab();   
+	                  refreshScheduleTab();  
 	              }else{
 	                  Swal.fire('실패','잠시 후 다시 시도해 주세요','error');
 	              }
@@ -112,18 +112,84 @@ function cancelSchedule(id) {
     showCancelButton: true,
     confirmButtonText: '취소하기',
     cancelButtonText: '닫기'
-  }).then(r => { 
-      if (!r.isConfirmed) return;           
+  }).then(r => {
+      if (!r.isConfirmed) return;          
 
 	  // 요청URL, 메소드, 파라미터, 응답타입, 콜백 순
-      sendAjaxRequest( 
-        ctx + '/schedule/cancel',             
-        'POST',                               
+      sendAjaxRequest(
+        ctx + '/schedule/cancel',            
+        'POST',                              
         { regularMeetingIdx: id },            
-        'json',                               
+        'json',                              
         res => {                              
           if (res && res.success) {
             Swal.fire('취소 완료!', '', 'success')
+                 .then(()=> refreshScheduleTab());  
+          } else {
+            Swal.fire('실패', '잠시 후 다시 시도해 주세요', 'error');
+          }
+        }
+      );
+  });
+}
+
+// 일정 수정하기
+function updateSchedule(id) {
+  const ctx = document
+               .querySelector('div.meeting-detail')
+               .getAttribute('data-contextPath');
+
+  Swal.fire({
+    title: '일정을 수정하시겠습니까 ? ',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '수정',
+    cancelButtonText: '취소'
+  }).then(r => {
+      if (!r.isConfirmed) return;          
+
+	  // 요청URL, 메소드, 파라미터, 응답타입, 콜백 순
+      sendAjaxRequest(
+        ctx + '/schedule/cancel',            
+        'POST',                              
+        { regularMeetingIdx: id },            
+        'json',                              
+        res => {                              
+          if (res && res.success) {
+            Swal.fire('수정 완료!', '', 'success')
+                 .then(()=> refreshScheduleTab());  
+          } else {
+            Swal.fire('실패', '잠시 후 다시 시도해 주세요', 'error');
+          }
+        }
+      );
+  });
+}
+
+// 일정 삭제하기
+function deleteSchedule(id) {
+  const ctx = document
+               .querySelector('div.meeting-detail')
+               .getAttribute('data-contextPath');
+
+  Swal.fire({
+    title: '일정을 삭제하시겠습니까?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '삭제',
+    cancelButtonText: '취소'
+  }).then(r => {
+      if (!r.isConfirmed) return;          
+
+	  // 요청URL, 메소드, 파라미터, 응답타입, 콜백 순
+      sendAjaxRequest(
+        ctx + '/schedule/cancel',            
+        'POST',                              
+        { regularMeetingIdx: id },            
+        'json',                              
+        res => {                              
+          if (res && res.success) {
+            Swal.fire('삭제 완료!', '', 'success')
                  .then(()=> refreshScheduleTab());  
           } else {
             Swal.fire('실패', '잠시 후 다시 시도해 주세요', 'error');

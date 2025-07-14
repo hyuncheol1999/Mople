@@ -3,6 +3,7 @@ package com.mopl.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,4 +53,29 @@ public class MemberOfMeetingDAO {
 		
 		return list;
 	}
+	
+	public boolean isLeader(long meetingIdx, long memberIdx) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+		
+		try {
+			sql = "SELECT role FROM MemberOfMeeting WHERE meetingIdx=? AND memberIdx=?";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, meetingIdx);
+			pstmt.setLong(2, memberIdx);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				return rs.getInt("role") == 0;
+			}
+			return false;
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+	}
 }
+
