@@ -227,15 +227,17 @@ public class MeetingController {
 				
 				memberOfMeetingList = memberOfMeetingDao.findMeetingIdx(meetingIdx);
 				
-				for(MemberOfMeetingDTO dto : memberOfMeetingList) {
-					if(dto.getMemberIdx() == info.getMemberIdx()) {
-						if(dto.getRole() == 0) {
-							userStatus = "HOST";
+				if (info != null) {
+					for(MemberOfMeetingDTO dto : memberOfMeetingList) {
+						if(dto.getMemberIdx() == info.getMemberIdx()) {
+							if(dto.getRole() == 0) {
+								userStatus = "HOST";
+								break;
+							}
+							userStatus = "JOINED";
 							break;
 						}
-						userStatus = "JOINED";
-						break;
-					}
+					}					
 				}
 				
 				mav.addObject("userStatus", userStatus);
