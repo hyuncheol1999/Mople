@@ -38,7 +38,7 @@ public class NoticeDAO {
 			rs = null;
 			pstmt = null;
 			
-			sql = "INSERT INTO notice(num, notice, memberIdx, subject, content, hitCount, reg_date, modify_date, showNotice) VALUES(?, ?, ?, ?, ?, 0, SYSDATE, SYSDATE)";
+			sql = "INSERT INTO notice(num, notice, memberIdx, subject, content, hitCount, reg_date, modify_date, showNotice) VALUES(notice_seq.NEXTVAL, ?, ?, ?, ?, 0, SYSDATE, SYSDATE, 0)";
 			
 			pstmt = conn.prepareStatement(sql);
 			
@@ -47,6 +47,8 @@ public class NoticeDAO {
 			pstmt.setLong(3, dto.getMemberIdx());
 			pstmt.setString(4, dto.getSubject());
 			pstmt.setString(5, dto.getContent());
+			
+			pstmt.executeUpdate();
 			
 			pstmt.close();
 			pstmt = null;
@@ -90,7 +92,7 @@ public class NoticeDAO {
 				result = rs.getInt(1);
 			}
 			
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -132,7 +134,7 @@ public class NoticeDAO {
 				result = rs.getInt(1);
 			}
 			
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -142,6 +144,7 @@ public class NoticeDAO {
 		return result;
 	}
 	
+	// 게시물 리스트
 	public List<NoticeDTO> listNotice(int offset, int size){
 		List<NoticeDTO> list = new ArrayList<NoticeDTO>();
 		PreparedStatement pstmt = null;
@@ -177,7 +180,7 @@ public class NoticeDAO {
 				
 				list.add(dto);
 			}
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -196,7 +199,7 @@ public class NoticeDAO {
 		
 		try {
 			sb.append(" SELECT num, n.memberIdx, userId, userName, userNickName, ");
-			sb.append("       subject, hitCount, reg_date ");
+			sb.append("       subject, hitCount, n.reg_date ");
 			sb.append(" FROM notice n ");
 			sb.append(" JOIN member1 m ON n.memberIdx = m.memberIdx ");
 			if (schType.equals("all")) {
@@ -238,7 +241,7 @@ public class NoticeDAO {
 				
 				list.add(dto);
 			}
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -256,8 +259,8 @@ public class NoticeDAO {
 		StringBuilder sb = new StringBuilder();
 		
 		try {
-			sb.append(" SELECT n.num, n.memberIdx, userId, userName, userNickName, subject, ");
-			sb.append("       hitCount, TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date  ");
+			sb.append(" SELECT num, n.memberIdx, userId, userName, userNickName, subject, ");
+			sb.append("       hitCount, TO_CHAR(reg_date, 'YYYY-MM-DD') n.reg_date  ");
 			sb.append(" FROM notice n ");
 			sb.append(" JOIN member1 m ON n.memberIdx = m.memberIdx ");
 			sb.append(" WHERE notice = 1  ");
@@ -281,7 +284,7 @@ public class NoticeDAO {
 				
 				list.add(dto);
 			}
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -298,8 +301,8 @@ public class NoticeDAO {
 		String sql;
 		
 		try {
-			sql = "SELECT n.num, notice, n.memberIdx, userId, userName, userNickName, subject, content, "
-					+ " hitCount, reg_date, n.modify_date "
+			sql = "SELECT num, notice, n.memberIdx, userId, userName, userNickName, subject, content, "
+					+ " hitCount, n.reg_date, n.modify_date "
 					+ " FROM notice n "
 					+ " JOIN member1 m ON n.memberIdx = m.memberIdx "
 					+ " WHERE num = ?";
@@ -324,7 +327,7 @@ public class NoticeDAO {
 				dto.setReg_date(rs.getString("reg_date"));
 				dto.setModify_date(rs.getString("modify_date"));
 			}
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -384,7 +387,7 @@ public class NoticeDAO {
 				dto.setSubject(rs.getString("subject"));
 			}
 			
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -445,7 +448,7 @@ public class NoticeDAO {
 				dto.setSubject(rs.getString("subject"));
 			}
 			
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -598,7 +601,7 @@ public class NoticeDAO {
 				
 				list.add(dto);
 			}	
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
@@ -631,7 +634,7 @@ public class NoticeDAO {
 				dto.setOriginalFilename(rs.getString("originalFilename"));
 				dto.setFileSize(rs.getLong("fileSize"));
 			}	
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);

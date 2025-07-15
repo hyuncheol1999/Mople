@@ -55,54 +55,16 @@
         .main-content {
             flex: 1;
             padding: 30px;
-            margin-left: 110px;
         }
-
-    .card {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-
-        /* ✅ 가운데 정렬 및 넓게 */
-        margin-left: auto;
-        margin-right: auto;
-        max-width: 1100px;
-    }
-
-    .btn {
-        font-size: 0.875rem !important;
-        padding: 4px 8px !important;
-        border-radius: 4px;
-    }
-
-    .form-select,
-    .form-control {
-        font-size: 0.875rem;
-        padding: 4px 8px;
-    }
-
-    .table.board-list {
-        width: 100%;
-        font-size: 0.875rem;
-    }
-
-    .page-navigation {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    .board-list-footer {
-        margin-top: 20px;
-        align-items: center;
-    }
-
-    .board-list-header {
-        margin-bottom: 10px;
-    }
-
-      .card h4 {
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+			margin-left: 220px;
+        }
+        .card h4 {
             margin-top: 0;
         }
         .stats-grid {
@@ -119,8 +81,6 @@
             text-align: center;
         }
     </style>
-
-
 </head>
 <body>
  <div class="wrap">
@@ -136,11 +96,9 @@
 			<div class="meetings-layout">
 			    <div class="main-content">
 			        <div class="card">
-		  				<div class="body-title">
-							<h3><i class="bi bi-app"></i> 공지사항 </h3>
-		    		  	</div>
+						<h4><i class="bi bi-app"></i> 공지사항 </h4>
 		    
-		   			 	<div class="body-main row">
+		   			 	<div class="stats-grid row">
 							<div class="col-xxl-9">
 								<form name="listForm" method="post">
 									<div class="row board-list-header">
@@ -189,7 +147,7 @@
 															<a href="${articleUrl}&num=${dto.num}" class="text-reset">${dto.subject}</a>
 														</div>
 													</td>
-													<td>${dto.userName}</td>
+													<td>${dto.userNickName}</td>
 													<td class="d-none d-md-table-cell">${dto.reg_date}</td>
 													<td class="d-none d-md-table-cell">${dto.hitCount}</td>
 												</tr>
@@ -209,7 +167,7 @@
 															<img class="align-middle" src="${pageContext.request.contextPath}/dist/images/new.gif">
 														</c:if>
 													</td>
-													<td>${dto.userName}</td>
+													<td>${dto.userNickName}</td>
 													<td class="d-none d-md-table-cell">${dto.reg_date}</td>
 													<td class="d-none d-md-table-cell">${dto.hitCount}</td>
 												</tr>
@@ -231,7 +189,7 @@
 											<div class="col-auto p-1">
 												<select name="schType" class="form-select">
 													<option value="all" ${schType=="all"?"selected":""}>제목+내용</option>
-													<option value="userName" ${schType=="userName"?"selected":""}>작성자</option>
+													<option value="userNickName" ${schType=="userNickName"?"selected":""}>작성자</option>
 													<option value="reg_date" ${schType=="reg_date"?"selected":""}>등록일</option>
 													<option value="subject" ${schType=="subject"?"selected":""}>제목</option>
 													<option value="content" ${schType=="content"?"selected":""}>내용</option>
@@ -239,7 +197,7 @@
 											</div>
 											<div class="col-auto p-1">
 												<input type="text" name="kwd" value="${kwd}" class="form-control">
-												<input type="hidden" name="size" value="${size}">
+												<input type="hidden" name="size" value="10">
 											</div>
 											<div class="col-auto p-1">
 												<button type="button" class="btn btn-light" onclick="searchList()"> <i class="bi bi-search"></i> </button>
@@ -247,7 +205,7 @@
 										</form>
 									</div>
 									<div class="col text-end">
-										<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/admin/notice/write?size=${size}';">글올리기</button>
+										<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/admin/notice/write?size=10';">글올리기</button>
 									</div>
 								</div>
 							</div>
@@ -329,6 +287,11 @@ function searchList() {
 	location.href = url + '?' + params;
 }
 </script>
+
+<jsp:include page="/WEB-INF/views/admin/layout/footer.jsp"/>
+
+<jsp:include page="/WEB-INF/views/admin/layout/footerResources.jsp"/>
+
 
 </div>
 </body>

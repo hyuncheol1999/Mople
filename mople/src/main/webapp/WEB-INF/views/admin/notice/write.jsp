@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>공지사항 등록</title>
 <jsp:include page="/WEB-INF/views/admin/layout/headerResources.jsp"/>
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/board.css" type="text/css">
 <style>
     body {
         font-family: 'Noto Sans KR', sans-serif;
@@ -102,7 +102,7 @@
 
     <form name="noticeForm" method="post" onsubmit="return check();" enctype="multipart/form-data">
         <label for="title">제목</label>
-        <input type="text" id="title" name="title" required />
+        <input type="text" id="subject" name="subject" required />
 
         <label for="content">내용</label>
         <textarea id="content" name="content" required></textarea>
@@ -127,9 +127,11 @@
         <c:if test="${mode=='update'}">
             <input type="hidden" name="num" value="${dto.num}">
             <input type="hidden" name="page" value="${page}">
+            <input type="hidden" name="size" value="10">
         </c:if>
     </form>
 </div>
+</main>
 
 <script type="text/javascript">
 function check() {
