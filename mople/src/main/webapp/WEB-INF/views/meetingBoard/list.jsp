@@ -10,6 +10,12 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css"
 	type="text/css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/dist/css/paginate.css"
+	type="text/css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/dist/css/paginate.css"
+	type="text/css">
 </head>
 <body>
 
@@ -29,7 +35,7 @@
 
 
 
-		<h3 class="board-title">${meetingName} 모임 소식</h3>
+		<h3 class="board-title">${meetingName}모임소식</h3>
 
 		<div class="category-tabs">
 			<a href="?meetingIdx=${meetingIdx}"
@@ -75,6 +81,15 @@
 				onclick="location.href='${pageContext.request.contextPath}/meetingBoard/write?meetingIdx=${meetingIdx}'">
 				글쓰기</button>
 		</div>
+
+		<c:if test="${not empty paging}">
+			<div class="page-navigation">
+				<div class="paginate">
+					<c:out value="${paging}" escapeXml="false" />
+				</div>
+			</div>
+		</c:if>
+
 
 	</main>
 

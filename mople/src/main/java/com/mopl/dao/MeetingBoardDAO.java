@@ -479,7 +479,7 @@ public class MeetingBoardDAO {
 		String sql;
 
 		try {
-			sql = "SELECT num, userId FROM meetingBoardLike WHERE num = ? AND memberIdx = ? ";
+			sql = "SELECT num, memberIdx FROM meetingBoardLike WHERE num = ? AND memberIdx = ? ";
 
 			pstmt = conn.prepareStatement(sql);
 
@@ -570,6 +570,147 @@ public class MeetingBoardDAO {
 			DBUtil.close(pstmt);
 		}
 		return result;
+	}
+
+	// 댓글 및 답글 추가
+	public void insertReply(MeetingBoardDTO dto) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+
+		try {
+			sql = "INSERT INTO meetingBoardReply(replyNum, num, memberIdx, content, reg_date, parentNum ) "
+					+ " VALUES (meetingBoardReply_seq.NEXTVAL, ?, ?, ?, SYSDATE, ?)";
+
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.setLong(1, dto.getNum());
+			pstmt.setLong(2, dto.getMemberIdx());
+			pstmt.setString(3, dto.getContent());
+			pstmt.setLong(4, dto.getParentNum());
+
+			pstmt.executeUpdate();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			DBUtil.close(pstmt);
+		}
+	}
+
+	// 댓글 개수
+	public int dataCountReply(long num) {
+		int result = 0;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "SELECT COUNT(*) FROM meetingBoardReply WHERE num = ? AND parentNum = 0";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, num);
+
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				result = rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return result;
+	}
+
+	// 댓글 목록 (페이징, 권한 체크 포함)
+	public List<MeetingBoardDTO> listReply(long num, int offset, int size, long memberIdx) {
+		List<MeetingBoardDTO> list = new ArrayList<MeetingBoardDTO>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			sb.append(" SELECT mb.replyNum, mb.num, mb.memberIdx, m.userNickName, mb.content, mb.reg_date ");
+			sb.append(" FROM meetingBoardReply mb ");
+			sb.append(" JOIN member1 m ON m.memberIdx = mb.memberIdx ");
+			sb.append(" LEFT OUTER JOIN ( ");
+			sb.append(" SELECT parentNum, COUNT(*) answerCount ");
+			sb.append(" FROM meetingBoardReply ");
+			sb.append(" WHERE parentNum != 0 ");
+			sb.append(" GROUP BY parentNum ");
+			sb.append(" ) a ON mb.replyNum = a.parentNum ");
+			sb.append(" WHERE mb.num = ? ");
+			sb.append(" ORDER BY mb.replyNum DESC ");
+			sb.append(" OFFSET ? ROWS FETCH FIRST ? ROWS ONLY ");
+
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setLong(1, num);
+			pstmt.setInt(2, offset);
+			pstmt.setInt(3, size);
+
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				MeetingBoardDTO dto = new MeetingBoardDTO();
+
+				dto.setReplyNum(rs.getLong("replyNum"));
+				dto.setNum(rs.getLong("num"));
+				dto.setMemberIdx(rs.getLong("memberIdx"));
+				dto.setUserNickName(rs.getString("userNickName"));
+				dto.setContent(rs.getString("content"));
+				dto.setReg_date(rs.getString("reg_date"));
+
+				list.add(dto);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+		return list;
+	}
+
+	// 특정 댓글 상세 정보 조회
+	public MeetingBoardDTO findByReplyId(long replyNum) {
+		MeetingBoardDTO dto = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "SELECT replyNum, num, memberIdx, content, reg_date FROM meetingBoardReply mb "
+					+ " JOIN member1 m ON mb.memberIdx = m.memberIdx WHERE replyNum = ? ";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, replyNum);
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				dto = new MeetingBoardDTO();
+
+				dto.setReplyNum(rs.getLong("replyNum"));
+				dto.setNum(rs.getLong("num"));
+				dto.setMemberIdx(rs.getLong("memberIdx"));
+				dto.setUserNickName(rs.getString("userNickName"));
+				dto.setContent(rs.getString("content"));
+				dto.setReg_date(rs.getString("reg_date"));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return dto;
 	}
 
 }

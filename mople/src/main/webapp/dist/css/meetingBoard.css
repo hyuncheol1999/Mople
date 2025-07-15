@@ -430,6 +430,76 @@ html, body {
 }
 
 /* ========================
+   댓글 리스트
+   ======================== */
+.reply-list {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	padding: 1rem 0;
+	text-align: left;
+}
+
+.reply-item {
+	background-color: #f9fafb;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	padding: 1rem 1.2rem;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+	transition: background-color 0.2s;
+}
+
+.reply-item:hover {
+	background-color: #ffffff;
+}
+
+.reply-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 0.5rem;
+}
+
+.reply-header .nickname {
+	font-weight: 600;
+	color: #1e293b;
+	font-size: 0.95rem;
+}
+
+.reply-header .meta {
+	font-size: 0.85rem;
+	color: #94a3b8;
+}
+
+.reply-content {
+	font-size: 0.95rem;
+	color: #334155;
+	line-height: 1.5;
+	word-break: break-word;
+	white-space: pre-line;
+}
+
+/* ========================
+   댓글 페이징
+   ======================== */
+.reply-pagination {
+	margin-top: 2rem;
+	text-align: center;
+	font-size: 0.9rem;
+	color: #64748b;
+}
+
+/* ========================
+   댓글 없음 메시지
+   ======================== */
+.text-muted {
+	color: #94a3b8;
+	font-size: 0.95rem;
+	text-align: center;
+	margin-top: 2rem;
+}
+
+/* ========================
    푸터
    ======================== */
 footer {

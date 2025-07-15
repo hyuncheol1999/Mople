@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${dto.subject}-모임 소식</title>
+<title>${dto.subject}-모임소식</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css">
@@ -34,7 +34,7 @@
 			<div class="profile-circle"></div>
 			<div>
 				<div class="nickname">${dto.userNickName}</div>
-				<div class="meta">${dto.reg_date} · 조회 10</div>
+				<div class="meta">${dto.reg_date}·조회10</div>
 			</div>
 		</div>
 
@@ -43,7 +43,7 @@
 			<c:out value="${dto.content}" escapeXml="false" />
 		</div>
 
-		<!-- 해시태그 / 카테고리 -->
+		<!-- 카테고리 -->
 		<div class="hashtags">
 			<span>#${dto.filter}</span>
 		</div>
@@ -55,7 +55,7 @@
 			<span id="boardLikeCount">${likeCount}</span>
 		</button>
 
-		<!-- 수정/삭제 -->
+		<!-- 수정/삭제 버튼 -->
 		<c:if test="${dto.userNickName == sessionScope.member.userNickName}">
 			<div class="view-footer">
 				<a
@@ -68,9 +68,25 @@
 
 		<!-- 댓글 영역 -->
 		<div class="comment-section">
-			<p class="comment-text">아직 댓글이 없습니다.</p>
-			<button class="btn comment-write">댓글 쓰기</button>
+			<form name="replyForm" method="post">
+				<table class="table table-borderless reply-form">
+					<tr>
+						<td><textarea class="form-control" name="content"
+								placeholder="댓글을 입력하세요."></textarea></td>
+					</tr>
+					<tr>
+						<td align="right">
+							<button type="button" class="btn btn-light btnSendReply">댓글
+								등록</button>
+						</td>
+					</tr>
+				</table>
+			</form>
+
+			<!-- 댓글 리스트 출력 위치 -->
+			<div id="listReply"></div>
 		</div>
+
 
 		<!-- 이전 글 -->
 		<div class="nav-item">
@@ -102,13 +118,13 @@
 			</c:choose>
 		</div>
 
-
 	</main>
 
+	<!-- 삭제 확인 스크립트 -->
 	<c:if test="${sessionScope.member.memberIdx==dto.memberIdx}">
 		<script type="text/javascript">
 			function deleteOk() {
-				if (confirm('게시물을 삭제하시겠습니까?')) {
+				if (confirm('게시글을 삭제하시겠습니까?')) {
 					let params = 'num=${dto.num}&${query}';
 					let url = '${pageContext.request.contextPath}/meetingBoard/delete?'
 							+ params;
@@ -153,7 +169,7 @@
 		$.ajax(url, settings);
 	}
 
-	// 좋아요 버튼 클릭 이벤트
+	// 좋아요 처리
 	$(function () {
 		$('.btnSendBoardLike').click(function () {
 			const $btn = $(this);
@@ -179,13 +195,67 @@
 					$('#boardLikeCount').text(data.meetingBoardLikeCount);
 					$btn.attr('data-liked', !userLiked);
 				} else if (state === 'liked') {
-					alert('이미 공감한 게시글입니다.');
+					alert('이미 좋아요를 누른 게시글입니다.');
 				} else {
-					alert('공감 처리에 실패했습니다.');
+					alert('좋아요 처리 중 오류가 발생했습니다.');
 				}
 			};
 
 			sendAjaxRequest(url, 'post', params, 'json', fn);
+		});
+	});
+	
+	// 댓글 불러오기
+	$(function() {
+		listPage(1);
+	});
+	
+	function listPage(page) {
+		let url = '${pageContext.request.contextPath}/meetingBoard/listReply';
+		let num = '${dto.num}';
+		let params = {num:num, pageNo:page};
+		let selector = '#listReply';
+		
+		const fn = function(data) {
+			$(selector).html(data);
+		};
+		
+		sendAjaxRequest(url, 'get', params, 'text', fn);
+	}
+	
+	// 댓글 등록
+	$(function() {
+		$('.btnSendReply').click(function() {
+			let num = '${dto.num}';
+			const $tb = $(this).closest('table');
+			
+			let content = $tb.find('textarea').val().trim();
+			if(! content) {
+				alert('댓글 내용을 입력하세요.');
+			return;
+		}
+		
+		let params = {num:num, content:content, parentNum:0};
+		
+		let url = '${pageContext.request.contextPath}/meetingBoard/insertReply';
+		
+		const fn = function(data) {
+			$tb.find('textarea').val('');
+			
+			let state = data.state;
+			if(state === 'loginFail') {
+				alert('로그인 후 댓글 작성이 가능합니다.');
+				login();
+				return;
+			} 
+			
+			if (state === 'true') {
+				listPage(1);
+			} else {
+				alert('댓글 등록에 실패했습니다. 다시 시도해주세요.');
+			}
+		};
+		sendAjaxRequest(url, 'post', params, 'json', fn);
 		});
 	});
 </script>

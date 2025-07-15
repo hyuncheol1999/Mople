@@ -41,7 +41,7 @@ public class MeetingBoardController {
 
 			int current_page = 1;
 			String page = req.getParameter("page");
-			if (page != null) {
+			if (page != null && !page.isEmpty()) {
 				current_page = Integer.parseInt(page);
 			}
 
@@ -54,8 +54,8 @@ public class MeetingBoardController {
 			} else {
 				kwd = util.decodeUrl(kwd);
 				if (schType == null || schType.trim().isEmpty()) {
-	                schType = "all";
-	            }
+					schType = "all";
+				}
 			}
 
 			String filter = req.getParameter("filter");
@@ -109,9 +109,15 @@ public class MeetingBoardController {
 	public ModelAndView writeForm(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("meetingBoard/write");
-
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		
+		if (info == null) {
+			return new ModelAndView("redirect:/member/login");
+		}
+		
 		long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
-
 		mav.addObject("meetingIdx", meetingIdx);
 		mav.addObject("mode", "write");
 
@@ -128,10 +134,6 @@ public class MeetingBoardController {
 
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
-
-		if (info == null) {
-			return new ModelAndView("redirect:/member/login");
-		}
 
 		try {
 			MeetingBoardDTO dto = new MeetingBoardDTO();
@@ -192,7 +194,7 @@ public class MeetingBoardController {
 			}
 
 			dto.setContent(util.htmlSymbols(dto.getContent()));
-			
+
 			// 이전 글, 다음 글
 			MeetingBoardDTO prevDto = dao.findByPrev(dto.getNum(), schType, kwd);
 			MeetingBoardDTO nextDto = dao.findByNext(dto.getNum(), schType, kwd);
@@ -376,6 +378,111 @@ public class MeetingBoardController {
 		model.put("state", state);
 		model.put("liked", liked);
 		model.put("meetingBoardLikeCount", meetingBoardLikeCount);
+
+		return model;
+	}
+
+	// 댓글 목록
+	@RequestMapping(value = "/meetingBoard/listReply", method = RequestMethod.GET)
+	public ModelAndView listReply(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		MeetingBoardDAO dao = new MeetingBoardDAO();
+		MyUtil util = new MyUtil();
+
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+		if (info == null) {
+	        resp.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 응답
+	        return null;
+	    }
+		
+		try {
+			long num = Long.parseLong(req.getParameter("num"));
+			String pageNo = req.getParameter("pageNo");
+
+			int current_page = 1;
+			if (pageNo != null) {
+				current_page = Integer.parseInt(pageNo);
+			}
+
+			int size = 10;
+			int total_page = 0;
+			int replyCount = 0;
+
+			replyCount = dao.dataCountReply(num);
+			total_page = util.pageCount(replyCount, size);
+			if (current_page > total_page) {
+				current_page = total_page;
+			}
+
+			int offset = (current_page - 1) * size;
+			if (offset < 0)
+				offset = 0;
+
+			List<MeetingBoardDTO> listReply = dao.listReply(num, offset, size, info.getMemberIdx());
+
+			for (MeetingBoardDTO dto : listReply) {
+				dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
+			}
+
+			String paging = util.pagingMethod(current_page, total_page, "listPage");
+
+			ModelAndView mav = new ModelAndView("meetingBoard/listReply");
+
+			mav.addObject("listReply", listReply);
+			mav.addObject("pageNo", current_page);
+			mav.addObject("replyCount", replyCount);
+			mav.addObject("total_page", total_page);
+			mav.addObject("paging", paging);
+
+			return mav;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			resp.sendError(406);
+			throw e;
+		}
+	}
+
+	// 댓글, 대댓글 저장 - AJAX:JSON
+	@ResponseBody
+	@RequestMapping(value = "/meetingBoard/insertReply", method = RequestMethod.POST)
+	public Map<String, Object> insertReply(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		Map<String, Object> model = new HashMap<String, Object>();
+
+		MeetingBoardDAO dao = new MeetingBoardDAO();
+
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		
+		if(info == null) {
+			model.put("state", "loginFail");
+			return model;
+		}
+
+		String state = "false";
+
+		try {
+			MeetingBoardDTO dto = new MeetingBoardDTO();
+
+			long num = Long.parseLong(req.getParameter("num"));
+			dto.setNum(num);
+			dto.setMemberIdx(info.getMemberIdx());
+			dto.setContent(req.getParameter("content"));
+			String parentNum = req.getParameter("parentNum");
+			if (parentNum != null) {
+				dto.setParentNum(Long.parseLong(parentNum));
+			}
+
+			dao.insertReply(dto);
+
+			state = "true";
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		model.put("state", state);
 
 		return model;
 	}
