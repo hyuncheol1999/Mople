@@ -38,7 +38,7 @@ public class NoticeDAO {
 			rs = null;
 			pstmt = null;
 			
-			sql = "INSERT INTO notice(num, notice, memberIdx, subject, content, hitCount, reg_date, modify_date, showNotice) VALUES(notice_seq.NEXTVAL, ?, ?, ?, ?, 0, SYSDATE, SYSDATE, 0)";
+			sql = "INSERT INTO notice(num, notice, memberIdx, subject, content, hitCount, reg_date, modify_date, showNotice) VALUES(?, ?, ?, ?, ?, 0, SYSDATE, SYSDATE, 0)";
 			
 			pstmt = conn.prepareStatement(sql);
 			
@@ -206,7 +206,7 @@ public class NoticeDAO {
 				sb.append(" WHERE INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ");
 			} else if (schType.equals("reg_date")) {
 				kwd = kwd.replaceAll("(\\-|\\/|\\.)", "");
-				sb.append(" WHERE TO_CHAR(reg_date, 'YYYYMMDD') = ?");
+				sb.append(" WHERE TO_CHAR(n.reg_date, 'YYYYMMDD') = ?");
 			} else {
 				sb.append(" WHERE INSTR(" + schType + ", ?) >= 1 ");
 			}
@@ -260,7 +260,7 @@ public class NoticeDAO {
 		
 		try {
 			sb.append(" SELECT num, n.memberIdx, userId, userName, userNickName, subject, ");
-			sb.append("       hitCount, TO_CHAR(reg_date, 'YYYY-MM-DD') n.reg_date  ");
+			sb.append("       hitCount, TO_CHAR(n.reg_date, 'YYYY-MM-DD') reg_date  ");
 			sb.append(" FROM notice n ");
 			sb.append(" JOIN member1 m ON n.memberIdx = m.memberIdx ");
 			sb.append(" WHERE notice = 1  ");

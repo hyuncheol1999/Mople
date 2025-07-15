@@ -106,15 +106,7 @@
 											<button type="button" class="btn btn-light" id="btnDeleteList" title="삭제"><i class="bi bi-trash"></i></button>
 										</div>
 										<div class="col-auto">
-											<c:if test="${dataCount != 0}">
-												<select name="size" class="form-select" onchange="changeList();">
-													<option value="5"  ${size==5 ? "selected ":""}>5개씩 출력</option>
-													<option value="10" ${size==10 ? "selected ":""}>10개씩 출력</option>
-													<option value="20" ${size==20 ? "selected ":""}>20개씩 출력</option>
-													<option value="30" ${size==30 ? "selected ":""}>30개씩 출력</option>
-													<option value="50" ${size==50 ? "selected ":""}>50개씩 출력</option>
-												</select>
-											</c:if>
+											<input type="hidden" name="size" value="10">
 											<input type="hidden" name="page" value="${page}">
 											<input type="hidden" name="schType" value="${schType}">
 											<input type="hidden" name="kwd" value="${kwd}">

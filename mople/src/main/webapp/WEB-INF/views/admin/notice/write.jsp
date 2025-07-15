@@ -101,11 +101,11 @@
     <h2>공지사항 등록</h2>
 
     <form name="noticeForm" method="post" onsubmit="return check();" enctype="multipart/form-data">
-        <label for="title">제목</label>
-        <input type="text" id="subject" name="subject" required />
+        <label for="subject">제목</label>
+        <input type="text" id="subject" name="subject" maxlength="100" class="form-control" value="${dto.subject}" />
 
         <label for="content">내용</label>
-        <textarea id="content" name="content" required></textarea>
+        <textarea name="content" id="content" class="form-control" style="width: 99%; height: 300px;">${dto.content}</textarea>
         
         <label for="selectFile">파일 첨부</label>
         <input type="file" id="selectFile" name="selectFile" multiple />
@@ -117,13 +117,14 @@
         </div>
 
         <div class="btn-box">
-            <button type="submit" class="btn">${mode=='update'?'수정완료':'등록완료'}&nbsp;<i class="bi bi-check2"></i></button>
+            <button type="button" class="btn" onclick="sendOk();">${mode=='update'?'수정완료':'등록완료'}&nbsp;<i class="bi bi-check2"></i></button>
             <button type="reset" class="btn cancel">다시입력</button>
             <button type="button" class="btn cancel" onclick="location.href='${pageContext.request.contextPath}/admin/notice/list';">
                 ${mode=='update'?'수정취소':'등록취소'}&nbsp;<i class="bi bi-x"></i>
             </button>
         </div>
 
+        <input type="hidden" name="size" value="10">
         <c:if test="${mode=='update'}">
             <input type="hidden" name="num" value="${dto.num}">
             <input type="hidden" name="page" value="${page}">
@@ -131,14 +132,13 @@
         </c:if>
     </form>
 </div>
-</main>
 
 <script type="text/javascript">
-function check() {
+function sendOk() {
     const f = document.noticeForm;
     let str;
     
-    str = f.title.value.trim();
+    str = f.subject.value.trim();
     if (!str) {
         alert('제목을 입력하세요.');
         f.title.focus();
@@ -153,13 +153,14 @@ function check() {
     }
 
     f.action = '${pageContext.request.contextPath}/admin/notice/${mode}';
+    f.submit();
     return true;
 }
 
 <c:if test="${mode=='update'}">
     function deleteFile(fileNum) {
         if (!confirm('파일을 삭제 하시겠습니까?')) return;
-        let params = 'num=${dto.num}&fileNum=' + fileNum + '&page=${page}&size=${size}';
+        let params = 'num=${dto.num}&fileNum=' + fileNum + '&page=${page}&size=10';
         let url = '${pageContext.request.contextPath}/admin/notice/deleteFile?' + params;
         location.href = url;
     }
