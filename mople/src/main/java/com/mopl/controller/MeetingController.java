@@ -196,11 +196,12 @@ public class MeetingController {
 		// 정모장인지아닌지 확인
 		ModelAndView mav = new ModelAndView("meeting/meetingDetail");
 		MeetingDAO dao = new MeetingDAO();
+		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 
 		MeetingDTO meetingDto = null;
 
 		// 유저의 모임 참가 여부
-		String userStatus = "NOT_JOINED";
+		String userStatus = "NOT_LOGIN";
 
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
@@ -221,14 +222,28 @@ public class MeetingController {
 				mav.addObject("meetingName", meetingDto.getMeetingName());
 				mav.addObject("sportName", meetingDto.getSportName());
 				mav.addObject("regionName", meetingDto.getRegionName());
+				// 대기인원 포함
 				mav.addObject("currentMembers", meetingDto.getCurrentMembers());
 				mav.addObject("meetingProfilePhoto", meetingDto.getMeetingProfilePhoto());
 
-
 				if (info != null) {
-
+					userStatus = "NOT_JOINED";
+					
+					MemberOfMeetingDAO momDao = new MemberOfMeetingDAO();
+					// 모임 인원이면
+					if(momDao.isMeetingMember(meetingIdx, info.getMemberIdx())) {
+						userStatus = "JOINED";
+						
+						// 모임장이면
+						if(momDao.isLeader(meetingIdx, info.getMemberIdx())) {
+							userStatus = "HOST";
+						}
+					}
+					
 				}
 
+				// 대기인원 제외 카운트
+				mav.addObject("memberCount", mDao.findMemberCount(meetingIdx));
 				mav.addObject("userStatus", userStatus);
 
 			} else {
@@ -236,7 +251,7 @@ public class MeetingController {
 			}
 
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 		return mav;
 	}
@@ -245,23 +260,54 @@ public class MeetingController {
 	@RequestMapping(value = "/meeting/meetingHome", method = RequestMethod.GET)
 	public ModelAndView meetingHome(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		
 		ModelAndView mav = new ModelAndView("meeting/meetingHome");
 		MeetingDAO meetingDao = new MeetingDAO();
 		MemberOfMeetingDAO memberOfMeetingDao = new MemberOfMeetingDAO();
+		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
+		
 		MeetingDTO meetingDto = null;
 		List<MemberOfMeetingDTO> memberOfMeetingList = null;
+		List<MemberOfMeetingDTO> waitingList = null;
+		
+		String userStatus = "NOT_LOGIN";
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
 
 		try {
 			long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
 			meetingDto = meetingDao.findByMeeetingIdx(meetingIdx);
 			memberOfMeetingList = memberOfMeetingDao.findMeetingIdx(meetingIdx);
+			waitingList = memberOfMeetingDao.findWaitingList(meetingIdx);
 
 			mav.addObject("meetingDesc", meetingDto.getMeetingDesc());
 			mav.addObject("regionName", meetingDto.getRegionName());
 			mav.addObject("currentMembers", meetingDto.getCurrentMembers());
 
 			mav.addObject("memberOfMeetingList", memberOfMeetingList);
+			mav.addObject("waitingList", waitingList);
+			
+			// 대기인원 제외 카운트
+			mav.addObject("memberCount", mDao.findMemberCount(meetingIdx));
+			
+			if (info != null) {
+				userStatus = "NOT_JOINED";
+				
+				MemberOfMeetingDAO momDao = new MemberOfMeetingDAO();
+				// 모임 인원이면
+				if(momDao.isMeetingMember(meetingIdx, info.getMemberIdx())) {
+					userStatus = "JOINED";
+					
+					// 모임장이면
+					if(momDao.isLeader(meetingIdx, info.getMemberIdx())) {
+						userStatus = "HOST";
+					}
+				}
+				
+			}
 
+			mav.addObject("userStatus", userStatus);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -478,10 +524,10 @@ public class MeetingController {
 			e.printStackTrace();
 		}
 
-		return new ModelAndView("redirect:/meeting/meetingList");
+		return new ModelAndView("redirect:/meeting/meetingList?sportCategory=0&regionCategory=0");
 	}
 
-	// 모임 참여
+	// 모임 신청
 	@ResponseBody
 	@RequestMapping(value = "/meeting/join", method = RequestMethod.POST)
 	public Map<String, Object> joinMeeting(HttpServletRequest req, HttpServletResponse resp) {
@@ -506,6 +552,70 @@ public class MeetingController {
 
 			dao.insertMeetingMember(dto);
 
+			map.put("success", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("success", false);
+		}
+		return map;
+	}
+	
+	// 모임 신청 승인
+	@ResponseBody
+	@RequestMapping(value = "/meeting/approve", method = RequestMethod.POST)
+	public Map<String, Object> approveMember(HttpServletRequest req, HttpServletResponse resp) {
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		Map<String, Object> map = new HashMap<>();
+		
+		String idxParam = req.getParameter("meetingIdx");
+		if (info == null || idxParam == null || idxParam.isBlank()) {
+			map.put("success", false);
+			return map;
+		}
+		
+		try {
+			MemberOfMeetingDAO dao = new MemberOfMeetingDAO();
+			MemberOfMeetingDTO dto = new MemberOfMeetingDTO();
+			
+			dto.setMeetingIdx(Long.parseLong(idxParam));
+			dto.setMemberIdx(Long.parseLong(req.getParameter("memberIdx")));
+			// 관리자: 0 / 회원: 1 / 대기: 2
+			dto.setRole(1);
+			
+			dao.approveMember(dto);
+			
+			map.put("success", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("success", false);
+		}
+		return map;
+	}
+	
+	// 모임 신청 거절
+	@ResponseBody
+	@RequestMapping(value = "/meeting/reject", method = RequestMethod.POST)
+	public Map<String, Object> rejectMember(HttpServletRequest req, HttpServletResponse resp) {
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		Map<String, Object> map = new HashMap<>();
+		
+		String idxParam = req.getParameter("meetingIdx");
+		if (info == null || idxParam == null || idxParam.isBlank()) {
+			map.put("success", false);
+			return map;
+		}
+		
+		try {
+			MemberOfMeetingDAO dao = new MemberOfMeetingDAO();
+			MemberOfMeetingDTO dto = new MemberOfMeetingDTO();
+			
+			dto.setMeetingIdx(Long.parseLong(idxParam));
+			dto.setMemberIdx(Long.parseLong(req.getParameter("memberIdx")));
+
+			dao.rejectMember(dto);
+			
 			map.put("success", true);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -565,6 +675,26 @@ public class MeetingController {
 		return new ModelAndView("redirect:/meeting/meetingDetail?" + query);
 	}
 
+	// 모임 해체 폼
+	@RequestMapping(value = "/meeting/meetingDelete", method = RequestMethod.GET)
+	public ModelAndView meetingDelete(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		ModelAndView mav = new ModelAndView("meeting/meetingDelete");
+		MemberOfMeetingDAO dao = new MemberOfMeetingDAO();
+		mav.addObject("list", dao.findMeetingIdx(Long.parseLong(req.getParameter("meetingIdx"))));
+		
+		return mav;
+	}
+	
+	// 모임 해체
+	@RequestMapping(value = "/meeting/meetingDelete", method = RequestMethod.POST)
+	public ModelAndView meetingDeleteSubmit(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		ModelAndView mav = new ModelAndView("meeting/meetingDelete");
+		
+		return mav;
+	}
+	
 	// 이미 삭제된 모임 클릭시 페이지 전환
 	@RequestMapping(value = "/meeting/deletedMeeting", method = RequestMethod.GET)
 	public ModelAndView deletedMeeting(HttpServletRequest req, HttpServletResponse resp)

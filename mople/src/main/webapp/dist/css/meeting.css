@@ -579,16 +579,17 @@ p.meetingDesc {
 
 .members-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 2rem;
 }
 
-.member-card {
-  min-width: 180px;
-  text-align: left;
-  border-radius: 8px;
-  background: #f8fafc;
+.waiting-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2rem;
 }
+
+
 
 
 .member-card img {
@@ -782,9 +783,45 @@ img.managerLogo {
   text-align: left;	
 }
 
-.albumPhotoInModal {
-	
-}
+        .icon-body {
+        	display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .icon-button {
+            background: none;
+            border: 2px solid;
+            border-radius: 50%; /* 원형 버튼 */
+            width: 30px; /* 버튼 크기 */
+            height: 30px; /* 버튼 크기 */
+            justify-content: center;
+            align-items: center;
+            font-size: 12px; /* 아이콘 크기 */
+            cursor: pointer;
+            margin-top: 5px;
+            transition: all 0.3s ease; /* 호버 효과 */
+        }
+        /* 승인 버튼 스타일 */
+        .approve-button {
+            color: #f08979; /* 녹색 */
+            border-color: #f08979;
+        }
+        .approve-button:hover {
+            background-color: #f08979;
+            color: white;
+        }
+        /* 거절 버튼 스타일 */
+        .reject-button {
+            color: #f08979; /* 빨간색 */
+            border-color: #f08979;
+        }
+        .reject-button:hover {
+            background-color: #f08979;
+            color: white;
+        }
+
+
 
 /* 반응형 디자인 고려 (모바일에서는 고정 해제) */
 @media (max-width: 768px) {

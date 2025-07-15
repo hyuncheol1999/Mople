@@ -223,8 +223,66 @@ function joinMeeting(meetingIdx) {
 	          'json',
 	          res=>{
 	              if(res && res.success){
-	                  Swal.fire('신청 완료!','','success');
-	                  showTabAjax('meetingHome');  
+	                  Swal.fire('신청 완료!','','success')
+	                  	.then(() => window.location.href = `${ctx}/meeting/meetingDetail?meetingIdx=${meetingIdx}`);  
+	              }else{
+	                  Swal.fire('실패','잠시 후 다시 시도해 주세요','error');
+	              }
+	          }
+	      );
+	  });
+}
+
+// 모임 승인
+function approveMember(meetingIdx, memberIdx) {
+  const ctx = document.querySelector('div.meeting-detail').getAttribute('data-contextPath');
+
+  Swal.fire({
+    title: '신청을 승인하시겠습니까?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '승인',
+    cancelButtonText: '취소'
+	}).then(r=>{
+	      if(!r.isConfirmed) return;
+	      sendAjaxRequest(
+	          ctx + '/meeting/approve',
+	          'POST',
+	          { meetingIdx:meetingIdx, memberIdx:memberIdx},
+	          'json',
+	          res=>{
+	              if(res && res.success){
+	                  Swal.fire('승인 완료!','','success')
+	                  	.then(() => window.location.href = `${ctx}/meeting/meetingDetail?page=1&sportCategory=0&regionCategory=0&sortBy=latest&meetingIdx=${meetingIdx}`); 
+	              }else{
+	                  Swal.fire('실패','잠시 후 다시 시도해 주세요','error');
+	              }
+	          }
+	      );
+	  });
+}
+
+// 모임 거절
+function rejectMember(meetingIdx, memberIdx) {
+  const ctx = document.querySelector('div.meeting-detail').getAttribute('data-contextPath');
+
+  Swal.fire({
+    title: '승인을 거절하시겠습니까?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '거절',
+    cancelButtonText: '취소'
+	}).then(r=>{
+	      if(!r.isConfirmed) return;
+	      sendAjaxRequest(
+	          ctx + '/meeting/reject',
+	          'POST',
+	          { meetingIdx:meetingIdx, memberIdx:memberIdx},
+	          'json',
+	          res=>{
+	              if(res && res.success){
+	                  Swal.fire('모임 신청을 거절하였습니다.','','success')
+	                  	.then(() => window.location.href = `${ctx}/meeting/meetingDetail?page=1&sportCategory=0&regionCategory=0&sortBy=latest&meetingIdx=${meetingIdx}`);  
 	              }else{
 	                  Swal.fire('실패','잠시 후 다시 시도해 주세요','error');
 	              }

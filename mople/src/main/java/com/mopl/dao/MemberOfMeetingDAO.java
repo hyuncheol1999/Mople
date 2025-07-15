@@ -14,7 +14,7 @@ import com.mopl.util.DBUtil;
 public class MemberOfMeetingDAO {
 	private Connection conn = DBConn.getConnection();
 	
-	// 모임 전체 인원 조회
+	// 모임 전체 인원 조회 (승인된 인원)
 	public List<MemberOfMeetingDTO> findMeetingIdx(long meetingIdx) {
 		List<MemberOfMeetingDTO> list = new ArrayList<MemberOfMeetingDTO>();
 		PreparedStatement pstmt = null;
@@ -26,7 +26,8 @@ public class MemberOfMeetingDAO {
 			sb.append("FROM memberOfMeeting mom ");
 			sb.append("LEFT OUTER JOIN member1 m1 ON mom.memberIdx = m1.memberIdx ");
 			sb.append("LEFT OUTER JOIN member2 m2 ON mom.memberIdx = m2.memberIdx ");
-			sb.append("WHERE meetingIdx = ?");
+			sb.append("WHERE meetingIdx = ? AND mom.role != 2 ");
+			sb.append("ORDER BY mom.role");
 			
 			pstmt = conn.prepareStatement(sb.toString());
 			
@@ -34,7 +35,7 @@ public class MemberOfMeetingDAO {
 			
 			rs = pstmt.executeQuery();
 			
-			if(rs.next()) {
+			while(rs.next()) {
 				MemberOfMeetingDTO dto = new MemberOfMeetingDTO();
 				dto.setMeetingIdx(rs.getLong("meetingIdx"));
 				dto.setMemberIdx(rs.getLong("memberIdx"));
@@ -54,6 +55,84 @@ public class MemberOfMeetingDAO {
 		
 		return list;
 	}
+	
+	// 승인 대기 인원 조회
+	public List<MemberOfMeetingDTO> findWaitingList(long meetingIdx) {
+		List<MemberOfMeetingDTO> list = new ArrayList<MemberOfMeetingDTO>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append("SELECT mom.meetingIdx, mom.memberIdx, mom.role, userName, profilePhoto ");
+			sb.append("FROM memberOfMeeting mom ");
+			sb.append("LEFT OUTER JOIN member1 m1 ON mom.memberIdx = m1.memberIdx ");
+			sb.append("LEFT OUTER JOIN member2 m2 ON mom.memberIdx = m2.memberIdx ");
+			sb.append("WHERE mom.meetingIdx = ? AND mom.role = 2");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setLong(1, meetingIdx);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				MemberOfMeetingDTO dto = new MemberOfMeetingDTO();
+				dto.setMeetingIdx(rs.getLong("meetingIdx"));
+				dto.setMemberIdx(rs.getLong("memberIdx"));
+				dto.setRole(rs.getInt("role"));
+				dto.setMemberName(rs.getString("userName"));
+				dto.setMemberProfilePhoto(rs.getString("profilePhoto"));
+				
+				list.add(dto);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+		
+		return list;
+	}
+	
+	// 모임 전체 인원 카운트 (대기 인원 제외 (role=2))
+	public int findMemberCount(long meetingIdx) {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+		
+		int waitingCount = 0;
+		
+		try {
+			sb.append("SELECT COUNT(*) count ");
+			sb.append("FROM memberOfMeeting mom ");
+			sb.append("LEFT OUTER JOIN member1 m1 ON mom.memberIdx = m1.memberIdx ");
+			sb.append("LEFT OUTER JOIN member2 m2 ON mom.memberIdx = m2.memberIdx ");
+			sb.append("WHERE mom.meetingIdx = ? AND mom.role != 2");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setLong(1, meetingIdx);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				waitingCount = rs.getInt(1);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+		
+		return waitingCount;
+	}
+	
+	
 	
 	// 모임장인지 확인
 	public boolean isLeader(long meetingIdx, long memberIdx) throws SQLException {
