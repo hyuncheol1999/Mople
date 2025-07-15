@@ -173,6 +173,9 @@ public class NoticeManageController {
 		try {
 			NoticeDTO dto = new NoticeDTO();
 			
+			System.out.println(info);
+			System.out.println(req.getParameter("subject"));
+			
 			dto.setMemberIdx(info.getMemberIdx());
 			if(req.getParameter("notice") != null) {
 				dto.setNotice(Integer.parseInt(req.getParameter("notice")));
@@ -229,7 +232,7 @@ public class NoticeManageController {
 			}
 
 			// 스마트 에디터를 사용하므로 주석 처리
-			// dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
+			dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
 
 			// 이전글/다음글
 			NoticeDTO prevDto = dao.findByPrev(dto.getNum(), schType, kwd);
