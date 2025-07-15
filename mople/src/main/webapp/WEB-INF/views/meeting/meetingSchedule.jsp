@@ -8,7 +8,12 @@
 		<div class="title">
 			<h3>
 				이번달 정모 일정
-				<button type="button" class="btn btn-outline btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/regularMeetingCreate'">+</button>
+				<c:if test="${isLeader}">
+					<button type="button" class="btn btn-outline btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/regularMeetingCreate'">+</button>
+				</c:if>
+				<c:if test="${canInteract}">
+					<button type="button" style="display:none;"class="btn btn-outline btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/regularMeetingCreate'">+</button>
+				</c:if>
 			</h3>
 		</div>	
 		<c:if test="${empty scheduleList}">

@@ -85,28 +85,6 @@ public class RegularMeetingDAO {
 		return false;
 	}
 
-	// 로그인한 회원이 모임에 가입된 멤버인지 확인
-	public boolean isMeetingMember(long meetingIdx, long memberIdx) throws SQLException {
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String sql;
-		
-		try {
-			sql = "SELECT COUNT(*) FROM memberOfMeeting WHERE meetingIdx = ? AND memberIdx = ?";
-			
-			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setLong(1, meetingIdx);
-			pstmt.setLong(2, memberIdx);
-			
-			rs = pstmt.executeQuery();
-			return rs.next() && rs.getInt(1) > 0;
-		} finally {
-			DBUtil.close(rs);
-			DBUtil.close(pstmt);
-		}
-	}
-
 	// 정모 참여 ( 중복체크 )
 	public void insertParticipant(long regularMeetingIdx, long memberIdx) throws SQLException {
 		PreparedStatement pstmt = null;
@@ -176,21 +154,23 @@ public class RegularMeetingDAO {
 		PreparedStatement pstmt = null;
 		StringBuilder sb = new StringBuilder();
 		
-		try {
-			sb.append("INSERT INTO regularMeeting(regularMeetingIdx, startDate, place, capacity, subject, ");
-			sb.append(" status, isBungaeMeeting, sportIdx, regionIdx, meetingIdx, memberIdx) ");
+		try {		        		        
+			sb.append("INSERT INTO regularMeeting(regularMeetingIdx, startDate, endDate, place, capacity, subject, ");
+			sb.append(" content, status, isBungaeMeeting, sportIdx, regionIdx, meetingIdx, memberIdx) ");
 			sb.append(" VALUES(regularMeeting_seq.NEXTVAL, TO_CHAR(?, 'YYYY-MM-DD'), TO_CHAR(?, 'YYYY-MM-DD'), ?, ?, ?, ?, 0, 0, ?, ?, ?, ?");			
 			
 			pstmt = conn.prepareStatement(sb.toString());
 			
 			pstmt.setString(1, dto.getStartDate());
-			pstmt.setString(2, dto.getPlace());
-			pstmt.setInt(3, dto.getCapacity());
-			pstmt.setString(4, dto.getSubject());
-			pstmt.setInt(5, dto.getSportIdx());
-			pstmt.setInt(6, dto.getRegionIdx());
-			pstmt.setLong(7, dto.getMeetingIdx());
-			pstmt.setLong(8, dto.getMemberIdx());
+			pstmt.setString(2, dto.getEndDate());
+			pstmt.setString(3, dto.getPlace());
+			pstmt.setInt(4, dto.getCapacity());
+			pstmt.setString(5, dto.getSubject());
+			pstmt.setString(6, dto.getContent());
+			pstmt.setInt(7, dto.getSportIdx());
+			pstmt.setInt(8, dto.getRegionIdx());
+			pstmt.setLong(9, dto.getMeetingIdx());
+			pstmt.setLong(10, dto.getMemberIdx());
 			
 			pstmt.executeUpdate();
 			
