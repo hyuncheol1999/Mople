@@ -50,7 +50,7 @@
 						</div>
 						<c:choose>
 						    <c:when test="${userStatus eq 'NOT_JOINED'}">
-						        <button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingJoin'">모임 참여</button>
+						        <button type="button" class="btn btn-primary" onclick="joinMeeting(${meetingIdx})">모임 참여</button>
 						    </c:when>
 						    <c:when test="${userStatus eq 'HOST'}">
 						        <button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingDelete'">모임 해체</button>
@@ -71,9 +71,7 @@
 					</nav>
 
 					<div class="meeting-content"></div>
-					<c:if test="${userStatus eq 'HOST'}">
-						아아
-					</c:if>
+
 				</div>
 			</div>
 		</main>

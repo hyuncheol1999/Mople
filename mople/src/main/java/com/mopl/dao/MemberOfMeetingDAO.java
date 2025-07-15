@@ -14,6 +14,7 @@ import com.mopl.util.DBUtil;
 public class MemberOfMeetingDAO {
 	private Connection conn = DBConn.getConnection();
 	
+	// 모임 전체 인원 조회
 	public List<MemberOfMeetingDTO> findMeetingIdx(long meetingIdx) {
 		List<MemberOfMeetingDTO> list = new ArrayList<MemberOfMeetingDTO>();
 		PreparedStatement pstmt = null;
@@ -54,6 +55,7 @@ public class MemberOfMeetingDAO {
 		return list;
 	}
 	
+	// 모임장인지 확인
 	public boolean isLeader(long meetingIdx, long memberIdx) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -74,6 +76,94 @@ public class MemberOfMeetingDAO {
 			return false;
 		} finally {
 			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+	}
+	
+	// 로그인한 회원이 모임에 가입된 멤버인지 확인
+	public boolean isMeetingMember(long meetingIdx, long memberIdx) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+		
+		try {
+			sql = "SELECT COUNT(*) FROM memberOfMeeting WHERE meetingIdx = ? AND memberIdx = ?";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, meetingIdx);
+			pstmt.setLong(2, memberIdx);
+			
+			rs = pstmt.executeQuery();
+			return rs.next() && rs.getInt(1) > 0;
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+	}
+	
+	// 모임원 등록 - 대기
+	public void insertMeetingMember(MemberOfMeetingDTO dto) {
+		PreparedStatement pstmt = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append("INSERT INTO memberOfMeeting(meetingIdx, memberIdx, role)");
+			sb.append("  VALUES(?, ?, ?)");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setLong(1, dto.getMeetingIdx());
+			pstmt.setLong(2, dto.getMemberIdx());
+			pstmt.setInt(3, dto.getRole());
+			
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(pstmt);
+		}
+	}
+	
+	// 모임원 등록 - 승인
+	public void approveMember(MemberOfMeetingDTO dto) {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "UPDATE memberOfMeeting SET role = ? WHERE meetingIdx = ? AND memberIdx = ?";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, dto.getRole());
+			pstmt.setLong(2, dto.getMeetingIdx());
+			pstmt.setLong(3, dto.getMemberIdx());
+			
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(pstmt);
+		}
+	}
+	
+	// 모임원 등록 - 거절
+	public void rejectMember(MemberOfMeetingDTO dto) {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "DELETE FROM memberOfMeeting WHERE meetingIdx = ? AND memberIdx = ?";
+
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, dto.getMeetingIdx());
+			pstmt.setLong(2, dto.getMemberIdx());
+			
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
 			DBUtil.close(pstmt);
 		}
 	}

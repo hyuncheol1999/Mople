@@ -98,7 +98,7 @@ function joinSchedule(id) {
 	          }
 	      );
 	  });
-	}
+	}	
 	
 // 일정참여 취소하기
 function cancelSchedule(id) {
@@ -202,4 +202,33 @@ function deleteSchedule(id) {
 // 일정 탭 새로고침
 function refreshScheduleTab() {
 	showTabAjax('meetingSchedule');
+}
+
+// 모임 참여하기
+function joinMeeting(meetingIdx) {
+  const ctx = document.querySelector('div.meeting-detail').getAttribute('data-contextPath');
+
+  Swal.fire({
+    title: '모임에 신청하시겠습니까?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '신청',
+    cancelButtonText: '취소'
+	}).then(r=>{
+	      if(!r.isConfirmed) return;
+	      sendAjaxRequest(
+	          ctx + '/meeting/join',
+	          'POST',
+	          { meetingIdx:meetingIdx },
+	          'json',
+	          res=>{
+	              if(res && res.success){
+	                  Swal.fire('신청 완료!','','success');
+	                  showTabAjax('meetingHome');  
+	              }else{
+	                  Swal.fire('실패','잠시 후 다시 시도해 주세요','error');
+	              }
+	          }
+	      );
+	  });
 }

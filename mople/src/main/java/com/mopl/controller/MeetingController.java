@@ -190,77 +190,56 @@ public class MeetingController {
 	}
 
 	// 모임 상세
-		@RequestMapping(value = "/meeting/meetingDetail", method = RequestMethod.GET)
-		public ModelAndView meetingDetail(HttpServletRequest req, HttpServletResponse resp)
-				throws ServletException, IOException {
-			// 정모장인지아닌지 확인
-			ModelAndView mav = new ModelAndView("meeting/meetingDetail");
-			MeetingDAO dao = new MeetingDAO();
-			MemberOfMeetingDAO memberOfMeetingDao = new MemberOfMeetingDAO();
-			
-			MeetingDTO meetingDto = null;
-			List<MemberOfMeetingDTO> memberOfMeetingList = null;
-			
-			// 유저의 모임 참가 여부
-			String userStatus = "NOT_JOINED";
-			
-			HttpSession session = req.getSession();
-			SessionInfo info = (SessionInfo) session.getAttribute("member");
+	@RequestMapping(value = "/meeting/meetingDetail", method = RequestMethod.GET)
+	public ModelAndView meetingDetail(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		// 정모장인지아닌지 확인
+		ModelAndView mav = new ModelAndView("meeting/meetingDetail");
+		MeetingDAO dao = new MeetingDAO();
 
+		MeetingDTO meetingDto = null;
+
+		// 유저의 모임 참가 여부
+		String userStatus = "NOT_JOINED";
+
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+		try {
 			// meetingIdx 파라미터가 없을 경우
 			String param = req.getParameter("meetingIdx");
 			if (param == null) {
 				return new ModelAndView("meeting/deletedMeeting");
 			}
-			
+
 			if (param != null && !param.isEmpty()) {
 				// 모임 정보
 				Long meetingIdx = Long.parseLong(param);
 				meetingDto = dao.findByMeeetingIdx(meetingIdx);
-				
+
 				mav.addObject("meetingIdx", meetingIdx);
 				mav.addObject("meetingName", meetingDto.getMeetingName());
 				mav.addObject("sportName", meetingDto.getSportName());
 				mav.addObject("regionName", meetingDto.getRegionName());
 				mav.addObject("currentMembers", meetingDto.getCurrentMembers());
 				mav.addObject("meetingProfilePhoto", meetingDto.getMeetingProfilePhoto());
-				
-				memberOfMeetingList = memberOfMeetingDao.findMeetingIdx(meetingIdx);
-				
+
+
 				if (info != null) {
-					for(MemberOfMeetingDTO dto : memberOfMeetingList) {
-						if(dto.getMemberIdx() == info.getMemberIdx()) {
-							if(dto.getRole() == 0) {
-								userStatus = "HOST";
-								break;
-							}
-							userStatus = "JOINED";
-							break;
-						}
-					}					
+
 				}
-				
+
 				mav.addObject("userStatus", userStatus);
-				
-				if (info != null) {
-					try {
-						RegularMeetingDAO rDao = new RegularMeetingDAO();
-						boolean isLeader = rDao.isMeetingMember(meetingIdx, info.getMemberIdx());
-						mav.addObject("isLeader", isLeader);
-						
-					} catch (Exception e) {
-						e.printStackTrace();
-						mav.addObject("isLeader", false);
-					}
-				} else {
-					mav.addObject("isLeader", false);
-				}
+
 			} else {
 				System.out.println("meetingIdx 존재X");
 			}
-			return mav;
-		}
 
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return mav;
+	}
 
 	// 모임상세 - 홈 화면
 	@RequestMapping(value = "/meeting/meetingHome", method = RequestMethod.GET)
@@ -307,7 +286,7 @@ public class MeetingController {
 			MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 
 			boolean isLogin = (info != null);
-			boolean meetingMember = isLogin && dao.isMeetingMember(meetingIdx, memberIdx);
+			boolean meetingMember = isLogin && mDao.isMeetingMember(meetingIdx, memberIdx);
 			boolean isLeader = isLogin && mDao.isLeader(meetingIdx, memberIdx);
 
 			List<RegularMeetingDTO> list = dao.listSchedule(meetingIdx);
@@ -500,6 +479,39 @@ public class MeetingController {
 		}
 
 		return new ModelAndView("redirect:/meeting/meetingList");
+	}
+
+	// 모임 참여
+	@ResponseBody
+	@RequestMapping(value = "/meeting/join", method = RequestMethod.POST)
+	public Map<String, Object> joinMeeting(HttpServletRequest req, HttpServletResponse resp) {
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		Map<String, Object> map = new HashMap<>();
+
+		String idxParam = req.getParameter("meetingIdx");
+		if (info == null || idxParam == null || idxParam.isBlank()) {
+			map.put("success", false);
+			return map;
+		}
+
+		try {
+			MemberOfMeetingDAO dao = new MemberOfMeetingDAO();
+			MemberOfMeetingDTO dto = new MemberOfMeetingDTO();
+
+			dto.setMeetingIdx(Long.parseLong(idxParam));
+			dto.setMemberIdx(info.getMemberIdx());
+			// 관리자: 0 / 회원: 1 / 대기: 2
+			dto.setRole(2);
+
+			dao.insertMeetingMember(dto);
+
+			map.put("success", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("success", false);
+		}
+		return map;
 	}
 
 	// 모임 상세 - 사진첩 - 등록 폼
