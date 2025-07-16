@@ -71,49 +71,112 @@ body {
 	justify-content: flex-start; /* 위에서부터 내용 시작 */
 	gap: 20px; /* 항목 간 여백 */
 }
+
 .radio-btn {
-    display: inline-flex;
-    align-items: center;
-    border: 2px solid #444;
-    border-radius: 25px;
-    padding: 10px 20px;
-    margin: 0 10px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    background-color: white;
+	display: inline-flex;
+	align-items: center;
+	border: 2px solid #444;
+	border-radius: 25px;
+	padding: 10px 20px;
+	margin: 0 10px;
+	cursor: pointer;
+	font-size: 16px;
+	transition: all 0.3s ease;
+	background-color: white;
 }
 
 .radio-btn input[type="radio"] {
-    display: none;
+	display: none;
 }
 
 .radio-btn span {
-    pointer-events: none;
+	pointer-events: none;
 }
 
 /* 선택된 항목 강조 */
-.radio-btn input[type="radio"]:checked + span {
-    color: #fff;
-    background-color: #444;
-    padding: 8px 16px;
-    border-radius: 20px;
+.radio-btn input[type="radio"]:checked+span {
+	color: #fff;
+	background-color: #444;
+	padding: 8px 16px;
+	border-radius: 20px;
 }
 
 .sport-submit-btn {
-    margin-top: 20px;
-    padding: 10px 30px;
-    font-size: 16px;
-    border-radius: 25px;
-    border: none;
-    background-color: #444;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+	margin-top: 20px;
+	padding: 10px 30px;
+	font-size: 16px;
+	border-radius: 25px;
+	border: none;
+	background-color: #444;
+	color: #fff;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
 }
 
 .sport-submit-btn:hover {
-    background-color: #222;
+	background-color: #222;
+}
+.game-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.game-row {
+    display: grid;
+    grid-template-columns: 80px 100px 1fr 80px 1fr 60px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+}
+
+.team-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.team-name {
+    font-size: 16px;
+}
+
+.game-score {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.score {
+    display: inline-block;
+    width: 20px;
+}
+
+.vs {
+    font-weight: bold;
+    color: #555;
+}
+
+.game-time,
+.game-place,
+.game-state {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+}
+.game-score {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 60px; /* 스코어 없는 상태에서도 자리 유지 */
 }
 </style>
 </head>
@@ -126,55 +189,66 @@ body {
 
 		<main class="main">
 			<section class="sport-selection">
-			    <form id="sportForm" action="/schedule/main" method="get">
-			        <label class="radio-btn">
-			            <input type="radio" name="sports" value="kbaseball" checked>
-			            <span>야구</span>
-			        </label>
-			        <label class="radio-btn">
-			            <input type="radio" name="sports" value="kfootball">
-			            <span>축구</span>
-			        </label>
-			        <label class="radio-btn">
-			            <input type="radio" name="sports" value="basketball">
-			            <span>농구</span>
-			        </label>
-			        <label class="radio-btn">
-			            <input type="radio" name="sports" value="volleyball">
-			            <span>배구</span>
-			        </label>
-			        <br><br>
-			        <button type="submit" class="sport-submit-btn">종목 선택</button>
-			    </form>
+				<form id="sportForm" action="/schedule/main" method="get">
+					<label class="radio-btn"> <input type="radio" name="sports"
+						value="kbaseball" checked> <span>야구</span>
+					</label> <label class="radio-btn"> <input type="radio"
+						name="sports" value="kfootball"> <span>축구</span>
+					</label> <label class="radio-btn"> <input type="radio"
+						name="sports" value="basketball"> <span>농구</span>
+					</label> <label class="radio-btn"> <input type="radio"
+						name="sports" value="volleyball"> <span>배구</span>
+					</label> <br>
+					<br>
+					<button type="submit" class="sport-submit-btn">종목 선택</button>
+				</form>
 			</section>
 
 			<section class="schedule-area">
 				<div class="schedule-box">
-					경기일정
 					<c:choose>
 						<c:when test="${not empty list}">
-							<c:forEach var="game" items="${list}">
-								<div class="schedule-item">
-									<div>
-										<strong>시간:</strong> ${game.time}
+							<div class="game-list">
+								<c:forEach var="game" items="${list}">
+									<div class="game-row">
+										<!-- 경기 시간 -->
+										<div class="game-time">${game.time}</div>
+										<!-- 경기 장소 -->
+										<div class="game-place">${game.place}</div>
+
+										<!-- 어웨이팀 -->
+										<div class="team">
+											<img src="${game.logo1}" alt="${game.away}" class="team-logo" />
+											<span class="team-name">${game.away}</span>
+										</div>
+
+										<!-- 스코어 (종료일 때만 표시) -->
+										<div class="game-score">
+											<c:if test="${game.state eq '종료'}">
+												<span class="score">${game.awayScore}</span>
+                                :
+                                <span class="score">${game.homeScore}</span>
+											</c:if>
+										</div>
+
+										<!-- 홈팀 -->
+										<div class="team">
+											<img src="${game.logo2}" alt="${game.home}" class="team-logo" />
+											<span class="team-name">${game.home}</span>
+										</div>
+
+										<!-- 경기 상태 -->
+										<div class="game-state">${game.state}</div>
 									</div>
-									<div>
-										<strong>장소:</strong> ${game.place}
-									</div>
-									<div>
-										<strong>경기:</strong> ${game.team1} vs ${game.team2}
-									</div>
-									<div>
-										<strong>상태:</strong> ${game.status}
-									</div>
-								</div>
-							</c:forEach>
+								</c:forEach>
+							</div>
 						</c:when>
 						<c:otherwise>
 							<p style="text-align: center;">경기 일정이 없습니다.</p>
 						</c:otherwise>
 					</c:choose>
 				</div>
+
 			</section>
 		</main>
 	</div>

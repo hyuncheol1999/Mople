@@ -18,9 +18,12 @@ public class ScheduleCrawler {
         System.setProperty("webdriver.chrome.driver", "C:\\chromedriver-win64\\chromedriver.exe");
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--headless=new"); // 창 안 띄우고 백그라운드 실행
+        options.addArguments("--window-size=1280,1024"); // 데스크탑 화면 크기
+        options.addArguments("--disable-gpu"); // (선택) 안정성 위해
+        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                             "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                             "Chrome/114.0.0.0 Safari/537.36"); // 데스크탑 환경 User-Agent
 
         WebDriver driver = new ChromeDriver(options);
 
@@ -34,15 +37,18 @@ public class ScheduleCrawler {
 
             for (WebElement game : games) {
                 GameDTO dto = new GameDTO();
-
-                // 경기 시간과 장소
+                // 경기 시간
                 dto.setTime(game.findElement(By.cssSelector("div[class^='MatchBox_time__']")).getText());
                 System.out.println(dto.getTime());
+
+                // 경기장
                 dto.setPlace(game.findElement(By.cssSelector("div[class^='MatchBox_stadium__']")).getText());
+                System.out.println(dto.getPlace());
 
                 // 경기 상태
-                String state = game.findElement(By.cssSelector("div[class^='MatchBox_match_area__'] > em")).getText();
+                String state = game.findElement(By.cssSelector("em[class^='MatchBox_status__']")).getText();
                 dto.setState(state);
+                System.out.println(dto.getState());
 
                 String awayTeam = "";
                 String homeTeam = "";
@@ -51,38 +57,21 @@ public class ScheduleCrawler {
                 String awayScore = "";
                 String homeScore = "";
 
-                if ("예정".equals(state)) {
-                    // 예정 경기 - 스코어 없음, 팀명 위치 기반 선택자 사용
-                    awayTeam = game.findElement(By.cssSelector(
-                        "div.MatchBox_match_area__39dEr > div:nth-child(2) > div > div.MatchBoxHeadToHeadArea_team_name__3GuBO > div > strong"
-                    )).getText();
+                List<WebElement> teamElements = game.findElements(By.cssSelector("strong[class^='MatchBoxHeadToHeadArea_team__']"));
+                List<WebElement> logoElements = game.findElements(By.cssSelector("div[class^='MatchBoxHeadToHeadArea_emblem__'] img"));
 
-                    homeTeam = game.findElement(By.cssSelector(
-                        "div.MatchBox_match_area__39dEr > div:nth-child(3) > div > div.MatchBoxHeadToHeadArea_team_name__3GuBO > div > strong"
-                    )).getText();
+                awayTeam = teamElements.get(0).getText();
+                homeTeam = teamElements.get(1).getText();
+                awayLogo = logoElements.get(0).getAttribute("src");
+                homeLogo = logoElements.get(1).getAttribute("src");
+                
+                if ("종료".equals(state)) {
+                    List<WebElement> scoreElements = game.findElements(By.cssSelector("strong[class^='MatchBoxHeadToHeadArea_score__']"));
 
-                    awayLogo = game.findElement(By.cssSelector(
-                        "div.MatchBox_match_area__39dEr > div:nth-child(2) img"
-                    )).getAttribute("src");
-
-                    homeLogo = game.findElement(By.cssSelector(
-                        "div.MatchBox_match_area__39dEr > div:nth-child(3) img"
-                    )).getAttribute("src");
-
-                } else if ("종료".equals(state)) {
-                    // 종료 경기 - 클래스 기반 선택자 사용, 스코어 포함
-                    awayTeam = game.findElement(By.cssSelector("div[class^='MatchBoxHeadToHeadArea_type_loser__'] strong")).getText();
-                    homeTeam = game.findElement(By.cssSelector("div[class^='MatchBoxHeadToHeadArea_type_winner__'] strong")).getText();
-
-                    awayLogo = game.findElement(By.cssSelector("div[class^='MatchBoxHeadToHeadArea_type_loser__'] img")).getAttribute("src");
-                    homeLogo = game.findElement(By.cssSelector("div[class^='MatchBoxHeadToHeadArea_type_winner__'] img")).getAttribute("src");
-
-                    awayScore = game.findElement(By.cssSelector("div[class^='MatchBoxHeadToHeadArea_type_loser__'] strong")).getText();
-                    homeScore = game.findElement(By.cssSelector("div[class^='MatchBoxHeadToHeadArea_type_winner__'] strong")).getText();
-
+                    awayScore = scoreElements.get(0).getText();
+                    homeScore = scoreElements.get(1).getText();
                 } else {
-                    // 기타 상태 (취소, 연기 등) 필요하면 처리 추가
-                    awayTeam = homeTeam = awayLogo = homeLogo = awayScore = homeScore = "";
+                    awayScore = homeScore = "";
                 }
 
                 dto.setAway(awayTeam);
