@@ -207,3 +207,24 @@ input[type="file"] {
         font-size: 1em;
     }
 }
+
+input[type="number"] {
+    width: 20%;
+    padding: 14px 18px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1.05em;
+    color: #333;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+input[type="number"]::placeholder {
+    color: #a0a0a0;
+}
+
+input[type="number"]:focus {
+    border-color: #f08979;
+    box-shadow: 0 0 0 3px rgba(240, 137, 121, 0.2);
+    outline: none;
+}

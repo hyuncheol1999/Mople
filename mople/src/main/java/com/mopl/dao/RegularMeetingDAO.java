@@ -16,44 +16,43 @@ public class RegularMeetingDAO {
 
 	// 어떤 모임의 정모일정리스트 + 현재 참여인원
 	public List<RegularMeetingDTO> listSchedule(long meetingIdx) throws SQLException {
-        List<RegularMeetingDTO> list = new ArrayList<>();
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        String sql;
-        
-        try {
-        	sql = "SELECT r.regularMeetingIdx, meetingIdx, startDate, place, capacity, subject, status, "
-        			+ " NVL( COUNT(m.memberIdx), 0 ) AS currentCnt " 
-        			+ " FROM regularMeeting r "
-        			+ " LEFT JOIN memberOfRegularMeeting m ON m.regularMeetingIdx = r.regularMeetingIdx "
-        			+ " WHERE meetingIdx = ? AND isBungaeMeeting = 0 "
-        			+ " GROUP BY r.regularMeetingIdx, meetingIdx, startDate, place, capacity, subject, status "
-        			+ " ORDER BY startDate ASC";
-        	
-            pstmt = conn.prepareStatement(sql);
-        	
-            pstmt.setLong(1, meetingIdx);
-            rs = pstmt.executeQuery();
-            
-            while (rs.next()) {
-                    RegularMeetingDTO dto = new RegularMeetingDTO();
-                    dto.setRegularMeetingIdx(rs.getLong("regularMeetingIdx"));
-                    dto.setStartDate(rs.getString("startDate"));
-                    dto.setPlace(rs.getString("place"));
-                    dto.setCapacity(rs.getInt("capacity"));
-                    dto.setSubject(rs.getString("subject"));
-                    dto.setStatus(rs.getInt("status"));
-                    dto.setCurrentCnt(rs.getInt("currentCnt"));
-                    
-                    list.add(dto);
-                }
-        } catch (Exception e) {
+		List<RegularMeetingDTO> list = new ArrayList<>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "SELECT r.regularMeetingIdx, meetingIdx, startDate, place, capacity, subject, status, "
+					+ " NVL( COUNT(m.memberIdx), 0 ) AS currentCnt " + " FROM regularMeeting r "
+					+ " LEFT JOIN memberOfRegularMeeting m ON m.regularMeetingIdx = r.regularMeetingIdx "
+					+ " WHERE meetingIdx = ? AND isBungaeMeeting = 0 "
+					+ " GROUP BY r.regularMeetingIdx, meetingIdx, startDate, place, capacity, subject, status "
+					+ " ORDER BY startDate ASC";
+
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.setLong(1, meetingIdx);
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				RegularMeetingDTO dto = new RegularMeetingDTO();
+				dto.setRegularMeetingIdx(rs.getLong("regularMeetingIdx"));
+				dto.setStartDate(rs.getString("startDate"));
+				dto.setPlace(rs.getString("place"));
+				dto.setCapacity(rs.getInt("capacity"));
+				dto.setSubject(rs.getString("subject"));
+				dto.setStatus(rs.getInt("status"));
+				dto.setCurrentCnt(rs.getInt("currentCnt"));
+
+				list.add(dto);
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(rs);
 			DBUtil.close(pstmt);
 		}
-			return list;
+		return list;
 
 	}
 
@@ -62,18 +61,18 @@ public class RegularMeetingDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String sql;
-		
+
 		try {
 			sql = "SELECT COUNT(*) FROM memberOfRegularMeeting WHERE regularMeetingIdx=? AND memberIdx=?";
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
+
 			pstmt.setLong(1, regularMeetingIdx);
 			pstmt.setLong(2, memberIdx);
-			
+
 			rs = pstmt.executeQuery();
-			
-			if(rs.next()) {
+
+			if (rs.next()) {
 				return rs.getInt(1) > 0;
 			}
 		} catch (Exception e) {
@@ -128,18 +127,18 @@ public class RegularMeetingDAO {
 	public void deleteParticipant(long regularMeetingIdx, long memberIdx) throws SQLException {
 		PreparedStatement pstmt = null;
 		String sql;
-		
+
 		try {
 			sql = "DELETE FROM memberOfRegularMeeting WHERE regularMeetingIdx = ? AND memberIdx = ?";
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
+
 			pstmt.setLong(1, regularMeetingIdx);
 			pstmt.setLong(2, memberIdx);
 			pstmt.executeUpdate();
-			
+
 			pstmt.executeUpdate();
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
@@ -147,67 +146,101 @@ public class RegularMeetingDAO {
 			DBUtil.close(pstmt);
 		}
 	}
-	
+
 // 정모장이 할것	
-	// 정모 추가 
-	public void insertRegularMeeting(RegularMeetingDTO dto) throws SQLException {
+	// 정모 생성
+	public void createRegularMeeting(RegularMeetingDTO dto) throws SQLException {
+	    PreparedStatement pstmt = null;
+	    String sql;
+
+	    try {
+	    	conn.setAutoCommit(false);
+	        sql = "INSERT INTO regularMeeting(regularMeetingIdx, startDate, place, capacity, subject, sportIdx, regionIdx, meetingIdx, memberIdx) "
+	            + "VALUES(regularMeeting_seq.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, dto.getStartDate());
+	        pstmt.setString(2, dto.getPlace());
+	        pstmt.setInt(3, dto.getCapacity());
+	        pstmt.setString(4, dto.getSubject());
+	        pstmt.setInt(5, dto.getSportIdx());
+	        pstmt.setInt(6, dto.getRegionIdx());
+	        pstmt.setLong(7, dto.getMeetingIdx());
+	        pstmt.setLong(8, dto.getMemberIdx());
+	        pstmt.executeUpdate();
+
+	        conn.commit();
+	    } catch (Exception e) {
+	        conn.rollback();
+	        throw e;
+	    } finally {
+	        DBUtil.close(pstmt);
+	        conn.setAutoCommit(true);
+	    }
+	}
+/*  정모장도 자동참여됨
+	public void createRegularMeeting(RegularMeetingDTO dto) throws SQLException {
 		PreparedStatement pstmt = null;
-		StringBuilder sb = new StringBuilder();
-		
-		try {		        		        
-			sb.append("INSERT INTO regularMeeting(regularMeetingIdx, startDate, endDate, place, capacity, subject, ");
-			sb.append(" content, status, isBungaeMeeting, sportIdx, regionIdx, meetingIdx, memberIdx) ");
-			sb.append(" VALUES(regularMeeting_seq.NEXTVAL, TO_CHAR(?, 'YYYY-MM-DD'), TO_CHAR(?, 'YYYY-MM-DD'), ?, ?, ?, ?, 0, 0, ?, ?, ?, ?");			
+		String sql;
+
+		try {
+			conn.setAutoCommit(false);
 			
-			pstmt = conn.prepareStatement(sb.toString());
-			
+			sql = "INSERT INTO regularMeeting(regularMeetingIdx, startDate, place, capacity, subject, sportIdx, regionIdx, meetingIdx, memberIdx) "
+					+ "VALUES(regularMeeting_seq.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, dto.getStartDate());
-			pstmt.setString(2, dto.getEndDate());
-			pstmt.setString(3, dto.getPlace());
-			pstmt.setInt(4, dto.getCapacity());
-			pstmt.setString(5, dto.getSubject());
-			pstmt.setString(6, dto.getContent());
-			pstmt.setInt(7, dto.getSportIdx());
-			pstmt.setInt(8, dto.getRegionIdx());
-			pstmt.setLong(9, dto.getMeetingIdx());
-			pstmt.setLong(10, dto.getMemberIdx());
-			
+			pstmt.setString(2, dto.getPlace());
+			pstmt.setInt(3, dto.getCapacity());
+			pstmt.setString(4, dto.getSubject());
+			pstmt.setInt(5, dto.getSportIdx());
+			pstmt.setInt(6, dto.getRegionIdx());
+			pstmt.setLong(7, dto.getMeetingIdx());
+			pstmt.setLong(8, dto.getMemberIdx());
 			pstmt.executeUpdate();
-			
+
 			pstmt.close();
-			pstmt = null;
+
+			sql = "INSERT INTO memberOfRegularMeeting(regularMeetingIdx, memberIdx) VALUES(regularMeeting_seq.CURRVAL, ?)";
 			
-			sb.append("INSERT INTO memberOfRegularMeeting(regularMeetingIdx, memberIdx ");
-			sb.append(" VALUES(regularMeeting_seq.CURRVAL, ?");
-			
-			pstmt = conn.prepareStatement(sb.toString());
+			pstmt = conn.prepareStatement(sql);
 			
 			pstmt.setLong(1, dto.getMemberIdx());
 			
 			pstmt.executeUpdate();
-			
+
+			conn.commit();
 		} catch (Exception e) {
-			e.printStackTrace();
+			conn.rollback();
 			throw e;
 		} finally {
-			DBUtil.close(pstmt);
+		DBUtil.close(pstmt);
+		conn.setAutoCommit(true);
 		}
 	}
-	
-	// 정모 수정 
+*/
+	// 정모 수정
 	public void updateRegularMeeting(RegularMeetingDTO dto) throws SQLException {
 		PreparedStatement pstmt = null;
 		String sql;
-		
+
 		try {
-			sql = "";
-			
+			sql = "UPDATE regularMeeting SET subject=?, startDate=TO_DATE(?, 'YYYY-MM-DD'), place=?, capacity=? "
+					+ " WHERE meetingIdx=? AND regularMeetingIdx=? AND isBungaeMeeting=0";
+
 			pstmt = conn.prepareStatement(sql);
-			
-	
-			
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, dto.getSubject());
+			pstmt.setString(2, dto.getStartDate());
+			pstmt.setString(3, dto.getPlace());
+			pstmt.setInt(4, dto.getCapacity());
+			pstmt.setLong(5, dto.getMeetingIdx());
+			pstmt.setLong(6, dto.getRegularMeetingIdx());
+
 			pstmt.executeUpdate();
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
@@ -215,27 +248,62 @@ public class RegularMeetingDAO {
 			DBUtil.close(pstmt);
 		}
 	}
-	
-	// 정모 삭제 
-	public void deleteRegularMeeting(long meetingIdx, long regularMeetingIdx) throws SQLException {
-		PreparedStatement pstmt = null;
-		String sql;
-		
-		try {
-			sql = "DELETE FROM regularMeeting WHERE meetingIdx=? AND regularMeetingIdx=?";
-			
-			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setLong(1, meetingIdx);
-			pstmt.setLong(2, regularMeetingIdx);
-			
-			pstmt.executeUpdate();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		} finally {
+
+	// 정모 삭제
+	public int deleteRegularMeeting(long regularMeetingIdx) throws SQLException {
+	    PreparedStatement pstmt = null;
+	    
+	    try {
+	    	String sql = "DELETE FROM regularMeeting WHERE regularMeetingIdx = ?";
+	        
+	    	pstmt = conn.prepareStatement(sql);
+	    	
+	    	pstmt.setLong(1, regularMeetingIdx);
+	        
+	    	return pstmt.executeUpdate();
+	    } finally {
 			DBUtil.close(pstmt);
 		}
 	}
+
+	
+	public RegularMeetingDTO findByRegularMeetingIdx(long regularMeetingIdx) throws SQLException {
+	    RegularMeetingDTO dto = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+	    String sql;
+
+	    try {
+	        sql = "SELECT regularMeetingIdx, startDate, place, capacity, subject, sportIdx, regionIdx, meetingIdx, memberIdx "
+	            + "FROM regularMeeting WHERE regularMeetingIdx = ?";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setLong(1, regularMeetingIdx);
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            dto = new RegularMeetingDTO();
+	            dto.setRegularMeetingIdx(rs.getLong("regularMeetingIdx"));
+	            dto.setStartDate(rs.getDate("startDate").toString());
+	            dto.setPlace(rs.getString("place"));
+	            dto.setCapacity(rs.getInt("capacity"));
+	            dto.setSubject(rs.getString("subject"));
+	            dto.setSportIdx(rs.getInt("sportIdx"));
+	            dto.setRegionIdx(rs.getInt("regionIdx"));
+	            dto.setMeetingIdx(rs.getLong("meetingIdx"));
+	            dto.setMemberIdx(rs.getLong("memberIdx"));
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        throw e;
+	    } finally {
+	        DBUtil.close(rs);
+	        DBUtil.close(pstmt);
+	    }
+
+	    return dto;
+	}
+
+
 }

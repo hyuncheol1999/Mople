@@ -81,6 +81,16 @@
 			src="${pageContext.request.contextPath}/dist/js/meeting-detail.js"></script>
 		<script type="text/javascript"
 			src="${pageContext.request.contextPath}/dist/js/meeting-album.js"></script>
+
+		<c:if test="${param.afterCreate eq 'true'}">
+		<script>$(document).ready(function(){showTabAjax('meetingSchedule');});</script>
+		</c:if>
+			
 	</div>
+	<script src="${pageContext.request.contextPath}/dist/js/meeting-detail.js"></script>
+	<script>
+	  const contextPath = '${pageContext.request.contextPath}';
+	  const meetingIdx = '${meetingIdx}'; 
+	</script>
 </body>
 </html>

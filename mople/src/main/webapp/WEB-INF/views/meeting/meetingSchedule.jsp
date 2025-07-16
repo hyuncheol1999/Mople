@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <c:set var="canInteract" value="${isLogin and meetingMember}" />
 <div id="scheduleTab" class="tab-content">
@@ -9,10 +10,7 @@
 			<h3>
 				이번달 정모 일정
 				<c:if test="${isLeader}">
-					<button type="button" class="btn btn-outline btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/regularMeetingCreate'">+</button>
-				</c:if>
-				<c:if test="${canInteract}">
-					<button type="button" style="display:none;"class="btn btn-outline btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/regularMeetingCreate'">+</button>
+					<button type="button" class="btn btn-outline btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/regularMeetingCreate?mode=create&meetingIdx=${meetingIdx}'">+</button>
 				</c:if>
 			</h3>
 		</div>	
@@ -22,36 +20,32 @@
 		<c:if test="${not empty scheduleList}">
 			<div class="schedule-list">
 				<c:forEach var="schedule" items="${scheduleList}">
-					<c:set var="closed"
-						value="${schedule.currentCnt >= schedule.capacity}" />
-					<fmt:parseDate value="${schedule.startDate}" pattern="yyyy-MM-dd"
-						var="parsedStartDate" />
-
-					<div class="schedule-item"
-						data-schedule-id="${schedule.regularMeetingIdx}">
-
+					<c:set var="closed" value="${schedule.currentCnt >= schedule.capacity}" />
+					<c:if test="${not empty schedule.startDate && fn:length(schedule.startDate) == 10 && fn:contains(schedule.startDate, '-')}">
+					    <fmt:parseDate value="${schedule.startDate}" pattern="yyyy-MM-dd" var="parsedStartDate" />
+					</c:if>
+					<div class="schedule-item" data-schedule-id="${schedule.regularMeetingIdx}">
 						<div class="schedule-date">
 							<span class="day"><fmt:formatDate
-									value="${parsedStartDate}" pattern="EEE" /></span> <span class="date"><fmt:formatDate
+									value="${parsedStartDate}" pattern="EEE" /></span> 
+							<span class="date"><fmt:formatDate
 									value="${parsedStartDate}" pattern="dd" /></span>
 						</div>
-
 						<div class="schedule-info">
 							<h4>${schedule.subject}</h4>
 							<p>장소 : ${schedule.place}</p>
 						</div>
 
-						<span class="status ${closed ? 'closed' : 'open'}"> <c:choose>
+						<span class="status ${closed ? 'closed' : 'open'}"> 
+							<c:choose>
 								<c:when test="${closed}">모집완료</c:when>
 								<c:otherwise>모집중</c:otherwise>
 							</c:choose>
 						</span>
-
 						<div class="capacity-box">
 							<span class="current-count">${schedule.currentCnt}</span> / <span
 								class="max-count">${schedule.capacity}</span>
 						</div>
-
 						<div class="button-wrapper">
 							<c:choose>
 								<c:when test="${isLeader}">
@@ -59,6 +53,16 @@
 										onclick="updateSchedule('${schedule.regularMeetingIdx}')">수정</button>									
 									<button type="button" class="btn btn-outline btn-small delete-btn" 
 										onclick="deleteSchedule('${schedule.regularMeetingIdx}')">삭제</button>
+									<c:choose>
+							            <c:when test="${schedule.joined}">
+							                <button type="button" class="btn btn-outline btn-small btn-join"
+							                        onclick="cancelSchedule('${schedule.regularMeetingIdx}')">참여취소</button>
+							            </c:when>
+							            <c:otherwise>
+							                <button type="button" class="btn btn-outline btn-small btn-join" ${closed ? 'disabled' : ''}
+							                        onclick="joinSchedule('${schedule.regularMeetingIdx}')">참여</button>
+							            </c:otherwise>
+							        </c:choose>
 								</c:when>
 								<c:when test="${canInteract}">
 									<c:choose>
@@ -78,10 +82,16 @@
 									</button>
 								</c:otherwise>
 							</c:choose>
-						</div>
+						</div>						
 					</div>
 				</c:forEach>
 			</div>
 		</c:if>
 	</div>
 </div>
+
+<script>
+  const contextPath = '${pageContext.request.contextPath}';
+  const meetingIdx  = '${meetingIdx}';
+</script>
+<script src="${pageContext.request.contextPath}/dist/js/regularMeetingSchedule.js"></script>

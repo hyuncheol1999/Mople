@@ -308,4 +308,36 @@ public class MeetingDAO {
 		return dto;
 	}
 	
+	// 모임에서 스포츠,지역 카테고리 가져오기(정모에)
+	public MeetingDTO getMeetingDetails(long meetingIdx) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+		MeetingDTO dto = null;
+		
+		try {
+			sql = "SELECT m.sportIdx, m.regionIdx "
+					+ " FROM meeting m "
+					+ " LEFT OUTER JOIN sportCategory s ON m.sportIdx = s.sportIdx "
+					+ " LEFT OUTER JOIN regionCategory r ON m.regionIdx = r.regionIdx "
+					+ " WHERE meetingIdx=?";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, meetingIdx);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				dto = new MeetingDTO();
+				dto.setSportIdx(rs.getInt("sportIdx"));
+				dto.setRegionIdx(rs.getInt("regionIdx"));
+			}
+		
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+		return dto;
+	}
 }

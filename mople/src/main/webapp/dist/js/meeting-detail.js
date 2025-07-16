@@ -134,70 +134,56 @@ function cancelSchedule(id) {
 }
 
 // 일정 수정하기
-function updateSchedule(id) {
-  const ctx = document
-               .querySelector('div.meeting-detail')
-               .getAttribute('data-contextPath');
-
+function updateSchedule(regularMeetingIdx) {
   Swal.fire({
-    title: '일정을 수정하시겠습니까 ? ',
-    icon: 'warning',
+    title: '정말 수정하시겠습니까?',
+    icon: 'question',
     showCancelButton: true,
-    confirmButtonText: '수정',
+    confirmButtonText: '수정하기',
     cancelButtonText: '취소'
-  }).then(r => {
-      if (!r.isConfirmed) return;          
-
-	  // 요청URL, 메소드, 파라미터, 응답타입, 콜백 순
-      sendAjaxRequest(
-        ctx + '/schedule/cancel',            
-        'POST',                              
-        { regularMeetingIdx: id },            
-        'json',                              
-        res => {                              
-          if (res && res.success) {
-            Swal.fire('수정 완료!', '', 'success')
-                 .then(()=> refreshScheduleTab());  
-          } else {
-            Swal.fire('실패', '잠시 후 다시 시도해 주세요', 'error');
-          }
-        }
-      );
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const url = `${contextPath}/meeting/regularMeetingCreate?mode=update&meetingIdx=${meetingIdx}&regularMeetingIdx=${regularMeetingIdx}`;
+      window.location.href = url;
+    }
   });
 }
 
+
 // 일정 삭제하기
-function deleteSchedule(id) {
-  const ctx = document
-               .querySelector('div.meeting-detail')
-               .getAttribute('data-contextPath');
+function deleteSchedule(regularMeetingIdx) {
+  const contextPath = document.querySelector('div.meeting-detail').getAttribute('data-contextPath');
+  const meetingIdx   = document.querySelector('div.meeting-detail').getAttribute('data-meetingIdx');
 
   Swal.fire({
-    title: '일정을 삭제하시겠습니까?',
+    title: '일정을 삭제할까요?',
     icon: 'warning',
     showCancelButton: true,
     confirmButtonText: '삭제',
     cancelButtonText: '취소'
-  }).then(r => {
-      if (!r.isConfirmed) return;          
-
-	  // 요청URL, 메소드, 파라미터, 응답타입, 콜백 순
-      sendAjaxRequest(
-        ctx + '/schedule/cancel',            
-        'POST',                              
-        { regularMeetingIdx: id },            
-        'json',                              
-        res => {                              
-          if (res && res.success) {
-            Swal.fire('삭제 완료!', '', 'success')
-                 .then(()=> refreshScheduleTab());  
-          } else {
-            Swal.fire('실패', '잠시 후 다시 시도해 주세요', 'error');
-          }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`${contextPath}/meeting/regularMeetingDelete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `meetingIdx=${meetingIdx}&regularMeetingIdx=${regularMeetingIdx}`
+      })
+      .then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          Swal.fire('삭제 완료!', '', 'success').then(() => {
+            refreshScheduleTab();
+          });
         }
-      );
+      });
+    }
   });
 }
+
+
 
 // 일정 탭 새로고침
 function refreshScheduleTab() {
