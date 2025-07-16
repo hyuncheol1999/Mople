@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+<style type="text/css">
+* { padding: 0; margin: 0; }
+*, *::after, *::before { box-sizing: border-box; }
+
+body {
+	font-family:"Malgun Gothic", "맑은 고딕", NanumGothic, 나눔고딕, 돋움, sans-serif;
+	font-size: 14px;
+	color: #222;
+}
+
+.container{ width:100%; }
+
+.body-container { width:100%; padding:10px; text-align:center; }
+.body-container button {
+	display: inline-block;
+	width: 150px;
+	padding: 15px;
+	background-color: #ffffff;
+	border: 1px solid #e1e1e1;
+	cursor: pointer;
+}
+</style>
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.7.2/css/all.css">
+<style type="text/css">
+.popup-wrap * { padding: 0; margin: 0; }
+.popup-wrap *, .popup-wrap *::after, .popup-wrap *::before { box-sizing: border-box; }
+
+.popup-wrap {
+	background-color: rgba(230, 230, 243, 0.2);
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: none;
+	padding: 15px;
+	opacity: 0;
+}
+.popup-wrap .popup-content {
+	width: 100%;
+	max-width: 450px;
+	background-color: #ffffff;
+	border-radius: 7px;
+	overflow: hidden;
+	border: 1px solid #dee2e6;
+	box-shadow: 3px 5px 5px 1px rgba(0,0,0,.2);
+}
+.popup-wrap .popup-header {
+	width: 100%;
+	padding: 7px 10px;
+	border-bottom: 1px solid #dee2e6;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.popup-wrap .popup-title {
+	font-size: 18px;
+	padding: 10px 7px;
+	font-weight: 500;
+}
+.popup-wrap .popup-body {
+	width:100%;
+	background-color:#ffffff;
+	padding: 30px;
+	display: block;
+}
+
+.popup-wrap .popup-footer {
+	display: flex;
+	width: 100%;
+	padding: 10px 7px;
+	border-top: 1px solid #dee2e6;
+	align-items: center;
+	justify-content: flex-end;
+}
+.popup-wrap .btn-popup {
+	color: #333333;
+	border: 1px solid #e4e4f4;
+	background-color: #ffffff;
+	padding: 5px 10px;
+	border-radius: 4px;
+	font-weight: 500;
+	cursor: pointer;
+	font-size: 14px;
+	font-family: "맑은 고딕", 나눔고딕, 돋움, sans-serif;
+	vertical-align: baseline;
+}
+.popup-header .btn-icon {
+	/* border: none; */
+	border-color: #ffffff;
+}
+
+.popup-wrap .popup-footer .btn-popup {
+	margin-right: 5px;
+}
+
+.popup-wrap .btn-popup:hover, .popup-wrap .btn-popup:active, .popup-wrap .btn-popup:focus {
+	background-color: #f8f9fa;
+	border-color: #e4e4f4;
+	color:#333;
+}
+.popup-header .btn-icon:hover,  .popup-header .btn-icon:active, .popup-header .btn-icon:focus {
+	background-color: #ffffff;
+	border: 1px solid #e4e4f4;
+}
+
+.popup-footer .confirm { background: #106eea; border:1px solid #00a6eb; color:#fff; }
+.popup-footer .confirm:hover, .popup-footer .confirm:active, .popup-footer .confirm:focus {
+	background: #3284f1; border:1px solid #00a6eb; color:#fff;
+}
+
+</style>
+
+<script type="text/javascript">
+function fadeIn(target) {
+	let level = 0;
+	let inTimer = null;
+	inTimer = setInterval(function(){
+		level = fadeInAction(target, level, inTimer);
+	}, 50);
+}
+
+function fadeInAction(target, level, inTimer) {
+	level = level + 0.1;
+	if(level < 1) {
+		target.style.opacity = level;
+	} else {
+		clearInterval(inTimer);
+	}
+	
+	return level;
+}
+
+function fadeOut(target) {
+	let level = 1;
+	let inTimer = null;
+	inTimer = setInterval(function(){
+		level = fadeOutAction(target, level, inTimer);
+	}, 50);
+}
+
+function fadeOutAction(target, level, inTimer) {
+	level = level - 0.1;
+	if(level > 0) {
+		target.style.opacity = level;
+	} else {
+		clearInterval(inTimer);
+	}
+	
+	return level;
+}
+
+function modalOpen(selector){
+	const modal = document.querySelector(selector);
+	
+	modal.style.display = 'flex';
+	fadeIn(modal);
+}
+
+function modalClose(selector){
+	const modal = document.querySelector(selector);
+	
+	fadeOut(modal);
+	modal.style.display = 'none';
+}
+
+window.addEventListener('load', (e) => {
+	const popupELS = document.querySelectorAll('.popup-wrap');
+	
+	for(let popupEL of popupELS) {
+		let closeELS = popupEL.querySelectorAll('.popup-close');
+		
+		for(let closeEL of closeELS) {
+			closeEL.addEventListener('click', (e)=> {
+				const modal = closeEL.closest('.popup-wrap');
+				fadeOut(modal);
+				modal.style.display = 'none';
+				
+				return;
+			});
+		}
+	}
+});
+</script>
+
+<script type="text/javascript">
+window.addEventListener('load', (e) => {
+	const btnOpen = document.querySelector('#modal-open');
+	const btnConfirm = document.querySelector('#modal-confirm');
+	// const btnClose = document.querySelector('#modal-close');
+	
+	btnOpen.addEventListener('click', () => {
+		modalOpen('#modal-container')
+	});
+
+	btnConfirm.addEventListener('click', () => {
+		modalClose('#modal-container')
+	});
+/*
+	btnClose.addEventListener('click', () => {
+		modalClose('#modal-container')
+	});
+*/	
+});
+</script>
+</head>
+<body>
+
+<div class="container">
+	<div class="body-container">
+		<button type="button" id="modal-open">모달창 열기</button>  
+	</div>
+  
+	<div class="popup-wrap" id="modal-container">
+		<div class="popup-content">
+			<div class="popup-header">
+				<h3 class="popup-title">제목</h3>
+				<button type="button" class="btn-popup btn-icon popup-close" > <i class="fa-solid fa-xmark"></i> </button>
+      		</div>
+			<div class="popup-body">
+				<p> 팝업 내용 입니다.</p>
+			</div>
+			<div class="popup-footer">
+				<button class="btn-popup popup-close" id="modal-close">닫기</button>
+				<button class="btn-popup confirm" id="modal-confirm">확인</button>
+			</div>
+		</div>
+	</div>
+</div>   
+
+</body>
+</html>
