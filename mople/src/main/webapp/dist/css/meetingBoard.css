@@ -512,6 +512,90 @@ footer {
 	margin-top: 3rem;
 }
 
+/* 페이징 바 전체 wrapper */
+.page-navigation {
+	display: flex;
+	justify-content: center;
+	margin: 40px 0 20px 0;
+}
+
+/* paginate container */
+.paginate {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	font-size: 14px;
+	font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 일반 링크 스타일 */
+.paginate a, .paginate span {
+	display: inline-block;
+	padding: 6px 14px;
+	color: #333;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	text-decoration: none;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* 현재 페이지 */
+.paginate span {
+	background-color: #106eea;
+	color: #fff;
+	border-color: #106eea;
+	font-weight: 500;
+}
+
+/* hover 효과 */
+.paginate a:hover {
+	background-color: #f0f7ff;
+	color: #106eea;
+	border-color: #106eea;
+}
+
+/* 첫/마지막 버튼 라운딩 강조 */
+.paginate a:first-child {
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+}
+
+.paginate a:last-child {
+	border-top-right-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+.reply-menu {
+	background-color: white;
+	border: 1px solid #e2e8f0;
+	border-radius: 6px;
+	padding: 0.5rem 1rem;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	position: absolute;
+	top: 30px;
+	right: 0;
+	min-width: 80px;
+	text-align: center;
+}
+
+.reply-menu-item {
+	color: red;
+	cursor: pointer;
+	font-size: 0.9rem;
+	display: inline-block;
+	margin-top: 8px;
+}
+
+.reply-menu-item:hover {
+	text-decoration: underline;
+}
+
+.d-none {
+	display: none !important;
+}
+
+
 /* ========================
    반응형
    ======================== */

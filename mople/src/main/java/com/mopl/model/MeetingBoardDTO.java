@@ -17,6 +17,8 @@ public class MeetingBoardDTO {
 	private long replyNum;
 	private long parentNum;
 
+	private int answerCount;
+
 	public String getUserNickName() {
 		return userNickName;
 	}
@@ -111,6 +113,14 @@ public class MeetingBoardDTO {
 
 	public void setReg_date(String reg_date) {
 		this.reg_date = reg_date;
+	}
+
+	public int getAnswerCount() {
+		return answerCount;
+	}
+
+	public void setAnswerCount(int answerCount) {
+		this.answerCount = answerCount;
 	}
 
 }

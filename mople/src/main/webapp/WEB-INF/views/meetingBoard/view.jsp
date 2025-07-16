@@ -224,38 +224,156 @@
 	}
 	
 	// 댓글 등록
-	$(function() {
-		$('.btnSendReply').click(function() {
+	$(document).on('click', '.btnSendReply', function() {
+			const $form = $(this).closest('.reply-form');
 			let num = '${dto.num}';
-			const $tb = $(this).closest('table');
+			let content = $form.find('textarea').val().trim();
 			
-			let content = $tb.find('textarea').val().trim();
 			if(! content) {
 				alert('댓글 내용을 입력하세요.');
+				$form.find('textarea').focus();
 			return;
 		}
 		
 		let params = {num:num, content:content, parentNum:0};
-		
 		let url = '${pageContext.request.contextPath}/meetingBoard/insertReply';
 		
-		const fn = function(data) {
-			$tb.find('textarea').val('');
-			
-			let state = data.state;
-			if(state === 'loginFail') {
+		const fn = function (data) {
+			if (data.state === 'loginFail') {
 				alert('로그인 후 댓글 작성이 가능합니다.');
 				login();
 				return;
-			} 
-			
-			if (state === 'true') {
+			}
+
+			if (data.state === 'true') {
+				$form.find('textarea').val('');
 				listPage(1);
 			} else {
-				alert('댓글 등록에 실패했습니다. 다시 시도해주세요.');
+				alert('댓글 등록에 실패했습니다.');
 			}
 		};
+		
 		sendAjaxRequest(url, 'post', params, 'json', fn);
+	});
+	
+	// 댓글 삭제 메뉴 토글
+	$(document).on('click', '.reply-dropdown', function (e) {
+	  e.stopPropagation();
+
+	  const $menu = $(this).siblings('.reply-menu');
+	  const isHidden = $menu.hasClass('d-none');
+
+	  $('.reply-menu').addClass('d-none');
+
+	  if (isHidden) {
+	    $menu.removeClass('d-none');
+	  }
+	});
+
+	$(document).on('click', '.reply-menu', function (e) {
+	  e.stopPropagation();
+	});
+
+	$(document).on('click', function () {
+	  $('.reply-menu').addClass('d-none');
+	});
+
+	// 댓글 삭제
+		$(document).on('click', '.deleteReply', function() {
+			if(! confirm('댓글을 삭제하시겠습니까?')) {
+				return;
+			}
+			
+			const replyNum = $(this).data('replynum');
+			const page = $(this).data('pageno');
+			
+			const url = '${pageContext.request.contextPath}/meetingBoard/deleteReply';
+			const params = {replyNum:replyNum};
+			
+			sendAjaxRequest(url, 'post', params, 'json', function() {
+				listPage(page);
+		});
+	});
+	
+	// 대댓글 보기 토글
+	$(document).on('click', '.btnReplyAnswerLayout', function() {
+			const replyNum = $(this).data('replynum');
+			const $container = $('#listReplyAnswer' + replyNum);
+			
+			if($container.hasClass('d-none')) {
+				listReplyAnswer(replyNum);
+				countReplyAnswer(replyNum);
+			}
+			
+			$container.toggleClass('d-none');
+		});
+	
+	// 대댓글 리스트
+	function listReplyAnswer(parentNum) {
+		let url = "${pageContext.request.contextPath}/meetingBoard/listReplyAnswer";
+		let params = {parentNum: parentNum};
+		
+		const fn = function(data) {
+			$('#listReplyAnswer' + parentNum).html(data);
+		};
+		sendAjaxRequest(url, 'get', params, 'text', fn);
+	}
+	
+	// 대댓글 카운트
+	function countReplyAnswer(parentNum) {
+		let url = '${pageContext.request.contextPath}/meetingBoard/countReplyAnswer';
+		let params = {parentNum: parentNum};
+		
+		const fn = function(data) {
+			$('#answerCount' + parentNum).html(data.count);
+		};
+		sendAjaxRequest(url, 'post', params, 'json', fn);
+	}
+	
+	// 대댓글 등록
+	$('#listReply').on('click', '.btnReplyAnswerSubmit', function() {
+			const $form = $(this).closest('.reply-form');
+			let content = $form.find('textarea').val().trim();
+			let replyNum = $(this).attr('data-replyNum');
+			let num = '${dto.num}';
+			
+			if(!content) {
+				$form.find('textarea').focus();
+				return;
+			}
+			
+			let url = '${pageContext.request.contextPath}/meetingBoard/insertReply';
+			let params = {num:num, content:content, parentNum:replyNum};
+			
+			const fn = function(data){
+				if(data.state === 'true') {
+					$form.find('textarea').val('');
+					listReplyAnswer(replyNum);
+					countReplyAnswer(replyNum);
+				}
+			};
+			sendAjaxRequest(url, 'post', params, 'json', fn);
+		});
+	
+	// 대댓글 삭제
+	$(function() {
+		$('#listReply').on('click', '.deleteReplyAnswer', function() {
+			if(! confirm('답글을 삭제하시겠습니까?')) {
+				return;
+			}
+			
+			let replyNum = $(this).data('replyNum');
+			let parentNum = $(this).data('parentNum');
+			
+			let url = '${pageContext.request.contextPath}/meetingBoard/deleteReply';
+			let params = {replyNum:replyNum};
+			
+			const fn = function() {
+				listReplyAnswer(parentNum);
+				countReplyAnswer(parentNum);
+			};
+			
+			sendAjaxRequest(url, 'post', params, 'json', fn);
 		});
 	});
 </script>

@@ -274,7 +274,7 @@ public class MeetingBoardDAO {
 			if (kwd != null && !kwd.trim().isEmpty()) {
 				sb.append(" SELECT mb.num, mb.subject ");
 				sb.append(" FROM meetingBoard mb ");
-				sb.append(" JOIN member1 m ON mb.userId = m.userId ");
+				sb.append(" JOIN member1 m ON mb.memberIdx = m.memberIdx ");
 				sb.append(" WHERE mb.num > ? ");
 
 				if (schType.equals("all")) {
@@ -339,7 +339,7 @@ public class MeetingBoardDAO {
 			if (kwd != null && !kwd.trim().isEmpty()) {
 				sb.append(" SELECT mb.num, mb.subject ");
 				sb.append(" FROM meetingBoard mb ");
-				sb.append(" JOIN member1 m ON mb.userId = m.userId ");
+				sb.append(" JOIN member1 m ON mb.memberIdx = m.memberIdx ");
 				sb.append(" WHERE mb.num < ? ");
 
 				if (schType.equals("all")) {
@@ -634,7 +634,9 @@ public class MeetingBoardDAO {
 		StringBuilder sb = new StringBuilder();
 
 		try {
-			sb.append(" SELECT mb.replyNum, mb.num, mb.memberIdx, m.userNickName, mb.content, mb.reg_date ");
+			sb.append(" SELECT mb.replyNum, mb.num, mb.memberIdx, m.userNickName, mb.content, ");
+			sb.append(" TO_CHAR(mb.reg_date, 'YYYY-MM-DD') reg_date, ");
+			sb.append(" NVL(a.answerCount, 0) answerCount  ");
 			sb.append(" FROM meetingBoardReply mb ");
 			sb.append(" JOIN member1 m ON m.memberIdx = mb.memberIdx ");
 			sb.append(" LEFT OUTER JOIN ( ");
@@ -643,12 +645,12 @@ public class MeetingBoardDAO {
 			sb.append(" WHERE parentNum != 0 ");
 			sb.append(" GROUP BY parentNum ");
 			sb.append(" ) a ON mb.replyNum = a.parentNum ");
-			sb.append(" WHERE mb.num = ? ");
+			sb.append(" WHERE mb.num = ? AND mb.parentNum = 0 ");
 			sb.append(" ORDER BY mb.replyNum DESC ");
 			sb.append(" OFFSET ? ROWS FETCH FIRST ? ROWS ONLY ");
 
 			pstmt = conn.prepareStatement(sb.toString());
-			
+
 			pstmt.setLong(1, num);
 			pstmt.setInt(2, offset);
 			pstmt.setInt(3, size);
@@ -664,6 +666,7 @@ public class MeetingBoardDAO {
 				dto.setUserNickName(rs.getString("userNickName"));
 				dto.setContent(rs.getString("content"));
 				dto.setReg_date(rs.getString("reg_date"));
+				dto.setAnswerCount(rs.getInt("answerCount"));
 
 				list.add(dto);
 			}
@@ -713,4 +716,99 @@ public class MeetingBoardDAO {
 		return dto;
 	}
 
+	// 댓글 삭제
+	public void deleteReply(long replyNum, long memberIdx) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+
+		try {
+
+			sql = " DELETE FROM meetingBoardReply WHERE replyNum = ? OR parentNum = ? ";
+
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.setLong(1, replyNum);
+			pstmt.setLong(2, replyNum);
+
+			pstmt.executeUpdate();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			DBUtil.close(pstmt);
+		}
+	}
+
+	// 대댓글 목록
+	public List<MeetingBoardDTO> listReplyAnswer(long parentNum, long memberIdx) {
+		List<MeetingBoardDTO> list = new ArrayList<MeetingBoardDTO>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			sb.append(" SELECT mb.replyNum, mb.num, mb.memberIdx, m.userNickName, mb.content, mb.reg_date, mb.parentNum ");
+			sb.append(" FROM meetingBoardReply mb ");
+			sb.append(" JOIN member1 m ON m.memberIdx = mb.memberIdx ");
+			sb.append(" WHERE mb.parentNum = ? ");
+			sb.append(" ORDER BY mb.replyNum DESC ");
+
+			pstmt = conn.prepareStatement(sb.toString());
+
+			pstmt.setLong(1, parentNum);
+
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				MeetingBoardDTO dto = new MeetingBoardDTO();
+
+				dto.setReplyNum(rs.getLong("replyNum"));
+				dto.setNum(rs.getLong("num"));
+				dto.setMemberIdx(rs.getLong("memberIdx"));
+				dto.setUserNickName(rs.getString("userNickName"));
+				dto.setContent(rs.getString("content"));
+				dto.setReg_date(rs.getString("reg_date"));
+				dto.setParentNum(rs.getLong("parentNum"));
+
+				list.add(dto);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+		return list;
+	}
+
+	// 대댓글 개수
+	public int dataCountReplyAnswer(long parentNum) {
+		int result = 0;
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "SELECT COUNT(*) FROM meetingBoardReply WHERE parentNum = ?";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, parentNum);
+
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				result = rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return result;
+	}
 }

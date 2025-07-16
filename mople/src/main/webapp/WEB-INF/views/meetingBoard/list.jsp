@@ -10,12 +10,6 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css"
 	type="text/css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/dist/css/paginate.css"
-	type="text/css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/dist/css/paginate.css"
-	type="text/css">
 </head>
 <body>
 

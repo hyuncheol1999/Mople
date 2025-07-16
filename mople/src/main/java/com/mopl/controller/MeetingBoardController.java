@@ -109,14 +109,14 @@ public class MeetingBoardController {
 	public ModelAndView writeForm(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("meetingBoard/write");
-		
+
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
-		
+
 		if (info == null) {
 			return new ModelAndView("redirect:/member/login");
 		}
-		
+
 		long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
 		mav.addObject("meetingIdx", meetingIdx);
 		mav.addObject("mode", "write");
@@ -393,10 +393,10 @@ public class MeetingBoardController {
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
 
 		if (info == null) {
-	        resp.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 응답
-	        return null;
-	    }
-		
+			resp.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 응답
+			return null;
+		}
+
 		try {
 			long num = Long.parseLong(req.getParameter("num"));
 			String pageNo = req.getParameter("pageNo");
@@ -456,8 +456,8 @@ public class MeetingBoardController {
 
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
-		
-		if(info == null) {
+
+		if (info == null) {
 			model.put("state", "loginFail");
 			return model;
 		}
@@ -483,6 +483,92 @@ public class MeetingBoardController {
 			e.printStackTrace();
 		}
 		model.put("state", state);
+
+		return model;
+	}
+
+	// 댓글 또는 대댓글 삭제 - AJAX:JSON
+	@ResponseBody
+	@RequestMapping(value = "/meetingBoard/deleteReply", method = RequestMethod.POST)
+	public Map<String, Object> deleteReply(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		Map<String, Object> model = new HashMap<String, Object>();
+
+		MeetingBoardDAO dao = new MeetingBoardDAO();
+
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+		String state = "false";
+		try {
+			long replyNum = Long.parseLong(req.getParameter("replyNum"));
+			dao.deleteReply(replyNum, info.getMemberIdx());
+
+			state = "true";
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		model.put("state", state);
+
+		return model;
+	}
+
+	// 대댓글 목록 - AJAX:TEXT
+	@RequestMapping(value = "/meetingBoard/listReplyAnswer", method = RequestMethod.GET)
+	public ModelAndView listReplyAnswer(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		MeetingBoardDAO dao = new MeetingBoardDAO();
+
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+		if (info == null) {
+			resp.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 응답
+			return null;
+		}
+
+		try {
+			long parentNum = Long.parseLong(req.getParameter("parentNum"));
+
+			List<MeetingBoardDTO> listReplyAnswer = dao.listReplyAnswer(parentNum, info.getMemberIdx());
+
+			for (MeetingBoardDTO dto : listReplyAnswer) {
+				dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
+			}
+
+			ModelAndView mav = new ModelAndView("meetingBoard/listReplyAnswer");
+
+			mav.addObject("listReplyAnswer", listReplyAnswer);
+
+			return mav;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			resp.sendError(406);
+			throw e;
+		}
+	}
+
+	// 대댓글 개수 - AJAX:JSON
+	@ResponseBody
+	@RequestMapping(value = "/meetingBoard/countReplyAnswer", method = RequestMethod.POST)
+	public Map<String, Object> countReplyAnswer(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		Map<String, Object> model = new HashMap<String, Object>();
+
+		MeetingBoardDAO dao = new MeetingBoardDAO();
+
+		int count = 0;
+
+		try {
+			long parentNum = Long.parseLong(req.getParameter("parentNum"));
+			count = dao.dataCountReplyAnswer(parentNum);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		model.put("count", count);
 
 		return model;
 	}
