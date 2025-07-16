@@ -3,7 +3,7 @@ package com.mopl.model;
 public class QnaDTO {
 	private long num;
 	private int secret;
-	private String memberIdx;
+	private long memberIdx;
 	private String userName;
 	private String userNickName;
 	private String subject;
@@ -11,7 +11,7 @@ public class QnaDTO {
 	private String reg_date;
 	private int hitCount;
 	
-	private String answerIdx;
+	private long answerIdx;
 	private String answerName;
 	private String answerNickName;
 	private String answer;
@@ -65,10 +65,10 @@ public class QnaDTO {
 	public void setAnswer_date(String answer_date) {
 		this.answer_date = answer_date;
 	}
-	public String getMemberIdx() {
+	public long getMemberIdx() {
 		return memberIdx;
 	}
-	public void setMemberIdx(String memberIdx) {
+	public void setMemberIdx(long memberIdx) {
 		this.memberIdx = memberIdx;
 	}
 	public String getUserNickName() {
@@ -89,10 +89,10 @@ public class QnaDTO {
 	public void setContent(String content) {
 		this.content = content;
 	}
-	public String getAnswerIdx() {
+	public long getAnswerIdx() {
 		return answerIdx;
 	}
-	public void setAnswerIdx(String answerIdx) {
+	public void setAnswerIdx(long answerIdx) {
 		this.answerIdx = answerIdx;
 	}
 	public String getAnswerNickName() {
