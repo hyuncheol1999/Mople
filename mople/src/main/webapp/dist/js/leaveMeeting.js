@@ -69,14 +69,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	// 멤버 리스트 설정
-	setupCategorySelection('memberList', 'regionCategoryList', 'regionCategoryNo');
+	setupCategorySelection('memberList', 'memberCategoryList', 'memberCategoryNo');
 
 	// 폼 제출
-	const meetingForm = document.deleteForm;
-	meetingForm.addEventListener('submit', (event) => {
+	const leaveForm = document.leaveForm;
+	leaveForm.addEventListener('submit', (event) => {
 		event.preventDefault();
 
-		meetingForm.submit();
+		leaveForm.submit();
 	});
 });	
 	
@@ -90,10 +90,4 @@ function getSelectedRadioValue(radioName) {
         }
     });
     return selectedValue;
-}
-
-function deleteMeeting() {
-	const memberIdx = getSelectedRadioValue('sportCategory');
-	console.log(memberIdx);
-	
 }

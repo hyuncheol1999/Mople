@@ -53,7 +53,6 @@
 						        <button type="button" class="btn btn-primary" onclick="joinMeeting(${meetingIdx})">모임 참여</button>
 						    </c:when>
 						    <c:when test="${userStatus eq 'HOST'}">
-						        <button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingDelete?meetingIdx=${meetingIdx}'">모임 해체</button>
 						    </c:when>
 						    <c:when test="${userStatus eq 'JOINED'}">
 						    </c:when>
@@ -69,9 +68,7 @@
 						<button class="nav-tab"
 							onclick="location.href='${pageContext.request.contextPath}/main'">모임&nbsp;게시판</button>
 					</nav>
-
 					<div class="meeting-content"></div>
-
 				</div>
 			</div>
 		</main>

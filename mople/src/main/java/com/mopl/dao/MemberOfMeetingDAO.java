@@ -15,7 +15,7 @@ public class MemberOfMeetingDAO {
 	private Connection conn = DBConn.getConnection();
 	
 	// 모임 전체 인원 조회 (승인된 인원)
-	public List<MemberOfMeetingDTO> findMeetingIdx(long meetingIdx) {
+	public List<MemberOfMeetingDTO> findByMeetingIdx(long meetingIdx) {
 		List<MemberOfMeetingDTO> list = new ArrayList<MemberOfMeetingDTO>();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -204,8 +204,8 @@ public class MemberOfMeetingDAO {
 		}
 	}
 	
-	// 모임원 등록 - 승인
-	public void approveMember(MemberOfMeetingDTO dto) {
+	// 모임원 역할 수정 / 모임원 등록 - 승인
+	public void updateMemberRole(MemberOfMeetingDTO dto) {
 		PreparedStatement pstmt = null;
 		String sql;
 		
@@ -226,8 +226,8 @@ public class MemberOfMeetingDAO {
 		}
 	}
 	
-	// 모임원 등록 - 거절
-	public void rejectMember(MemberOfMeetingDTO dto) {
+	// 모임 탈퇴 / 모임원 등록 - 거절
+	public void leaveMeeting(MemberOfMeetingDTO dto) {
 		PreparedStatement pstmt = null;
 		String sql;
 		
@@ -246,5 +246,6 @@ public class MemberOfMeetingDAO {
 			DBUtil.close(pstmt);
 		}
 	}
+
 }
 

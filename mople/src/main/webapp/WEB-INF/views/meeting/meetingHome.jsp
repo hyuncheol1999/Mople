@@ -75,5 +75,11 @@
 	    		<p>현재 승인 대기 목록이 없습니다.</p>
 	    	</c:otherwise>
     	</c:choose>
+    	<div class="">
+			<c:if test="${userStatus eq 'HOST'}">
+				<button type="button" class="btn btn-primary btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingDelete?meetingIdx=${meetingIdx}'">모임 해체</button>
+				<button type="button" class="btn btn-primary btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/leaveMeeting?meetingIdx=${meetingIdx}'">모임 탈퇴</button>
+			</c:if>
+		</div>
     </c:if>
 </div>
