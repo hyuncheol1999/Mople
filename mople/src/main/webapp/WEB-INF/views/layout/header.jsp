@@ -14,6 +14,17 @@
 			class="nav-link">모임</a> <a href="#" class="nav-link">번개&nbsp;모임</a> <a
 			href="${pageContext.request.contextPath}/schedule/main" class="nav-link">경기&nbsp;일정</a> <a href="${pageContext.request.contextPath}/bbs/list" class="nav-link">자유&nbsp;게시판</a>
 		<a href="${pageContext.request.contextPath}/sports/facilities" class="nav-link">체육&nbsp;시설&nbsp;정보</a>
+		<ul class="navbar-nav flex-nowrap">
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								고객센터
+				</a>
+				<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<li><a class="dropdown-item" href="${pageContext.request.contextPath}/notice/list">공지사항</a></li>
+					<li><a class="dropdown-item" href="${pageContext.request.contextPath}/qna/list">문의하기</a></li>
+				</ul>
+			</li>
+		</ul>
 	</nav>
 	<div class="auth-section">
 		<c:choose>
