@@ -116,67 +116,67 @@ body {
 .sport-submit-btn:hover {
 	background-color: #222;
 }
+
 .game-list {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
 }
 
 .game-row {
-    display: grid;
-    grid-template-columns: 80px 100px 1fr 80px 1fr 60px;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid #ccc;
+	display: grid;
+	grid-template-columns: 80px 100px 1fr 80px 1fr 60px;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 0;
+	border-bottom: 1px solid #ccc;
 }
 
 .team {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: bold;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: bold;
 }
 
 .team-logo {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
+	width: 28px;
+	height: 28px;
+	object-fit: contain;
 }
 
 .team-name {
-    font-size: 16px;
+	font-size: 16px;
 }
 
 .game-score {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
 }
 
 .score {
-    display: inline-block;
-    width: 20px;
+	display: inline-block;
+	width: 20px;
 }
 
 .vs {
-    font-weight: bold;
-    color: #555;
+	font-weight: bold;
+	color: #555;
 }
 
-.game-time,
-.game-place,
-.game-state {
-    font-size: 14px;
-    color: #888;
-    text-align: center;
+.game-time, .game-place, .game-state {
+	font-size: 14px;
+	color: #888;
+	text-align: center;
 }
+
 .game-score {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    min-width: 60px; /* 스코어 없는 상태에서도 자리 유지 */
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+	min-width: 60px; /* 스코어 없는 상태에서도 자리 유지 */
 }
 </style>
 </head>
@@ -188,8 +188,8 @@ body {
 		<jsp:include page="/WEB-INF/views/layout/login.jsp" />
 
 		<main class="main">
-			<section class="sport-selection">
-				<form id="sportForm" action="/schedule/main" method="get">
+			<form action="/schdule/matcharea">
+				<section class="sport-selection">
 					<label class="radio-btn"> <input type="radio" name="sports"
 						value="kbaseball" checked> <span>야구</span>
 					</label> <label class="radio-btn"> <input type="radio"
@@ -198,60 +198,77 @@ body {
 						name="sports" value="basketball"> <span>농구</span>
 					</label> <label class="radio-btn"> <input type="radio"
 						name="sports" value="volleyball"> <span>배구</span>
-					</label> <br>
-					<br>
-					<button type="submit" class="sport-submit-btn">종목 선택</button>
-				</form>
-			</section>
+					</label> <br> <br>
+				</section>
+				<div class="monthPageing">
+					<ul class="month-list">
+						<li data-month="02">2월</li>
+						<li data-month="03">3월</li>
+						<li data-month="04">4월</li>
+						<li data-month="05">5월</li>
+						<li data-month="06">6월</li>
+						<li data-month="07" class="active">7월</li>
+						<li data-month="08">8월</li>
+						<li data-month="09">9월</li>
+						<li data-month="10">10월</li>
+						<li data-month="11" class="disabled">11월</li>
+						<li data-month="12" class="disabled">12월</li>
+						<li data-month="1" class="disabled">1월</li>
+					</ul>
+					<input type="hidden" name="month" id="selectedMonth" value="7">
+				</div>
+			</form>
 
 			<section class="schedule-area">
-				<div class="schedule-box">
-					<c:choose>
-						<c:when test="${not empty list}">
-							<div class="game-list">
-								<c:forEach var="game" items="${list}">
-									<div class="game-row">
-										<!-- 경기 시간 -->
-										<div class="game-time">${game.time}</div>
-										<!-- 경기 장소 -->
-										<div class="game-place">${game.place}</div>
-
-										<!-- 어웨이팀 -->
-										<div class="team">
-											<img src="${game.logo1}" alt="${game.away}" class="team-logo" />
-											<span class="team-name">${game.away}</span>
-										</div>
-
-										<!-- 스코어 (종료일 때만 표시) -->
-										<div class="game-score">
-											<c:if test="${game.state eq '종료'}">
-												<span class="score">${game.awayScore}</span>
-                                :
-                                <span class="score">${game.homeScore}</span>
-											</c:if>
-										</div>
-
-										<!-- 홈팀 -->
-										<div class="team">
-											<img src="${game.logo2}" alt="${game.home}" class="team-logo" />
-											<span class="team-name">${game.home}</span>
-										</div>
-
-										<!-- 경기 상태 -->
-										<div class="game-state">${game.state}</div>
-									</div>
-								</c:forEach>
-							</div>
-						</c:when>
-						<c:otherwise>
-							<p style="text-align: center;">경기 일정이 없습니다.</p>
-						</c:otherwise>
-					</c:choose>
-				</div>
-
+			
 			</section>
 		</main>
 	</div>
+	<script type="text/javascript">
+function sendAjaxRequest(url, method, requestParams, responseType, fn) {
+	const settings = {
+			type: method, 
+			data: requestParams,
+			dataType: responseType,
+			success: function(data) {
+				fn(data);
+			},
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader('AJAX', true);
+			},
+			complete: function () {
+			},
+			error: function(xhr) {
+				if(xhr.status === 403) {
+					login();
+					return false;
+				} else if(xhr.status === 406) {
+					alert('요청 처리가 실패 했습니다.');
+					return false;
+		    	}
+		    	
+				console.log(xhr.responseText);
+			}
+	};
+	
+	$.ajax(url, settings);
+}
+document.querySelectorAll(".month-list li").forEach(item => {
+    item.addEventListener("click", () => {
+        const month = item.dataset.month;
+        document.getElementById("selectedMonth").value = month;
+        let url = '${pageContext.request.contextPath}/schdule/matcharea.jsp';
+        
+        let params={}
+        const fn = function(data){
+        	
+        }
+        
+        sendAjaxRequest(url,'post',params,'json',fn);
+    });
+});
+
+</script>
 	<footer class="footer">
 		<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 	</footer>
