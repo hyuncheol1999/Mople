@@ -1,4 +1,4 @@
-package com.mopl.controller.admin;
+package com.mopl.controller;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,12 +18,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-public class QnaManageController {
+public class QnaController {
 
-	@RequestMapping(value = "/admin/qna/list", method = RequestMethod.GET)
+	@RequestMapping(value = "/qna/list", method = RequestMethod.GET)
 	public ModelAndView list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 게시물 리스트
-		ModelAndView mav = new ModelAndView("admin/qna/list");
+		ModelAndView mav = new ModelAndView("qna/list");
 		
 		QnaDAO dao = new QnaDAO();
 		MyUtil util = new MyUtil();
@@ -76,8 +76,8 @@ public class QnaManageController {
 
 			// 페이징 처리
 			String cp = req.getContextPath();
-			String listUrl = cp + "/admin/qna/list";
-			String articleUrl = cp + "/admin/qna/article?page=" + current_page;
+			String listUrl = cp + "/qna/list";
+			String articleUrl = cp + "/qna/article?page=" + current_page;
 			if (query.length() != 0) {
 				listUrl += "?" + query;
 				articleUrl += "&" + query;
@@ -103,11 +103,49 @@ public class QnaManageController {
 		return mav;
 	}
 
-	@RequestMapping(value = "/admin/qna/article", method = RequestMethod.GET)
+	@RequestMapping(value = "/qna/write", method = RequestMethod.GET)
+	public ModelAndView writeForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 글쓰기 폼
+		ModelAndView mav = new ModelAndView("qna/write");		
+		mav.addObject("mode", "write");
+		return mav;
+	}
+
+	@RequestMapping(value = "/qna/write", method = RequestMethod.POST)
+	public ModelAndView writeSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 글 저장
+		QnaDAO dao = new QnaDAO();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		
+		try {
+			QnaDTO dto = new QnaDTO();
+
+			// userId는 세션에 저장된 정보
+			dto.setMemberIdx(info.getMemberIdx());
+			
+			// 파라미터
+			dto.setSecret(Integer.parseInt(req.getParameter("secret")));
+			dto.setSubject(req.getParameter("subject"));
+			dto.setContent(req.getParameter("content"));
+
+			dao.insertContent(dto);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return new ModelAndView("redirect:/qna/list");
+	}
+
+	@RequestMapping(value = "/qna/article", method = RequestMethod.GET)
 	public ModelAndView article(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 글보기
 		QnaDAO dao = new QnaDAO();
 		MyUtil util = new MyUtil();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
 		
 		String page = req.getParameter("page");
 		String query = "page=" + page;
@@ -127,7 +165,13 @@ public class QnaManageController {
 			// 게시물 가져오기
 			QnaDTO dto = dao.findById(num);
 			if (dto == null) {
-				return new ModelAndView("redirect:/admin/qna/list?" + query);
+				return new ModelAndView("redirect:/qna/list?" + query);
+			}
+			
+			if(dto.getSecret() == 1) {
+				if( dto.getMemberIdx()!=info.getMemberIdx() && info.getRole() != 0 ) {
+					return new ModelAndView("redirect:/qna/list?" + query);
+				}
 			}
 			
 			dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
@@ -139,7 +183,7 @@ public class QnaManageController {
 			QnaDTO prevDto = dao.findByPrev(dto.getNum(), kwd);
 			QnaDTO nextDto = dao.findByNext(dto.getNum(), kwd);
 
-			ModelAndView mav = new ModelAndView("admin/qna/article");
+			ModelAndView mav = new ModelAndView("qna/article");
 			
 			// JSP로 전달할 속성
 			mav.addObject("dto", dto);
@@ -154,14 +198,51 @@ public class QnaManageController {
 			e.printStackTrace();
 		}
 
-		return new ModelAndView("redirect:/admin/qna/list?" + query);
+		return new ModelAndView("redirect:/qna/list?" + query);
 	}
 
-	@RequestMapping(value = "/admin/qna/answer", method = RequestMethod.POST)
-	public ModelAndView answerSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// 답변 완료
+	@RequestMapping(value = "/qna/update", method = RequestMethod.GET)
+	public ModelAndView updateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 수정 폼
 		QnaDAO dao = new QnaDAO();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		
+		String page = req.getParameter("page");
 
+		try {
+			long num = Long.parseLong(req.getParameter("num"));
+			QnaDTO dto = dao.findById(num);
+
+			if (dto == null) {
+				return new ModelAndView("redirect:/qna/list?page=" + page);
+			}
+
+			// 게시물을 올린 사용자가 아니면
+			if ( dto.getMemberIdx() != info.getMemberIdx()) {
+				return new ModelAndView("redirect:/qna/list?page=" + page);
+			}
+
+			ModelAndView mav = new ModelAndView("qna/write");
+			
+			mav.addObject("dto", dto);
+			mav.addObject("page", page);
+			mav.addObject("mode", "update");
+
+			return mav;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return new ModelAndView("redirect:/qna/list?page=" + page);
+	}
+
+	@RequestMapping(value = "/qna/update", method = RequestMethod.POST)
+	public ModelAndView updateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 수정 완료
+		QnaDAO dao = new QnaDAO();
+		
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
 		
@@ -170,18 +251,21 @@ public class QnaManageController {
 			QnaDTO dto = new QnaDTO();
 			
 			dto.setNum(Long.parseLong(req.getParameter("num")));
-			dto.setAnswer(req.getParameter("answer"));
-			dto.setAnswerIdx(info.getMemberIdx());
+			dto.setSecret(Integer.parseInt(req.getParameter("secret")));
+			dto.setSubject(req.getParameter("subject"));
+			dto.setContent(req.getParameter("content"));
 
-			dao.updateAnswer(dto);
+			dto.setMemberIdx(info.getMemberIdx());
+
+			dao.updateContent(dto);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return new ModelAndView("redirect:/admin/qna/list?page=" + page);
+		return new ModelAndView("redirect:/qna/list?page=" + page);
 	}
 
-	@RequestMapping(value = "/admin/qna/delete", method = RequestMethod.GET)
+	@RequestMapping(value = "/qna/delete", method = RequestMethod.GET)
 	public ModelAndView delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 삭제
 		QnaDAO dao = new QnaDAO();
@@ -207,7 +291,7 @@ public class QnaManageController {
 				query += "&kwd=" + util.encodeUrl(kwd);
 			}
 			
-			if(mode.equals("answer")) {
+			if(mode.equals("answer") && info.getRole() == 0) {
 				// 답변 삭제
 				QnaDTO dto = new QnaDTO();
 				dto.setNum(num);
@@ -223,6 +307,6 @@ public class QnaManageController {
 			e.printStackTrace();
 		}
 
-		return new ModelAndView("redirect:/admin/qna/list?" + query);
+		return new ModelAndView("redirect:/qna/list?" + query);
 	}
 }

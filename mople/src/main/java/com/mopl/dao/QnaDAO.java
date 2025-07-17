@@ -31,6 +31,7 @@ public class QnaDAO {
 
 			pstmt.executeUpdate();
 
+			System.out.println(dto.getAnswerIdx());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw e;
@@ -379,19 +380,24 @@ public class QnaDAO {
 		String sql;
 
 		try {
-			sql = "UPDATE qna SET content = ?, answerIdx = ?, ";
-			if(dto.getAnswer().length() == 0) {
-				sql += " answer_date = NULL ";
+			sql = "UPDATE qna SET answer = ?, ";
+			if (dto.getAnswerIdx()== 0) {
+			    sql += "answerIdx = NULL, answer_date = NULL ";
 			} else {
-				sql += " answer_date = SYSDATE ";
+			    sql += "answerIdx = ?, answer_date = SYSDATE ";
 			}
 			sql += " WHERE num = ?";
 			
 			pstmt = conn.prepareStatement(sql);
 			
 			pstmt.setString(1, dto.getAnswer());
-			pstmt.setLong(2, dto.getAnswerIdx());
-			pstmt.setLong(3, dto.getNum());
+			
+			if (dto.getAnswerIdx()== 0) {
+			    pstmt.setLong(2, dto.getNum());
+			} else {
+				pstmt.setLong(2, dto.getAnswerIdx());
+				pstmt.setLong(3, dto.getNum());
+			}
 			
 			pstmt.executeUpdate();
 

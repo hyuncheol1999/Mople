@@ -86,13 +86,10 @@
 <body>
  <div class="wrap">
     <header class="header">
-		<jsp:include page="/WEB-INF/views/admin/layout/header.jsp"/>
+		<jsp:include page="/WEB-INF/views/layout/header.jsp"/>
     </header>
     
 	<main class="main">
-		<aside class="sidebar">
-			<jsp:include page="/WEB-INF/views/admin/layout/sidebar.jsp" />
-		</aside>
 		<div class="main-content">
 			<div class="meetings-layout">
 			    <div class="main-content">
@@ -100,100 +97,95 @@
 						<h4><i class="bi bi-whatsapp"></i> 문의하기 </h4>
 		    
 		   			 	<div class="stats-grid row">
-							<div class="col-md-4 text-start">
-								<form name="searchForm" class="input-group">
-									<input type="text" name="kwd" value="${kwd}" class="form-control rounded me-1" placeholder="검색어를 입력하세요">
-									<button type="button" class="btn btn-light rounded" onclick="searchList();"><i class="bi bi-search"></i></button>
-								</form>							
-							</div>
-							<div class="col-auto">&nbsp;</div>
-						</div>				
-
-						<table class="table table-hover board-list">
-							<thead class="table-light">
-								<tr>
-									<th width="60">번호</th>
-									<th>제목</th>
-									<th width="100">작성자</th>
-									<th width="100">질문일자</th>
-									<th width="80">처리결과</th>
-								</tr>
-							</thead>
+						<div class="body-main">
 							
-							<tbody>
-								<c:forEach var="dto" items="${list}" varStatus="status">
+							<div class="row board-list-header">
+								<div class="col-auto me-auto dataCount">
+									${dataCount}개(${page}/${total_page} 페이지)
+								</div>
+								<div class="col-auto">&nbsp;</div>
+							</div>				
+		
+							<table class="table table-hover board-list">
+								<thead class="table-light">
 									<tr>
-										<td>${dataCount - (page-1) * size - status.index}</td>
-										<td class="left">
-											<div class="text-wrap">
-												<a href="${articleUrl}&num=${dto.num}" class="text-reset">${dto.subject}</a>
-											</div>
-											<c:if test="${dto.secret==1}">
-												<i class="bi bi-file-lock2"></i>
-											</c:if>										
-										</td>
-										<td>${dto.userNickName}</td>
-										<td>${dto.reg_date}</td>
-										<td>${dto.answerIdx!=0?"답변완료":"답변대기"}</td>
+										<th width="60">번호</th>
+										<th>제목</th>
+										<th width="100">작성자</th>
+										<th width="100">질문일자</th>
+										<th width="80">처리결과</th>
 									</tr>
-								</c:forEach>
-							</tbody>
-						</table>
-						
-						<div class="page-navigation">
-							${dataCount == 0 ? "등록된 게시물이 없습니다." : paging}
+								</thead>
+								
+								<tbody>
+									<c:forEach var="dto" items="${list}" varStatus="status">
+										<tr>
+											<td>${dataCount - (page-1) * size - status.index}</td>
+											<td class="left">
+												<c:choose>
+													<c:when test="${dto.secret==1}">
+														<c:if test="${sessionScope.member.memberIdx==dto.memberIdx || sessionScope.member.role == 0}">
+															<a href="${articleUrl}&num=${dto.num}" class="text-reset">${dto.subject}</a>
+														</c:if>
+														<c:if test="${sessionScope.member.memberIdx!=dto.memberIdx && sessionScope.member.role != 0}">
+															비밀글 입니다.
+														</c:if>
+														<i class="bi bi-file-lock2"></i>
+													</c:when>
+													<c:otherwise>
+														<a href="${articleUrl}&num=${dto.num}" class="text-reset">${dto.subject}</a>
+													</c:otherwise>
+												</c:choose>
+											</td>
+											<td>${dto.userNickName}</td>
+											<td>${dto.reg_date}</td>
+											<td>${dto.answerIdx!=0?"답변완료":"답변대기"}</td>
+										</tr>
+									</c:forEach>
+								</tbody>
+							</table>
+							
+							<div class="page-navigation">
+								${dataCount == 0 ? "등록된 게시물이 없습니다." : paging}
+							</div>
+				
+							<div class="row board-list-footer">
+								<div class="col">
+									<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/qna/list';" title="새로고침"><i class="bi bi-arrow-counterclockwise"></i></button>
+								</div>
+								<div class="col-6 d-flex justify-content-center">
+									<form class="row" name="searchForm">
+										<div class="col-auto p-1">
+											<select name="schType" class="form-select">
+												<option value="all" ${schType=="all"?"selected":""}>제목+내용</option>
+												<option value="userNickName" ${schType=="userNickName"?"selected":""}>작성자</option>
+												<option value="reg_date" ${schType=="reg_date"?"selected":""}>등록일</option>
+												<option value="subject" ${schType=="subject"?"selected":""}>제목</option>
+												<option value="content" ${schType=="content"?"selected":""}>내용</option>
+											</select>
+										</div>
+										<div class="col-auto p-1">
+											<input type="text" name="kwd" value="${kwd}" class="form-control">
+										</div>
+										<div class="col-auto p-1">
+											<button type="button" class="btn btn-light" onclick="searchList()"> <i class="bi bi-search"></i> </button>
+										</div>
+									</form>
+								</div>
+								<div class="col text-end">
+									<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/qna/write';">문의등록</button>
+								</div>
+							</div>
+							
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>	
-    </main>
+		</div>
+	</div>
+</main>
 
 <script type="text/javascript">
-function changeList() {
-    const f = document.listForm;
-    f.page.value = '1';
-    
-	const formData = new FormData(f);
-	let params = new URLSearchParams(formData).toString();
-	
-	let url = '${pageContext.request.contextPath}/admin/notice/list';
-	location.href = url + '?' + params;    
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-	const btnDeleteEL = document.querySelector('button#btnDeleteList');
-	const chkAllEL = document.querySelector('input#chkAll');
-	const numsELS = document.querySelectorAll('form input[name=nums]');
-	
-	btnDeleteEL.addEventListener('click', () => {
-		const f = document.listForm;
-		const checkedELS = document.querySelectorAll('form input[name=nums]:checked');
-		
-		if(checkedELS.length === 0) {
-			alert('삭제할 게시물을 먼저 선택하세요');
-			return;
-		}
-		
-		if( confirm('선택한 게시글을 삭제하시겠습니까 ? ') ) {
-			const f = document.listForm;
-			f.action = '${pageContext.request.contextPath}/admin/notice/deleteList';
-			f.submit();
-		}		
-	});
-	
-	chkAllEL.addEventListener('click', () => {
-		numsELS.forEach( inputEL => inputEL.checked = chkAllEL.checked );		
-	});
-	
-	for(let el of numsELS) {
-		el.addEventListener('click', () => {
-			const checkedELS = document.querySelectorAll('form input[name=nums]:checked');
-			chkAllEL.checked = numsELS.length === checkedELS.length;
-		});
-	}
-});
-
 // 검색 키워드 입력란에서 엔터를 누른 경우 서버 전송 막기 
 window.addEventListener('DOMContentLoaded', () => {
 	const inputEL = document.querySelector('form input[name=kwd]'); 
@@ -216,10 +208,11 @@ function searchList() {
 	const formData = new FormData(f);
 	let params = new URLSearchParams(formData).toString();
 	
-	let url = '${pageContext.request.contextPath}/admin/notice/list';
+	let url = '${pageContext.request.contextPath}/qna/list';
 	location.href = url + '?' + params;
 }
 </script>
+
 
 <jsp:include page="/WEB-INF/views/admin/layout/footer.jsp"/>
 

@@ -280,7 +280,7 @@
 			f.submit();
 		});
 		
-		if( ! answerIdx) {
+		if( answerIdx==0 ) {
 			answerEL.classList.remove('d-none');
 			// $('.answer-container').removeClass('d-none');
 		} else {
