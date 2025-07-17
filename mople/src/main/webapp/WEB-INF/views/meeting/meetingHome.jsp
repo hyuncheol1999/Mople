@@ -11,7 +11,7 @@
         </p>
         <div class="meeting-stats">
 		    <div class="stat-card">
-		        <img width="40" height="40" src="https://img.icons8.com/ios-filled/50/region-code.png" alt="region-code"/><h4>지역</h4>
+		        <img width="36" height="38" src="https://img.icons8.com/ios-filled/50/region-code.png" alt="region-code"/><h4>지역</h4>
 		        <p>${regionName}</p>
 		    </div>
 		    <div class="stat-card">
@@ -60,11 +60,11 @@
 					'${pageContext.request.contextPath}/uploads/memberProfilePhoto/${dto.memberProfilePhoto}'
 				</c:when>
 				<c:otherwise>
-					'${pageContext.request.contextPath}/dist/images/defaultMeetingProfilePhoto.png'	
+					'${pageContext.request.contextPath}/dist/images/defaultPerson.png'	
 				</c:otherwise>
 			</c:choose>
             >
-            <span>${dto.memberName}
+            <span>${dto.memberNickName}
             </span>
             <c:if test="${dto.role == 0}">
 	           	<img class="managerLogo" src="${pageContext.request.contextPath}/dist/images/manager.png" alt="Manager">
@@ -87,7 +87,7 @@
 								'${pageContext.request.contextPath}/uploads/memberProfilePhoto/${dto.memberProfilePhoto}'
 							</c:when>
 							<c:otherwise>
-								'${pageContext.request.contextPath}/dist/images/defaultMeetingProfilePhoto.png'	
+								'${pageContext.request.contextPath}/dist/images/defaultPerson.png'	
 							</c:otherwise>
 						</c:choose>
 			             >

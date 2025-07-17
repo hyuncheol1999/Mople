@@ -22,7 +22,7 @@ public class MemberOfMeetingDAO {
 		StringBuilder sb = new StringBuilder();
 		
 		try {
-			sb.append("SELECT meetingIdx, mom.memberIdx, mom.role, userName, profilePhoto ");
+			sb.append("SELECT meetingIdx, mom.memberIdx, mom.role, userName, userNickName, profilePhoto ");
 			sb.append("FROM memberOfMeeting mom ");
 			sb.append("LEFT OUTER JOIN member1 m1 ON mom.memberIdx = m1.memberIdx ");
 			sb.append("LEFT OUTER JOIN member2 m2 ON mom.memberIdx = m2.memberIdx ");
@@ -41,6 +41,7 @@ public class MemberOfMeetingDAO {
 				dto.setMemberIdx(rs.getLong("memberIdx"));
 				dto.setRole(rs.getInt("role"));
 				dto.setMemberName(rs.getString("userName"));
+				dto.setMemberNickName(rs.getString("userNickName"));
 				dto.setMemberProfilePhoto(rs.getString("profilePhoto"));
 				
 				list.add(dto);

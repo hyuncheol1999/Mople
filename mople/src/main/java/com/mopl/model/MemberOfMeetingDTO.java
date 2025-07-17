@@ -6,6 +6,7 @@ public class MemberOfMeetingDTO {
 	private int role;
 	
 	private String memberName;
+	private String memberNickName;
 	private String memberProfilePhoto;
 	
 	public long getMeetingIdx() {
@@ -37,6 +38,12 @@ public class MemberOfMeetingDTO {
 	}
 	public void setMemberProfilePhoto(String memberProfilePhoto) {
 		this.memberProfilePhoto = memberProfilePhoto;
+	}
+	public String getMemberNickName() {
+		return memberNickName;
+	}
+	public void setMemberNickName(String memberNickName) {
+		this.memberNickName = memberNickName;
 	}
 	
 }

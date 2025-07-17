@@ -34,12 +34,15 @@
 </div>
 
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered"> <div class="modal-content">
-      <div class="modal-body text-center"> <img src='' class="albumPhotoInModal img-fluid rounded mb-3"> 
-      <p class="albumModal-userNickName fw-bold"></p>
-      <p class="albumModal-content text-break"></p> </div>
+  <div class="modal-dialog modal-dialog-centered"> 
+  	  <div class="modal-content">
+      <div class="modal-body text-center"> 
+      	  <img src='' class="albumPhotoInModal img-fluid rounded mb-3"> 
+	      <p class="albumModal-userNickName fw-bold"></p>
+	      <p class="albumModal-content text-break"></p> 
+	  </div>
       <div class="modal-footer">
-	      <button type="button" class="btn btn-primary btn-small" onclick="">삭제</button>
+	      <button type="button" class="btn btn-primary btn-small" onclick="deleteImage(this);">삭제</button>
       </div>
     </div>
   </div>

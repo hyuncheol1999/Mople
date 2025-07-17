@@ -80,5 +80,24 @@ public class MeetingAlbumDAO {
 		}
 	}
 	
+	public void deleteImage(long photoNum) {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "DELETE FROM meetingAlbum WHERE photoNum = ?";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, photoNum);
+			
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(pstmt);
+		}
+	}
+	
 	
 }

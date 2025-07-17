@@ -17,8 +17,7 @@
 			<div class="meetings-header">
 				<h1 class="meetingHead">모임</h1>
 				<button class="btn btn-primary"
-					onclick="location.href='${pageContext.request.contextPath}/meeting/meetingCreate'">Create
-					New Meeting</button>
+					onclick="location.href='${pageContext.request.contextPath}/meeting/meetingCreate'">스포츠 모임 만들기</button>
 			</div>
 			<div class="meetings-grid" id="meetingsGrid">
 				<c:choose>
@@ -55,8 +54,8 @@
 		        		다른 흥미로운 모임을 찾아보시거나, <br>새로운 모임을 직접 만들어보는 건 어떠세요?
 		    		</p>
 		    		<div class="button-group">
-		        		<button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingList'">다른 모임 찾아보기</button>
-		        		<button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingCreate'">새 모임 만들기</button>
+		        		<button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingList?sportCategory=0&regionCategory=0'">다른 모임 찾아보기!</button>
+		        		<button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingCreate'">새 모임 만들기!</button>
 		    		</div>
 				<img src="${pageContext.request.contextPath}/dist/images/notMeetingList.png">
 	    		</div>						
@@ -65,3 +64,5 @@
 	</div>
 </div>
 <div class="page-navigation">${dataCount == 0 ? "" : paging}</div>
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/dist/js/meeting.js"></script>

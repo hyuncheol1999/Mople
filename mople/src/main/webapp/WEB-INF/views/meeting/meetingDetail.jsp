@@ -13,6 +13,10 @@
 	href="${pageContext.request.contextPath}/dist/css/meeting.css"
 	type="text/css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  const contextPath = '${pageContext.request.contextPath}';
+  const meetingIdx = '${meetingIdx}'; 
+</script>
 </head>
 <body>
 	<header class="header">
@@ -35,10 +39,11 @@
 										'${pageContext.request.contextPath}/uploads/meetingProfilePhoto/${meetingProfilePhoto}'
 									</c:when>
 									<c:otherwise>
-										'${pageContext.request.contextPath}/dist/images/defaultMeetingProfilePhoto.png'	
+										'${pageContext.request.contextPath}/dist/images/defaultMeetingProfilePhotoMini.png'	
 									</c:otherwise>
 								</c:choose>
 								 alt="Group Profile" class="group-avatar">
+								 <script src="${pageContext.request.contextPath}/dist/js/handleImageErrors.js"></script>
 							<div class="meeting-meta">
 								<h2 class="meetingTitle" id="meetingTitle">${meetingName}</h2>
 								<div class="meeting-tags">
@@ -92,9 +97,5 @@
 			
 	</div>
 	<script src="${pageContext.request.contextPath}/dist/js/meeting-detail.js"></script>
-	<script>
-	  const contextPath = '${pageContext.request.contextPath}';
-	  const meetingIdx = '${meetingIdx}'; 
-	</script>
 </body>
 </html>

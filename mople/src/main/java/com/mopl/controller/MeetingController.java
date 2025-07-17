@@ -674,10 +674,10 @@ public class MeetingController {
 		String root = session.getServletContext().getRealPath("/");
 		String pathname = root + "uploads" + File.separator + "meetingProfilePhoto";
 
+		String meetingIdxParam = req.getParameter("meetingIdx");
 		try {
 			MeetingDTO dto = new MeetingDTO();
-			
-			dto.setMeetingIdx(Long.parseLong(req.getParameter("meetingIdx")));
+			dto.setMeetingIdx(Long.parseLong(meetingIdxParam));
 			dto.setMeetingName(req.getParameter("meetingName"));
 			dto.setMeetingDesc(req.getParameter("meetingDesc"));
 			
@@ -693,7 +693,7 @@ public class MeetingController {
 			e.printStackTrace();
 		}
 
-		return new ModelAndView("redirect:/meeting/meetingList?sportCategory=0&regionCategory=0");
+		return new ModelAndView("redirect:/meeting/meetingDetail?sportCategory=0&regionCategory=0&meetingIdx=" + meetingIdxParam);
 	}
 	
 	// 모임 신청
@@ -860,6 +860,36 @@ public class MeetingController {
 		}
 
 		return new ModelAndView("redirect:/meeting/meetingDetail?" + query);
+	}
+	
+	// 모임 상세 - 사진첩 - 사진 삭제
+	@ResponseBody
+	@RequestMapping(value = "/meeting/albumImageDelete", method = RequestMethod.POST)
+	public Map<String, Object> albumImageDelete(HttpServletRequest req, HttpServletResponse resp) {
+		Map<String, Object> map = new HashMap<>();
+		MeetingDAO dao = new MeetingDAO();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		
+		if (info == null) {
+			map.put("success", false);
+			return map;
+		}
+		
+		try {
+			long photoNum = Long.parseLong(req.getParameter("photoNum"));
+			
+			// 파일 삭제
+			
+			dao.deleteMeeting(photoNum);
+			
+			map.put("success", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("success", false);
+		}
+		return map;
 	}
 
 	// 모임 탈퇴 폼 - 모임장

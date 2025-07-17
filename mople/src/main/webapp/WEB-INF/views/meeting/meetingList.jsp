@@ -17,6 +17,7 @@
 	const regionCategoryList = "${regionCategoryList}";
 </script>
 </head>
+
 <body>
 	<header class="header">
 		<jsp:include page="/WEB-INF/views/layout/header.jsp" />
@@ -33,7 +34,5 @@
 	</main>
 
 	<jsp:include page="/WEB-INF/views/layout/footerResources.jsp" />
-	<script type="text/javascript"
-		src="${pageContext.request.contextPath}/dist/js/meeting.js"></script>
 </body>
 </html>

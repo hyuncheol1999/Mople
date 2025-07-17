@@ -379,8 +379,8 @@ html, body {
 
 /* --- ✨ meeting-card-header (아바타) ✨ --- */
 .meeting-card-header {
-    min-width: 328px;
-    min-height: 148px;
+    min-width: 530px;
+    min-height: 280px;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
@@ -527,6 +527,7 @@ html, body {
         padding: 5px;
     }
     .stat-card h4 {
+    	margin-top: 7px;
         margin-bottom: 5px;
         color: #555;
         font-size: 0.9em;
@@ -535,6 +536,7 @@ html, body {
         font-weight: bold;
         color: #333;
         font-size: 1.1em;
+        
         margin-bottom: 0; /* p 태그 기본 마진 제거 */
     }
 
