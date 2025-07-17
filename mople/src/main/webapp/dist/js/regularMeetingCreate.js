@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 날짜 유효성 검사 함수
   function isValidDate(startDate) {
+	const rf = document.regularMeetingForm
+	startDate = rf.querySelector('#startDate');
+	
     if(startDate.length !== 8 && startDate.length !== 10) return false;
 
     let p = /(\.)|(\-)|(\/)/g;
@@ -23,6 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return true;
   }
+  
+  isValidDate(startdate);
 
   // 숫자 유효성 검사 함수
   function isNumber(capacity) {
@@ -43,15 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     } else {
       subjectError.classList.remove('active');
-    }
-
-    // 정모날짜 검사
-    const startDate = regularMeetingForm.startDate;
-    if (!isValidDate(startDate.value.trim())) {
-      event.preventDefault();
-      startDate.focus();
-      Swal.fire('정모 날짜 형식을 확인해주세요. (YYYY-MM-DD)', '', 'warning');
-      return;
     }
 
     // 정모장소 검사

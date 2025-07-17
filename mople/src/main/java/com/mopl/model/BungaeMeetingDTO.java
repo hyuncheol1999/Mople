@@ -12,8 +12,38 @@ public class BungaeMeetingDTO {
 	
 	private int categoryIdx;
 	private int regionIdx;
-	private Long bungaeMemberIdx;
+	private Long memberIdx;
 	
+	private String sortBy;
+	private String regionName;
+	private String sportName;
+	private int currentMembers;
+	
+	
+	public String getSortBy() {
+		return sortBy;
+	}
+	public void setSortBy(String sortBy) {
+		this.sortBy = sortBy;
+	}
+	public int getCurrentMembers() {
+		return currentMembers;
+	}
+	public void setCurrentMembers(int currentMembers) {
+		this.currentMembers = currentMembers;
+	}
+	public String getRegionName() {
+		return regionName;
+	}
+	public void setRegionName(String regionName) {
+		this.regionName = regionName;
+	}
+	public String getSportName() {
+		return sportName;
+	}
+	public void setSportName(String sportName) {
+		this.sportName = sportName;
+	}
 	public Long getBungaeMeetingIdx() {
 		return bungaeMeetingIdx;
 	}
@@ -74,11 +104,11 @@ public class BungaeMeetingDTO {
 	public void setRegionIdx(int regionIdx) {
 		this.regionIdx = regionIdx;
 	}
-	public Long getBungaeMemberIdx() {
-		return bungaeMemberIdx;
+	public Long getMemberIdx() {
+		return memberIdx;
 	}
-	public void setBungaeMemberIdx(Long bungaeMemberIdx) {
-		this.bungaeMemberIdx = bungaeMemberIdx;
+	public void setMemberIdx(Long memberIdx) {
+		this.memberIdx = memberIdx;
 	}
 	
 	
