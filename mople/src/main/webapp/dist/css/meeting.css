@@ -480,6 +480,124 @@ html, body {
   margin-bottom: 20px;
 }
 
+    .meeting-info-top {
+        display: flex;
+        justify-content: space-between; /* 요소들을 양 끝으로 정렬 */
+        gap: 20px; /* 요소들 사이 간격 */
+        margin-bottom: 20px;
+        /* align-items: stretch; */ /* 이 속성은 기본값이므로 생략 가능하나, 명시적으로 높이를 맞추려면 추가 */
+    }
+
+    .meeting-description-area { /* 새로운 컨테이너 이름 */
+        flex: 2; /* 모임 소개가 더 많은 공간을 차지하도록 */
+        min-width: 300px; /* 최소 너비 설정 */
+        display: flex; /* 내부 요소들을 세로로 정렬하기 위해 flex 사용 */
+        flex-direction: column; /* 세로 정렬 */
+    }
+
+    .meeting-description-area h3 {
+        margin-top: 0;
+        margin-bottom: 15px; /* 제목과 내용 사이 간격 */
+    }
+
+    .meeting-description-area p {
+        flex-grow: 1; /* p 태그가 남은 공간을 모두 차지하도록 하여 아래 stats가 바닥에 붙도록 */
+        margin-bottom: 15px; /* 소개글과 통계 사이 간격 */
+        white-space: normal;
+        overflow-x: auto;
+        overflow-y: auto;
+        overflow-wrap: break-word;
+    }
+
+    .meeting-stats { /* meeting-description-area 안에 있을 때의 스타일 */
+        display: flex;
+        justify-content: space-around; /* 통계 카드들을 고르게 배치 */
+        background-color: #e9ecef; /* 통계 섹션 배경색으로 구분 */
+        padding-top: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 0px;
+        border-radius: 8px;
+        margin-top: auto; /* 중요: flex-grow:1인 p 태그 아래에 배치되도록 */
+    }
+
+    .stat-card {
+        text-align: center;
+        flex: 1; /* 균등 분배 */
+        padding: 5px;
+    }
+    .stat-card h4 {
+        margin-bottom: 5px;
+        color: #555;
+        font-size: 0.9em;
+    }
+    .stat-card p {
+        font-weight: bold;
+        color: #333;
+        font-size: 1.1em;
+        margin-bottom: 0; /* p 태그 기본 마진 제거 */
+    }
+
+
+    .latest-posts-section {
+        flex: 1; /* 게시글 미리보기가 모임 소개 옆에 배치되도록 */
+        min-width: 250px; /* 최소 너비 설정 */
+        background-color: #f8f9fa; /* 배경색으로 구분 */
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex; /* 내부 요소 높이 맞추기 위해 flex 사용 */
+        flex-direction: column; /* 세로 정렬 */
+    }
+
+    .latest-posts-section h3 {
+        margin-top: 0;
+        color: #333;
+        font-size: 1.2em;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    .latest-posts-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1; /* ul이 남은 공간을 채우도록 */
+        overflow: auto; /* 내용이 많아지면 스크롤 */
+    }
+
+    .latest-posts-section ul li {
+        margin-bottom: 10px;
+    }
+
+    .latest-posts-section ul li a {
+        color: #f08979;
+        text-decoration: none;
+        font-weight: 500;
+        display: block;
+        white-space: nowrap; /* 줄바꿈 방지 */
+        overflow: hidden; /* 넘치는 텍스트 숨김 */
+        text-overflow: ellipsis; /* ...으로 표시 */
+    }
+
+    .latest-posts-section ul li a:hover {
+        text-decoration: underline;
+    }
+
+    .latest-posts-section .post-date {
+        font-size: 0.8em;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    .view-more-posts {
+        display: block;
+        text-align: right;
+        margin-top: auto; /* 중요: flex-grow:1인 ul 아래에 배치되도록 */
+        font-size: 0.9em;
+    }
+
 .group-avatar {
   width: 80px;
   height: 80px;
@@ -496,6 +614,23 @@ html, body {
 meeting-nav {
   display: flex;
   border-bottom: 1px solid #e2e8f0;
+}
+
+.btn-wait {
+    opacity: 0.8; 
+    
+    padding: 14px 28px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #f08979;
+}
+
+.btn-wait:hover {
+    opacity: 0.5; 
+    color: #f08979;
 }
 
 p.meetingName {
@@ -535,9 +670,6 @@ p.meetingDesc {
 	margin-left: 224px;
 }
 
-.meeting-description {
-  margin-bottom: 2rem;
-}
 
 .meeting-description h3 {
   color: #1e293b;
@@ -548,7 +680,7 @@ p.meetingDesc {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-  margin-bottom: 2rem;
+  background: #fff;
 }
 
 .stat-card {

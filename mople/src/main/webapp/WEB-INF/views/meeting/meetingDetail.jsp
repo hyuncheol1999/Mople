@@ -50,11 +50,15 @@
 						</div>
 						<c:choose>
 						    <c:when test="${userStatus eq 'NOT_JOINED'}">
-						        <button type="button" class="btn btn-primary" onclick="joinMeeting(${meetingIdx})">모임 참여</button>
+						        <button type="button" class="btn btn-primary" onclick="joinMeeting(${meetingIdx})">모임 신청</button>
 						    </c:when>
 						    <c:when test="${userStatus eq 'HOST'}">
+						        <button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingUpdate?meetingIdx=${meetingIdx}'">모임 정보 수정</button>						    	
 						    </c:when>
 						    <c:when test="${userStatus eq 'JOINED'}">
+						    </c:when>
+						    <c:when test="${userStatus eq 'WAITING'}">
+						    	<div class="btn-wait">승인 대기중</div>
 						    </c:when>
 						    <c:otherwise>
 						    </c:otherwise>
@@ -66,7 +70,7 @@
 						<button class="nav-tab" onclick="showTabAjax('meetingSchedule')">정모&nbsp;일정</button>
 						<button class="nav-tab" onclick="showTabAjax('meetingAlbum')">사진첩</button>
 						<button class="nav-tab"
-							onclick="location.href='${pageContext.request.contextPath}/main'">모임&nbsp;게시판</button>
+							onclick="location.href='${pageContext.request.contextPath}/meetingBoard/list?meetingIdx=${meetingIdx}'">모임&nbsp;게시판</button>
 					</nav>
 					<div class="meeting-content"></div>
 				</div>

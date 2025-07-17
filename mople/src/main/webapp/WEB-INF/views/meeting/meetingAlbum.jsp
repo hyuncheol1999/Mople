@@ -21,9 +21,10 @@
 				data-imageFileName='${dto.imageFileName}'
 				data-content='${dto.content}'
 				data-meetingIdx='${dto.meetingIdx}'
-				data-uploadMemberIdx='${dto.memberIdx}'
+				data-memberIdx='${dto.memberIdx}'
 				data-userNickName='${dto.userNickName}'
 				data-currUserIdx='${sessionScope.member.memberIdx}'
+				data-userStatus='${userStatus}'
 				class="photo"
 			>
 			<button id="modalBtn" type="button" hidden="" data-bs-toggle="modal" data-bs-target="#exampleModal"></button>
@@ -38,7 +39,7 @@
       <p class="albumModal-userNickName fw-bold"></p>
       <p class="albumModal-content text-break"></p> </div>
       <div class="modal-footer">
-      <button type="button" class="btn btn-primary btn-small" onclick="">수정</button>
+	      <button type="button" class="btn btn-primary btn-small" onclick="">삭제</button>
       </div>
     </div>
   </div>

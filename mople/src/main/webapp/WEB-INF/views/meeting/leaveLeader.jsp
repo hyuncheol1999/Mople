@@ -14,6 +14,7 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/dist/css/meetingCreate.css"
 	type="text/css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 	<div class="wrap">
@@ -50,7 +51,8 @@
 				</div>
 				<div class="button-group">
 	                <button type="submit" class="btn btn-outline btn-large">모임 탈퇴</button>
-	                <button class="btn btn-outline btn-large" type="button" onclick="history.back()">취소</button>
+	                <button class="btn btn-outline btn-large" type="button" onclick="history.back();">취소</button>
+		        	<input type="hidden" name="contextPath" value="${pageContext.request.contextPath}">
 		        </div>
 			</form>
 			</div>
@@ -61,10 +63,7 @@
 		<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
 	</footer>
 	<jsp:include page="/WEB-INF/views/layout/footerResources.jsp" />
-	<script>
-		const contextPath = "${pageContext.request.contextPath}";
-	</script>
 	<script type="text/javascript"
-		src="${pageContext.request.contextPath}/dist/js/leaveMeeting.js"></script>
+		src="${pageContext.request.contextPath}/dist/js/leaveLeader.js"></script>
 </body>
 </html>

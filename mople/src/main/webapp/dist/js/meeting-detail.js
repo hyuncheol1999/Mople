@@ -276,3 +276,61 @@ function rejectMember(meetingIdx, memberIdx) {
 	      );
 	  });
 }
+
+// 모임 탈퇴 - 모임원
+function leaveMeeting(meetingIdx, memberIdx) {
+  const ctx = document.querySelector('div.meeting-detail').getAttribute('data-contextPath');
+
+  Swal.fire({
+    title: '정말 모임을 탈퇴하시겠어요?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '탈퇴',
+    cancelButtonText: '취소'
+	}).then(r=>{
+	      if(!r.isConfirmed) return;
+	      sendAjaxRequest(
+	          ctx + '/meeting/reject',
+	          'POST',
+	          { meetingIdx:meetingIdx, memberIdx:memberIdx},
+	          'json',
+	          res=>{
+	              if(res && res.success){
+	                  Swal.fire('모임을 탈퇴하였습니다.','','success')
+	                  	.then(() => window.location.href = `${ctx}/meeting/meetingDetail?page=1&sportCategory=0&regionCategory=0&sortBy=latest&meetingIdx=${meetingIdx}`);  
+	              }else{
+	                  Swal.fire('실패','잠시 후 다시 시도해 주세요','error');
+	              }
+	          }
+	      );
+	  });
+}
+
+// 모임 해체
+function deleteMeeting(meetingIdx) {
+  const ctx = document.querySelector('div.meeting-detail').getAttribute('data-contextPath');
+
+  Swal.fire({
+    title: '정말 모임을 해체하시겠어요?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '해체',
+    cancelButtonText: '취소'
+	}).then(r=>{
+	      if(!r.isConfirmed) return;
+	      sendAjaxRequest(
+	          ctx + '/meeting/meetingDelete',
+	          'POST',
+	          { meetingIdx:meetingIdx},
+	          'json',
+	          res=>{
+	              if(res && res.success){
+	                  Swal.fire('모임을 해체하였습니다.','','success')
+	                  	.then(() => window.location.href = `${ctx}/meeting/meetingList?page=1&sportCategory=0&regionCategory=0&sortBy=latest`);  
+	              }else{
+	                  Swal.fire('실패','잠시 후 다시 시도해 주세요','error');
+	              }
+	          }
+	      );
+	  });
+}

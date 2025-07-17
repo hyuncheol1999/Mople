@@ -159,6 +159,31 @@ public class MemberOfMeetingDAO {
 		}
 	}
 	
+	// 승인 대기인원인지 확인
+	public boolean isWaiting(long meetingIdx, long memberIdx) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+		
+		try {
+			sql = "SELECT role FROM MemberOfMeeting WHERE meetingIdx=? AND memberIdx=?";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, meetingIdx);
+			pstmt.setLong(2, memberIdx);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				return rs.getInt("role") == 2;
+			}
+			return false;
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+	}
+	
 	// 로그인한 회원이 모임에 가입된 멤버인지 확인
 	public boolean isMeetingMember(long meetingIdx, long memberIdx) throws SQLException {
 		PreparedStatement pstmt = null;
@@ -244,6 +269,51 @@ public class MemberOfMeetingDAO {
 			e.printStackTrace();
 		} finally {
 			DBUtil.close(pstmt);
+		}
+	}
+	
+	// 모임장 모임 탈퇴
+	public void leaveLeader(MemberOfMeetingDTO dto, long beforeHostIdx) {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			conn.setAutoCommit(false);
+			
+			// 모임장 위임
+			sql = "UPDATE memberOfMeeting SET role = ? WHERE meetingIdx = ? AND memberIdx = ?";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, dto.getRole());
+			pstmt.setLong(2, dto.getMeetingIdx());
+			pstmt.setLong(3, dto.getMemberIdx());
+			
+			pstmt.executeUpdate();
+			
+			pstmt.close();
+			pstmt = null;
+			
+			// 모임장 탈퇴
+			sql = "DELETE FROM memberOfMeeting WHERE meetingIdx = ? AND memberIdx = ?";
+
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, dto.getMeetingIdx());
+			pstmt.setLong(2, beforeHostIdx);
+			
+			pstmt.executeUpdate();
+			
+			conn.commit();
+		} catch (SQLException e) {
+			DBUtil.rollback(conn);
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(pstmt);			
+			try {
+				conn.setAutoCommit(true);
+			} catch (Exception e2) {
+			}
 		}
 	}
 

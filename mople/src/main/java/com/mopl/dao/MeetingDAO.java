@@ -308,6 +308,61 @@ public class MeetingDAO {
 		return dto;
 	}
 	
+	// 모임 수정
+	public void updateMeeting(MeetingDTO dto) throws SQLException {
+		PreparedStatement pstmt = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append("UPDATE meeting ");			
+			sb.append("SET meetingName = ?, meetingDesc = ? ");
+			if(dto.getMeetingProfilePhoto() != null) {	
+				sb.append("AND meetingProfilePhoto = ? ");				
+			}
+			sb.append("WHERE meetingIdx = ?");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setString(1, dto.getMeetingName());
+			pstmt.setString(2, dto.getMeetingDesc());
+			
+			if(dto.getMeetingProfilePhoto() != null) {
+				pstmt.setString(3, dto.getMeetingProfilePhoto());	
+				pstmt.setLong(4, dto.getMeetingIdx());			
+			} else {
+				pstmt.setLong(3, dto.getMeetingIdx());
+			}
+			
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			DBUtil.close(pstmt);
+		}
+	}
+	
+	// 모임 삭제
+	public void deleteMeeting(long meetingIdx) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "DELETE FROM meeting WHERE meetingIdx = ?";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, meetingIdx);			
+
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			DBUtil.close(pstmt);
+		}
+	}
+	
 	// 모임에서 스포츠,지역 카테고리 가져오기(정모에)
 	public MeetingDTO getMeetingDetails(long meetingIdx) throws SQLException {
 		PreparedStatement pstmt = null;

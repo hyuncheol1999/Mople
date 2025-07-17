@@ -3,23 +3,51 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-<div class="meeting-description">
-    <h3>모임 소개</h3>
-    <p id="meetingDescription">
-		${meetingDesc}
-    </p>
+<div class="meeting-info-top">
+    <div class="meeting-description-area">
+        <h3>모임 소개</h3>
+        <p id="meetingDescription">
+            ${meetingDesc}
+        </p>
+        <div class="meeting-stats">
+		    <div class="stat-card">
+		        <img width="40" height="40" src="https://img.icons8.com/ios-filled/50/region-code.png" alt="region-code"/><h4>지역</h4>
+		        <p>${regionName}</p>
+		    </div>
+		    <div class="stat-card">
+		        <img width="40" height="40" src="https://img.icons8.com/fluency-systems-filled/48/user.png" alt="user"/><h4>멤버</h4>
+		        <p>${memberCount}명</p>
+		    </div>
+		    <div class="stat-card">
+		        <img width="40" height="40" src="https://img.icons8.com/ios/50/calendar--v1.png" alt="calendar--v1"/><h4>생성일</h4>
+		        <p>${createdDate}</p>
+		    </div>
+		</div>	
+	</div>
+
+    <div class="latest-posts-section">
+        <h3>최신 게시글</h3>
+        <c:choose>
+            <c:when test="${not empty meetingBoardList}">
+                <ul>
+                    <c:forEach var="dto" items="${meetingBoardList}" varStatus="status">
+                        <li>
+                            <a href="${pageContext.request.contextPath}/meetingBoard/view?num=${dto.num}&meetingIdx=${meetingIdx}">${dto.subject}</a>
+                            <div class="post-date">${dto.userNickName}&nbsp;·&nbsp;${dto.reg_date}</div>
+                        </li>
+                    </c:forEach>
+                </ul>
+                <a href="${pageContext.request.contextPath}/board/list?meetingIdx=${meetingIdx}" class="view-more-posts">게시글 전체보기 <i class="fas fa-chevron-right"></i></a>
+            </c:when>
+            <c:otherwise>
+                <p>아직 작성된 게시글이 없습니다.</p>
+                <a href="${pageContext.request.contextPath}/board/write?meetingIdx=${meetingIdx}" class="view-more-posts">첫 게시글 작성하기 <i class="fas fa-edit"></i></a>
+            </c:otherwise>
+        </c:choose>
+    </div>
 </div>
 
-<div class="meeting-stats">
-    <div class="stat-card">
-        <h4>지역</h4>
-        <p>${regionName}</p>
-    </div>
-    <div class="stat-card">
-        <h4>인원</h4>
-        <p>${memberCount}</p>
-    </div>
-</div>
+
 
 <div class="members-section">
     <h3>멤버</h3>
@@ -75,11 +103,22 @@
 	    		<p>현재 승인 대기 목록이 없습니다.</p>
 	    	</c:otherwise>
     	</c:choose>
-    	<div class="">
-			<c:if test="${userStatus eq 'HOST'}">
-				<button type="button" class="btn btn-primary btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingDelete?meetingIdx=${meetingIdx}'">모임 해체</button>
-				<button type="button" class="btn btn-primary btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/leaveMeeting?meetingIdx=${meetingIdx}'">모임 탈퇴</button>
-			</c:if>
-		</div>
     </c:if>
+	<div>
+		<c:choose>
+			<c:when test="${userStatus eq 'HOST'}">
+				<br>
+				<button type="button" class="btn btn-primary btn-small" onclick="deleteMeeting(${meetingIdx})">모임 해체</button>
+				<c:if test="${memberCount > 1}">
+					<button type="button" class="btn btn-primary btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/leaveLeader?meetingIdx=${meetingIdx}'">모임 탈퇴</button>
+				</c:if>
+			</c:when>
+			<c:when test="${userStatus eq 'JOINED'}">
+				<br>
+				<c:if test="${memberCount > 1}">
+					<button type="button" class="btn btn-primary btn-small" onclick="leaveMeeting(${meetingIdx}, ${currentUserIdx})">모임 탈퇴</button>
+				</c:if>
+			</c:when>
+		</c:choose>
+	</div>
 </div>

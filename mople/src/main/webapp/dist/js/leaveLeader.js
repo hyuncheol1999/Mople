@@ -75,8 +75,41 @@ document.addEventListener('DOMContentLoaded', () => {
 	const leaveForm = document.leaveForm;
 	leaveForm.addEventListener('submit', (event) => {
 		event.preventDefault();
-
-		leaveForm.submit();
+		
+		Swal.fire({
+		        title: '정말 탈퇴하시겠어요?',
+		        text: '탈퇴하시면 모임에 대한 모든 정보에 접근할 수 없게 됩니다.', // 추가 설명
+		        icon: 'warning', // 경고 아이콘
+		        showCancelButton: true, // 취소 버튼 표시
+		        confirmButtonColor: '#dc3545', // 확인 버튼을 빨간색으로
+		        cancelButtonColor: '#6c757d', // 취소 버튼을 회색으로
+		        confirmButtonText: '탈퇴', // 확인 버튼 텍스트
+		        cancelButtonText: '취소' // 취소 버튼 텍스트
+		    }).then((result) => {
+		        if (result.isConfirmed) {
+					// 탈퇴 완료 메시지 창
+					Swal.fire({
+					    title: '탈퇴가 완료되었습니다!', // 제목을 좀 더 명확하게
+					    text: '성공적으로 모임을 탈퇴하셨습니다.', // 추가 설명
+					    icon: 'success', // 성공 아이콘
+					    confirmButtonText: '확인', // 버튼 텍스트
+					    confirmButtonColor: '#28a745', // 성공 메시지에 어울리는 초록색 버튼
+					    timer: 2000, // 2초 후 자동으로 닫히도록 설정 (선택 사항)
+					    timerProgressBar: true, // 타이머 진행 바 표시 (선택 사항)
+					    showConfirmButton: false, // (선택 사항) 타이머가 있다면 확인 버튼을 숨길 수 있어요
+					    customClass: { // 추가적인 CSS 커스터마이징을 위한 클래스
+					        popup: 'my-success-popup',
+					        title: 'my-success-title'
+					    }
+					}).then(() => {
+					    leaveForm.submit(); // 폼 제출 진행
+					});
+		        } else {
+					const url = `${contextPath}/meeting/meetingDetail?meetingIdx=${meetingIdx}`;
+					window.location.href = url;
+				}
+		    });
+		
 	});
 });	
 	

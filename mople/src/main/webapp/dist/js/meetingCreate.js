@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		// input click 트리거
 		meetingImageInput.click();
 	});
-	
+
 	// 카테고리 선택 (스포츠, 지역 공통 함수)
 	function setupCategorySelection(categoryId, listId, hiddenInputId) {
 		const searchInputEL = document.getElementById(categoryId);
@@ -63,23 +63,23 @@ document.addEventListener('DOMContentLoaded', () => {
 			// 모든 리스트 아이템을 순회하며 필터링
 			listItemsELS.forEach(item => {
 				const itemText = item.textContent.trim(); // 리스트 아이템 텍스트
-				
+
 				// 아이템 텍스트에 검색어가 포함되어 있으면
-				if (itemText.includes(searchTerm)) { 
+				if (itemText.includes(searchTerm)) {
 					item.style.display = 'block'; // 해당 아이템 보이기
 				} else {
 					item.style.display = 'none'; // 포함되어 있지 않으면 숨기기
 				}
-				
+
 				// 검색어와 리스트 아이템이 일치하면
-				if(itemText === searchTerm) {
+				if (itemText === searchTerm) {
 					// 카테고리 번호 저장
 					hiddenInputEL.value = item.dataset.categoryNo;
 					hiddenInputEL.closest('.form-group').lastElementChild.classList.remove('active');
 				} else {
 					hiddenInputEL.value = '';
 				}
-				
+
 			});
 
 		});
@@ -139,6 +139,24 @@ document.addEventListener('DOMContentLoaded', () => {
 			regionCategoryError.classList.remove('active');
 		}
 
-		meetingForm.submit();
+		Swal.fire({
+		    title: '모임 생성이 완료되었습니다!',
+		    text: '새로운 모임이 성공적으로 생성되었습니다.', // 추가 설명
+		    icon: 'success', // 성공 아이콘
+		    confirmButtonText: '확인', // 버튼 텍스트
+		    confirmButtonColor: '#28a745', // 성공 메시지에 어울리는 초록색 버튼
+		    timer: 2000, // 2초 후 자동으로 닫히도록 설정 (사용자 경험에 따라 조절)
+		    timerProgressBar: true, // 타이머 진행 바 표시
+		    showConfirmButton: false, // 타이머가 있으니 확인 버튼은 숨깁니다.
+		    customClass: { // 디자인 커스터마이징을 위한 CSS 클래스 추가
+		        popup: 'my-creation-success-popup',
+		        title: 'my-creation-success-title'
+		    }
+		}).then(() => {
+		    // SweetAlert2 창이 닫힌 후에 폼을 제출합니다.
+		    meetingForm.submit();
+		});
+		
+
 	});
 });
