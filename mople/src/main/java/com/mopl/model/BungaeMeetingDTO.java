@@ -12,7 +12,7 @@ public class BungaeMeetingDTO {
 	
 	private int categoryIdx;
 	private int regionIdx;
-	private Long memberIdx;
+	private Long bungaeMemberIdx;
 	
 	private String sortBy;
 	private String regionName;
@@ -20,6 +20,13 @@ public class BungaeMeetingDTO {
 	private int currentMembers;
 	
 	
+	
+	public Long getBungaeMemberIdx() {
+		return bungaeMemberIdx;
+	}
+	public void setBungaeMemberIdx(Long bungaeMemberIdx) {
+		this.bungaeMemberIdx = bungaeMemberIdx;
+	}
 	public String getSortBy() {
 		return sortBy;
 	}
@@ -104,12 +111,7 @@ public class BungaeMeetingDTO {
 	public void setRegionIdx(int regionIdx) {
 		this.regionIdx = regionIdx;
 	}
-	public Long getMemberIdx() {
-		return memberIdx;
-	}
-	public void setMemberIdx(Long memberIdx) {
-		this.memberIdx = memberIdx;
-	}
+
 	
 	
 }
