@@ -388,7 +388,23 @@ public class MemberController {
 	
 	// 마이 페이지
 	@RequestMapping(value = "/member/myPage", method = RequestMethod.GET)
-	public String myPage(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		return "member/myPage";
+	public ModelAndView myPage(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		ModelAndView mav = new ModelAndView("member/myPage");
+		MemberDAO dao = new MemberDAO();
+		MemberDTO dto = null;
+
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		
+		try {
+			dto = dao.findByMemberIdx(info.getMemberIdx());
+			
+			mav.addObject("dto", dto);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		return mav;
 	}
 }
