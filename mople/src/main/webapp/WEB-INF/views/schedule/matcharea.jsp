@@ -1,52 +1,45 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
-<c:forEach var="entry" items="${map}">
-					<div class="schedule-box">
-						<!-- 날짜 (key) 출력 -->
-						<h3 class="schedule-date">${entry.key}</h3>
+<div class="match-container">
+  <c:forEach var="entry" items="${map}">
+    <c:set var="date" value="${entry.key}" />
+    <c:set var="games" value="${entry.value}" />
 
-						<c:choose>
-							<c:when test="${not empty entry.value}">
-								<div class="game-list">
-									<c:forEach var="game" items="${entry.value}">
-										<div class="game-row">
-											<!-- 경기 시간 -->
-											<div class="game-time">${game.time}</div>
+    <div class="day-section">
+      <div class="day-header">${date}</div>
+      <c:forEach var="game" items="${games}">
+        <div class="match-row">
+          <div class="match-time">${game.time} | ${game.place}</div>
+          <div class="match-teams">
+            <div class="team-block">
+              <c:if test="${not empty game.logo2}">
+                <img src="${game.logo2}" alt="Home Logo" class="team-logo" />
+              </c:if>
+              <div class="team-name">${game.home}</div>
+            </div>
 
-											<!-- 경기 장소 -->
-											<div class="game-place">${game.place}</div>
+            <div class="match-score">
+              <c:choose>
+                <c:when test="${not empty game.homeScore && not empty game.awayScore}">
+                  ${game.homeScore} : ${game.awayScore}
+                </c:when>
+                <c:otherwise>
+                  -
+                </c:otherwise>
+              </c:choose>
+            </div>
 
-											<!-- 어웨이팀 -->
-											<div class="team">
-												<img src="${game.logo1}" alt="${game.away}"
-													class="team-logo" /> <span class="team-name">${game.away}</span>
-											</div>
-
-											<!-- 스코어 (종료일 때만 표시) -->
-											<div class="game-score">
-												<c:if test="${game.state eq '종료'}">
-													<span class="score">${game.awayScore}</span>
-									:
-									<span class="score">${game.homeScore}</span>
-												</c:if>
-											</div>
-
-											<!-- 홈팀 -->
-											<div class="team">
-												<img src="${game.logo2}" alt="${game.home}"
-													class="team-logo" /> <span class="team-name">${game.home}</span>
-											</div>
-
-											<!-- 경기 상태 -->
-											<div class="game-state">${game.state}</div>
-										</div>
-									</c:forEach>
-								</div>
-							</c:when>
-							<c:otherwise>
-								<p style="text-align: center;">경기 일정이 없습니다.</p>
-							</c:otherwise>
-						</c:choose>
-					</div>
-				</c:forEach>
+            <div class="team-block">
+              <c:if test="${not empty game.logo1}">
+                <img src="${game.logo1}" alt="Away Logo" class="team-logo" />
+              </c:if>
+              <div class="team-name">${game.away}</div>
+            </div>
+          </div>
+          <div class="match-status">${game.state}</div>
+        </div>
+      </c:forEach>
+    </div>
+  </c:forEach>
+</div>

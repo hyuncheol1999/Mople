@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.mopl.crawler.ScheduleCrawler;
 import com.mopl.model.GameDTO;
@@ -27,7 +28,7 @@ public class ScheduleController {
 		return mav;
 	}
 
-	@RequestMapping(value = "/schedule/matcharea", method = RequestMethod.GET)
+	@RequestMapping(value = "/schedule/matcharea", method = RequestMethod.POST)
 	public ModelAndView baseball(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("schedule/matcharea");
@@ -53,8 +54,9 @@ public class ScheduleController {
 
 			url = url + sports + "/schedule/index?" + params +"2025-"+ date+"-01";
 			Map<String, List<GameDTO>> map = sc.getSchduleMonth(url);
-
-			mav.addObject("map", map);
+			Map<String, List<GameDTO>> sortedMap = new TreeMap<>(map); // 날짜 순 정렬
+			
+			mav.addObject("map", sortedMap);
 
 		} catch (Exception e) {
 			e.printStackTrace();

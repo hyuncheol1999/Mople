@@ -1,7 +1,6 @@
 package com.mopl.model;
 
 public class GameDTO {
-	private String gameDate;
 	private String time;
     private String away;
     private String home;
@@ -12,12 +11,6 @@ public class GameDTO {
     private String awayScore;
     private String homeScore;
     
-    public String getGameDate() {
-		return gameDate;
-	}
-	public void setGameDate(String gameDate) {
-		this.gameDate = gameDate;
-	}
     public String getAwayScore() {
 		return awayScore;
 	}
