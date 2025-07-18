@@ -624,6 +624,7 @@ div.form-check {
   margin-bottom: 0.5rem;
 }
 
+
 meeting-nav {
   display: flex;
   border-bottom: 1px solid #e2e8f0;
@@ -949,7 +950,7 @@ img.managerLogo {
         }
         /* 승인 버튼 스타일 */
         .approve-button {
-            color: #f08979; /* 녹색 */
+            color: #f08979;
             border-color: #f08979;
         }
         .approve-button:hover {
@@ -1039,6 +1040,3 @@ input[type="date"]:focus {
   box-shadow: 0 0 0 3px rgba(240, 137, 121, 0.2);
   outline: none;
 }
-
-
-

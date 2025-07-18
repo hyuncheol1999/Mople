@@ -253,5 +253,60 @@ public class MemberDAO {
 		}
 
 	}
+	
+   // 총 회원 수 
+   public int countMember() {
+      int result = 0;
+      PreparedStatement pstmt = null;
+      ResultSet rs = null;
+      String sql;
+
+      try {
+         sql = "SELECT NVL(COUNT(*), 0) FROM member1";
+         pstmt = conn.prepareStatement(sql);
+
+         rs = pstmt.executeQuery();
+         
+         if (rs.next()) {
+            result = rs.getInt(1);
+         }
+
+      } catch (SQLException e) {
+         e.printStackTrace();
+      } finally {
+         DBUtil.close(rs);
+         DBUtil.close(pstmt);
+      }
+
+      return result;
+   }
+
+
+   // 오늘 가입자 수
+   public int countTodayMember() {
+      int result = 0;
+      PreparedStatement pstmt = null;
+      ResultSet rs = null;
+      String sql;
+
+      try {
+         sql = "SELECT NVL(COUNT(*), 0) FROM member1 WHERE reg_date >= TRUNC(SYSDATE) AND reg_date < TRUNC(SYSDATE + 1)";
+         pstmt = conn.prepareStatement(sql);
+
+         rs = pstmt.executeQuery();
+         
+         if (rs.next()) {
+            result = rs.getInt(1);
+         }
+
+      } catch (SQLException e) {
+         e.printStackTrace();
+      } finally {
+         DBUtil.close(rs);
+         DBUtil.close(pstmt);
+      }
+
+      return result;
+   }
 
 }
