@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.mopl.model.MemberDTO;
 import com.mopl.util.DBConn;
@@ -307,6 +309,42 @@ public class MemberDAO {
       }
 
       return result;
+   }
+   
+   public List<MemberDTO> memberList() {
+       List<MemberDTO> list = new ArrayList<MemberDTO>();
+       PreparedStatement pstmt = null;
+       ResultSet rs = null;
+       String sql;
+       
+       try {
+
+           sql = "SELECT memberIdx, userId, userName, userNickName, TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date "
+                      + "FROM member1 "
+                      + "ORDER BY reg_date DESC";
+
+           pstmt = conn.prepareStatement(sql);
+           rs = pstmt.executeQuery();
+
+           while (rs.next()) {
+               MemberDTO dto = new MemberDTO();
+               dto.setMemberIdx(rs.getInt("memberIdx"));
+               dto.setUserId(rs.getString("userId"));
+               dto.setUserName(rs.getString("userName"));
+               dto.setUserNickName(rs.getString("userNickName"));
+               dto.setReg_date(rs.getString("reg_date"));
+
+               list.add(dto);
+           }
+
+       } catch (Exception e) {
+           e.printStackTrace();
+       } finally {
+    	   DBUtil.close(rs);
+           DBUtil.close(pstmt);
+       }
+
+       return list;
    }
 
 }
