@@ -102,38 +102,40 @@
 			            <div class="stats-grid">
 			                <div class="stat-box">
 			                    <strong>총 회원 수</strong>
-			                    <p>1234명</p>
+			                    <p>${countMember}명</p>
 			                </div>
 			                <div class="stat-box">
 			                    <strong>활성 모임 수</strong>
-			                    <p>56개</p>
+			                    <p>${countMeeting}개</p>
 			                </div>
 			                <div class="stat-box">
 			                    <strong>오늘 가입자 수</strong>
-			                    <p>12명</p>
+			                    <p>${countTodayMember}명</p>
 			                </div>
 			                <div class="stat-box">
 			                    <strong>문의 내역</strong>
-			                    <p>3건</p>
+			                    <p>${countQna}건</p>
 			                </div>
 			            </div>
 			        </div>
 			
 			        <div class="card">
-			            <h4>최근 생성된 모임</h4>
+			            <h4>최근 생성된 정모</h4>
 			            <table border="1" cellpadding="10" cellspacing="0" width="100%">
 			                <tr>
-			                    <th>모임명</th>
-			                    <th>카테고리</th>
-			                    <th>지역</th>
-			                    <th>생성일</th>
+			                    <th>정모제목</th>
+			                    <th>시작날짜</th>
+			                    <th>종료날짜</th>
+			                    <th>장소</th>
+			                    <th>정원</th>
 			                </tr>
-			                <c:forEach var="meeting" items="${recentMeetings}">
+			                <c:forEach var="list" items="${list}">
 			                    <tr>
-			                        <td>${meeting.title}</td>
-			                        <td>${meeting.category}</td>
-			                        <td>${meeting.region}</td>
-			                        <td>${meeting.createdDate}</td>
+			                        <td>${list.subject}</td>
+			                        <td>${list.startDate}</td>
+			                        <td>${list.endDate}</td>
+			                        <td>${list.place}</td>
+			                        <td>${list.capacity}</td>
 			                    </tr>
 			                </c:forEach>
 			            </table>

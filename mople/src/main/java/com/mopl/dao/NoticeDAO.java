@@ -116,7 +116,7 @@ public class NoticeDAO {
 				sql += " WHERE INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ";
 			} else if (schType.equals("reg_date")) {
 				kwd = kwd.replaceAll("(\\-|\\/|\\.)", "");
-				sql += "  WHERE TO_CHAR(reg_date, 'YYYYMMDD') = ? ";
+				sql += "  WHERE TO_CHAR(n.reg_date, 'YYYYMMDD') = ? ";
 			} else {
 				sql += "  WHERE INSTR(" + schType + ", ?) >= 1 ";
 			}

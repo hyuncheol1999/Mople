@@ -214,9 +214,9 @@ function searchList() {
 </script>
 
 
-<jsp:include page="/WEB-INF/views/admin/layout/footer.jsp"/>
+<jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
 
-<jsp:include page="/WEB-INF/views/admin/layout/footerResources.jsp"/>
+<jsp:include page="/WEB-INF/views/layout/footerResources.jsp"/>
 
 
 </div>

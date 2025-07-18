@@ -440,4 +440,31 @@ public class QnaDAO {
 			DBUtil.close(pstmt);
 		}
 	}
+	
+	// 답변 대기중인 문의 건수
+	public int countQna() {
+		int result = 0;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "SELECT NVL(COUNT(*), 0) FROM qna WHERE answerIdx = 0 OR answer IS NULL";
+			pstmt = conn.prepareStatement(sql);
+
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				result = rs.getInt(1);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return result;
+	}
 }

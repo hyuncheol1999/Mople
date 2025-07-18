@@ -309,4 +309,6 @@ public class QnaController {
 
 		return new ModelAndView("redirect:/qna/list?" + query);
 	}
+	
+
 }
