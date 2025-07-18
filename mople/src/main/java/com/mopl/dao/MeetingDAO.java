@@ -442,7 +442,7 @@ public class MeetingDAO {
 
             while (rs.next()) {
                 MeetingDTO dto = new MeetingDTO();
-                dto.setMeetingIdx(rs.getInt("meetingIdx"));
+                dto.setMeetingIdx(rs.getLong("meetingIdx"));
                 dto.setMeetingName(rs.getString("meetingName"));
                 dto.setCreatedDate(rs.getString("createdDate"));
                 dto.setRegionName(rs.getString("regionName"));
