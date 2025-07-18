@@ -305,5 +305,87 @@ public class RegularMeetingDAO {
 	    return dto;
 	}
 
+	// 정기모임 중 번개로 전환된 모임 조회 (isBungaeMeeting = 1)
+		public List<RegularMeetingDTO> selectUrgentRegularMeetings(String keyword) throws Exception {
+		    List<RegularMeetingDTO> list = new ArrayList<>();
+		    PreparedStatement pstmt = null;
+		    ResultSet rs = null;
+		    String sql;
+
+		    try {
+		        sql = "SELECT meetingIdx, subject, content, startDate, place, capacity, isBungaeMeeting "
+		            + "FROM RegularMeeting "
+		            + "WHERE isBungaeMeeting = 1 AND (subject LIKE ? OR content LIKE ?) "
+		            + "ORDER BY startDate ASC";
+
+		        pstmt = conn.prepareStatement(sql);
+		        String kw = "%" + keyword + "%";
+		        pstmt.setString(1, kw);
+		        pstmt.setString(2, kw);
+
+		        rs = pstmt.executeQuery();
+
+		        while (rs.next()) {
+		            RegularMeetingDTO dto = new RegularMeetingDTO();
+		            dto.setMeetingIdx(rs.getLong("meetingIdx"));
+		            dto.setSubject(rs.getString("subject"));
+		            dto.setContent(rs.getString("content"));
+		            dto.setStartDate(rs.getString("startDate"));
+		            dto.setPlace(rs.getString("place"));
+		            dto.setCapacity(rs.getInt("capacity"));
+		            dto.setIsBungaeMeeting(rs.getInt("isBungaeMeeting"));
+
+		            list.add(dto);
+		        }
+
+		    } finally {
+		        DBUtil.close(rs);
+		        DBUtil.close(pstmt);
+		    }
+
+		    return list;
+		}
+
+
+		public List<RegularMeetingDTO> getOngoingMeetingsTop5() {
+		    List<RegularMeetingDTO> list = new ArrayList<>();
+		    PreparedStatement pstmt = null;
+		    ResultSet rs = null;
+		    String sql;
+
+		    try {
+		        sql = "SELECT regularMeetingIdx, subject, startDate, endDate, place, capacity, status, isBungaeMeeting "
+		            + "FROM regularMeeting "
+		            + "WHERE status = 0 "
+		            + "ORDER BY startDate ASC "
+		            + "FETCH FIRST 5 ROWS ONLY";  // 상위 5개만 가져오기
+
+		        pstmt = conn.prepareStatement(sql);
+		        rs = pstmt.executeQuery();
+
+		        while (rs.next()) {
+		            RegularMeetingDTO dto = new RegularMeetingDTO();
+
+		            dto.setRegularMeetingIdx(rs.getLong("regularMeetingIdx"));
+		            dto.setSubject(rs.getString("subject"));
+		            dto.setStartDate(rs.getString("startDate"));
+		            dto.setEndDate(rs.getString("endDate"));
+		            dto.setPlace(rs.getString("place"));
+		            dto.setCapacity(rs.getInt("capacity"));
+		            dto.setStatus(rs.getInt("status"));
+		            dto.setIsBungaeMeeting(rs.getInt("isBungaeMeeting"));
+
+		            list.add(dto);
+		        }
+
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    } finally {
+		        DBUtil.close(rs);
+		        DBUtil.close(pstmt);
+		    }
+
+		    return list;
+		}
 
 }
