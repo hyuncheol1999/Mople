@@ -37,11 +37,11 @@
                         </li>
                     </c:forEach>
                 </ul>
-                <a href="${pageContext.request.contextPath}/board/list?meetingIdx=${meetingIdx}" class="view-more-posts">게시글 전체보기 <i class="fas fa-chevron-right"></i></a>
+                <a href="${pageContext.request.contextPath}/meetingBoard/list?meetingIdx=${meetingIdx}" class="view-more-posts">게시글 전체보기 <i class="fas fa-chevron-right"></i></a>
             </c:when>
             <c:otherwise>
                 <p>아직 작성된 게시글이 없습니다.</p>
-                <a href="${pageContext.request.contextPath}/board/write?meetingIdx=${meetingIdx}" class="view-more-posts">첫 게시글 작성하기 <i class="fas fa-edit"></i></a>
+                <a href="${pageContext.request.contextPath}/meetingBoard/write?meetingIdx=${meetingIdx}" class="view-more-posts">첫 게시글 작성하기 <i class="fas fa-edit"></i></a>
             </c:otherwise>
         </c:choose>
     </div>
@@ -57,7 +57,7 @@
             <img src=
             <c:choose>					
 				<c:when test="${not empty dto.memberProfilePhoto}">						
-					'${pageContext.request.contextPath}/uploads/memberProfilePhoto/${dto.memberProfilePhoto}'
+					'${pageContext.request.contextPath}/uploads/member/${dto.memberProfilePhoto}'
 				</c:when>
 				<c:otherwise>
 					'${pageContext.request.contextPath}/dist/images/defaultPerson.png'	

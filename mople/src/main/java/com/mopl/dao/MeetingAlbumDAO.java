@@ -57,6 +57,46 @@ public class MeetingAlbumDAO {
 		return list;
 	}
 	
+	// 사진 정보
+	public MeetingAlbumDTO findByPhotoNum(long photoNum) {
+		MeetingAlbumDTO dto = new MeetingAlbumDTO();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append("SELECT photoNum, imageFileName, content, meetingIdx, a.memberIdx, userNickName ");
+			sb.append("FROM meetingAlbum a ");
+			sb.append("LEFT OUTER JOIN member1 m ON a.memberIdx = m.memberIdx ");
+			sb.append("WHERE photoNum = ?");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setLong(1, photoNum);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				
+				dto.setPhotoNum(rs.getLong("photoNum"));
+				dto.setImageFileName(rs.getString("imageFileName"));
+				dto.setContent(rs.getString("content"));
+				dto.setMeetingIdx(rs.getLong("meetingIdx"));
+				dto.setMemberIdx(rs.getLong("memberIdx"));
+				dto.setUserNickName(rs.getString("userNickName"));
+				
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+		
+		return dto;
+	}
+	
 	public void insertAlbum(MeetingAlbumDTO dto) {
 		PreparedStatement pstmt = null;
 		StringBuilder sb = new StringBuilder();

@@ -48,6 +48,17 @@ html, body {
   margin-bottom: 30px;	
 }
 
+.img-avatar {
+	width: 100px;
+	height: 100px;
+}
+
+div.form-check {
+	margin: 0px;
+	padding: 0px;
+	margin-right: 7px;
+}
+
 /* Features */
 .features {
   padding: 4rem 0;

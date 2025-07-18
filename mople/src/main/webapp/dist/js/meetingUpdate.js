@@ -1,3 +1,23 @@
+document.addEventListener('DOMContentLoaded', () => {
+	// 파일 입력 필드 변경 시 파일명 표시
+	const meetingImageInput = document.getElementById('meetingImage'); // <input type='file' ...>
+	const fileNameDisplay = document.getElementById('fileNameDisplay');
+	meetingImageInput.addEventListener('change', (event) => {
+		if (event.target.files.length > 0) {
+			fileNameDisplay.textContent = event.target.files[0].name;
+		} else {
+			fileNameDisplay.textContent = '선택된 파일 없음';
+		}
+	});
+
+	// 파일 입력 필드 클릭 시
+	document.querySelector('#fileNameDisplay').addEventListener('click', (event) => {
+		// input click 트리거
+		meetingImageInput.click();
+	});
+});
+	
+
 // 폼 제출 시 유효성 검사
 const meetingForm = document.meetingForm;
 meetingForm.addEventListener('submit', (event) => {

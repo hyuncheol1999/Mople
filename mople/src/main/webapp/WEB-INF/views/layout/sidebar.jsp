@@ -47,7 +47,7 @@ $(function() {
 	listPage(1);
 	
     // 카테고리 변경 시 모임 리스트 새로 불러오기
-    $('.filter-section').on('change', 'input[type=radio]', function() { // delegate 방식으로 변경
+    $('.filter-section').on('change', 'input[type=radio]', function() { 
         listPage(1);
     });
 });

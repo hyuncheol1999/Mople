@@ -12,8 +12,27 @@ public class MemberDTO {
 	private String reg_date;
 	private int role;
 	private String email;
+	private String email1;
+	private String email2;
 	private String tel;
 	private String profilePhoto;
+	
+	public String getEmail1() {
+		return email1;
+	}
+
+	public void setEmail1(String email1) {
+		this.email1 = email1;
+	}
+
+	public String getEmail2() {
+		return email2;
+	}
+
+	public void setEmail2(String email2) {
+		this.email2 = email2;
+	}
+
 
 	public long getMemberIdx() {
 		return memberIdx;

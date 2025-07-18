@@ -317,7 +317,7 @@ public class MeetingDAO {
 			sb.append("UPDATE meeting ");			
 			sb.append("SET meetingName = ?, meetingDesc = ? ");
 			if(dto.getMeetingProfilePhoto() != null) {	
-				sb.append("AND meetingProfilePhoto = ? ");				
+				sb.append(", meetingProfilePhoto = ? ");				
 			}
 			sb.append("WHERE meetingIdx = ?");
 			

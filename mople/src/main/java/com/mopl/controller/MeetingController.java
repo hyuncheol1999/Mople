@@ -49,6 +49,7 @@ public class MeetingController {
 		ModelAndView mav = new ModelAndView("meeting/meetingList");
 
 		MeetingDAO dao = new MeetingDAO();
+		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 		SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
 		RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
 		MyUtil util = new MyUtil();
@@ -85,6 +86,12 @@ public class MeetingController {
 				offset = 0;
 
 			List<MeetingDTO> list = dao.findAllMeetings(offset, size, sportCategory, regionCategory, sortBy);
+			
+			for (MeetingDTO dto : list) {
+				dto.setMeetingName(util.htmlSymbols(dto.getMeetingName()));
+				dto.setContent(util.htmlSymbols(dto.getContent()));				
+				dto.setCurrentMembers(mDao.findMemberCount(dto.getMeetingIdx()));
+			}
 
 			List<SportCategoryDTO> sportCategoryList = sportCategoryDao.findAllSportCategory();
 			List<RegionCategoryDTO> regionCategoryList = regionCategoryDao.findAllRegionCategory();
@@ -676,16 +683,25 @@ public class MeetingController {
 
 		String meetingIdxParam = req.getParameter("meetingIdx");
 		try {
+			MeetingDTO beforeDto = dao.findByMeeetingIdx(Long.parseLong(meetingIdxParam));
+			
 			MeetingDTO dto = new MeetingDTO();
 			dto.setMeetingIdx(Long.parseLong(meetingIdxParam));
 			dto.setMeetingName(req.getParameter("meetingName"));
 			dto.setMeetingDesc(req.getParameter("meetingDesc"));
 			
 			Part p = req.getPart("meetingProfilePhoto");
+			
 			MyMultipartFile multiFile = fileManager.doFileUpload(p, pathname);
 
+			// 이미지 업로드 시
 			if (multiFile != null) {
+				// 파일 삭제
+				fileManager.doFiledelete(pathname, beforeDto.getMeetingProfilePhoto());	
+				
 				dto.setMeetingProfilePhoto(multiFile.getSaveFilename());
+			} else {
+				dto.setMeetingProfilePhoto(null);
 			}
 
 			dao.updateMeeting(dto);
@@ -867,27 +883,37 @@ public class MeetingController {
 	@RequestMapping(value = "/meeting/albumImageDelete", method = RequestMethod.POST)
 	public Map<String, Object> albumImageDelete(HttpServletRequest req, HttpServletResponse resp) {
 		Map<String, Object> map = new HashMap<>();
-		MeetingDAO dao = new MeetingDAO();
+		FileManager fileManager = new FileManager();
+		MeetingAlbumDAO maDao = new MeetingAlbumDAO();
 		
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
 		
+		String root = session.getServletContext().getRealPath("/");
+		String pathname = root + "uploads" + File.separator + "meetingAlbum";
+		
 		if (info == null) {
-			map.put("success", false);
+			map.put("status", "false");
 			return map;
 		}
 		
 		try {
 			long photoNum = Long.parseLong(req.getParameter("photoNum"));
 			
-			// 파일 삭제
+			MeetingAlbumDTO dto = maDao.findByPhotoNum(photoNum);
 			
-			dao.deleteMeeting(photoNum);
+			if(dto != null) {
+				// 파일 삭제
+				fileManager.doFiledelete(pathname, dto.getImageFileName());				
+
+				// DB 삭제
+				maDao.deleteImage(photoNum);
+			}
 			
-			map.put("success", true);
+			map.put("status", "success");
 		} catch (Exception e) {
 			e.printStackTrace();
-			map.put("success", false);
+			map.put("status", "false");
 		}
 		return map;
 	}

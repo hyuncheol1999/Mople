@@ -43,7 +43,7 @@ function deleteImage(btnEL) {
 		if (!r.isConfirmed) return;
 
 		$.ajax({
-			url: 'meeting/albumImageDelete',
+			url: 'albumImageDelete',
 			type: 'POST',
 			data: { photoNum: photoNum },
 			dataType: 'json',

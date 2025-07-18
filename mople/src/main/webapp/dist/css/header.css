@@ -150,10 +150,18 @@ a:hover {
     letter-spacing: 0.5px;
 }
 
+
 .btn-outline:hover, .btn-primary:hover {
     background-color: #f08979;
     color: white;
     border: 1px solid #f08979;
+}
+
+.btn-outline:disabled, .btn-primary:disabled {
+    background-color: #fff;
+    color: #f08979;
+    border: 1px solid #f08979;
+    opacity: 0.4;
 }
 
 .btn-outline, .btn-primary {
