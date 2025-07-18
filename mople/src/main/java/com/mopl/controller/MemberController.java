@@ -4,9 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.mopl.dao.BoardDAO;
+import com.mopl.dao.MeetingAlbumDAO;
+import com.mopl.dao.MeetingDAO;
 import com.mopl.dao.MemberDAO;
+import com.mopl.dao.MemberOfMeetingDAO;
+import com.mopl.model.BoardDTO;
+import com.mopl.model.MeetingAlbumDTO;
+import com.mopl.model.MeetingDTO;
 import com.mopl.model.MemberDTO;
 import com.mopl.model.SessionInfo;
 import com.mopl.mvc.annotation.Controller;
@@ -16,6 +24,7 @@ import com.mopl.mvc.annotation.ResponseBody;
 import com.mopl.mvc.view.ModelAndView;
 import com.mopl.util.FileManager;
 import com.mopl.util.MyMultipartFile;
+import com.mopl.util.MyUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -391,13 +400,34 @@ public class MemberController {
 	public ModelAndView myPage(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("member/myPage");
 		MemberDAO dao = new MemberDAO();
+		MeetingDAO meetingDAO = new MeetingDAO();
+		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
+		BoardDAO boardDAO = new BoardDAO();
+		MeetingAlbumDAO meetingAlbumDAO = new MeetingAlbumDAO();
+		MyUtil util = new MyUtil();
 		MemberDTO dto = null;
 
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo)session.getAttribute("member");
 		
 		try {
-			dto = dao.findByMemberIdx(info.getMemberIdx());
+			if(info != null) {
+				dto = dao.findByMemberIdx(info.getMemberIdx());
+				List<MeetingDTO> myMeetingList = meetingDAO.findByMemberIdx(info.getMemberIdx());
+				List<BoardDTO> myBoardList = boardDAO.findByMemberIdx(info.getMemberIdx());
+				List<MeetingAlbumDTO> myMeetingAlbumList = meetingAlbumDAO.findByMemberIdx(info.getMemberIdx());				
+			
+			
+				for (MeetingDTO meetingDto : myMeetingList) {
+					meetingDto.setMeetingName(util.htmlSymbols(meetingDto.getMeetingName()));
+					meetingDto.setContent(util.htmlSymbols(meetingDto.getContent()));				
+					meetingDto.setCurrentMembers(mDao.findMemberCount(meetingDto.getMeetingIdx()));
+				}
+				
+				mav.addObject("myMeetingList", myMeetingList);
+				mav.addObject("myBoardList", myBoardList);
+				mav.addObject("myMeetingAlbumList", myMeetingAlbumList);
+			}
 			
 			mav.addObject("dto", dto);
 		} catch (Exception e) {

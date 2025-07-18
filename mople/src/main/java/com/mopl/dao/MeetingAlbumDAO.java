@@ -57,6 +57,49 @@ public class MeetingAlbumDAO {
 		return list;
 	}
 	
+	// 회원이 올린 모임 사진 리스트
+	public List<MeetingAlbumDTO> findByMemberIdx(long memberIdx) {
+		List<MeetingAlbumDTO> list = new ArrayList<MeetingAlbumDTO>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append("SELECT photoNum, imageFileName, content, a.meetingIdx, a.memberIdx, userNickName, meetingName ");
+			sb.append("FROM meetingAlbum a ");
+			sb.append("LEFT OUTER JOIN member1 m ON a.memberIdx = m.memberIdx ");
+			sb.append("LEFT OUTER JOIN meeting mt ON a.memberIdx = mt.meetingIdx ");
+			sb.append("WHERE a.memberIdx = ?");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setLong(1, memberIdx);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				MeetingAlbumDTO dto = new MeetingAlbumDTO();
+				
+				dto.setPhotoNum(rs.getLong("photoNum"));
+				dto.setImageFileName(rs.getString("imageFileName"));
+				dto.setContent(rs.getString("content"));
+				dto.setMeetingIdx(rs.getLong("meetingIdx"));
+				dto.setMemberIdx(rs.getLong("memberIdx"));
+				dto.setUserNickName(rs.getString("userNickName"));
+				
+				list.add(dto);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+		
+		return list;
+	}
+	
 	// 사진 정보
 	public MeetingAlbumDTO findByPhotoNum(long photoNum) {
 		MeetingAlbumDTO dto = new MeetingAlbumDTO();

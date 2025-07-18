@@ -119,11 +119,11 @@
 								    <div class="row g-2">
 								        <div class="col-md-6 genderBlock">
 								            <div class="form-check form-check-inline pt-1">
-								                <input class="" type="radio" name="gender" id="genderMale" value="0" ${dto.gender == 0 ? "checked" : ""}>
+								                <input class="" type="radio" name="gender" id="genderMale" value="0" ${mode=="update"? "" :""}  ${dto.gender == 0 ? "checked" : ""}>
 								                <label class="" for="genderMale">남자</label>
 								            </div>
 								            <div class="form-check form-check-inline pt-1">
-								                <input class="" type="radio" name="gender" id="genderFemale" value="1" ${dto.gender == 1 ? "checked" : ""}>
+								                <input class="" type="radio" name="gender" id="genderFemale" value="1" ${mode=="update"? "" :""}>
 								                <label class="" for="genderFemale">여자</label>
 								            </div>
 								        </div>
@@ -158,7 +158,7 @@
 										<div class="col-md-6">
 											<div class="form-check pt-1">
 												<input class="form-check-input" type="checkbox" name="receiveEmail" id="receiveEmail"
-													value="1" ${empty dto || dto.receiveEmail == 1 ? "checked":""}>
+													value="1">
 												<label class="form-check-label" for="receiveEmail"> 동의</label>
 											</div>
 										</div>
@@ -234,7 +234,7 @@
 
 <script type="text/javascript">
 window.addEventListener('DOMContentLoaded', ev => {
-	let img = '${dto.profile_photo}';
+	let img = '${dto.profilePhoto}';
 
 	const avatarEL = document.querySelector('.img-avatar');
 	const inputEL = document.querySelector('form[name=memberForm] input[name=selectFile]');

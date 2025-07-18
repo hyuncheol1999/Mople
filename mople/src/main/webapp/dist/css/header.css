@@ -351,3 +351,9 @@ input[type="checkbox"]:focus + label::before {
   -webkit-animation: spin 2s linear infinite;
   animation: spin 2s linear infinite;
 }
+
+p.loginMessage {
+	margin-top: 3px;
+	text-align: center;
+	color: #f08979;
+}
