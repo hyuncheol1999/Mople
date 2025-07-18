@@ -1,5 +1,7 @@
 package com.mopl.model;
 
+import java.util.List;
+
 public class MeetingBoardDTO {
 	private long num;
 	private long memberIdx;
@@ -11,8 +13,24 @@ public class MeetingBoardDTO {
 	private String reg_date;
 	private String userNickName;
 
-	private long fileNum;
-	private String imageFileName;
+	private List<String> imageFileNames;
+	private String thumbnail;
+
+	public String getThumbnail() {
+		return thumbnail;
+	}
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
+	}
+
+	public List<String> getImageFileNames() {
+		return imageFileNames;
+	}
+
+	public void setImageFileNames(List<String> imageFileNames) {
+		this.imageFileNames = imageFileNames;
+	}
 
 	private long replyNum;
 	private long parentNum;
@@ -25,22 +43,6 @@ public class MeetingBoardDTO {
 
 	public void setUserNickName(String userNickName) {
 		this.userNickName = userNickName;
-	}
-
-	public long getFileNum() {
-		return fileNum;
-	}
-
-	public void setFileNum(long fileNum) {
-		this.fileNum = fileNum;
-	}
-
-	public String getImageFileName() {
-		return imageFileName;
-	}
-
-	public void setImageFileName(String imageFileName) {
-		this.imageFileName = imageFileName;
 	}
 
 	public long getReplyNum() {

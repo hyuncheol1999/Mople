@@ -1,10 +1,14 @@
 package com.mopl.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mopl.util.FileManager;
+import com.mopl.util.MyMultipartFile;
 import com.mopl.dao.MeetingBoardDAO;
 import com.mopl.model.MeetingBoardDTO;
 import com.mopl.model.SessionInfo;
@@ -19,6 +23,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 @Controller
 public class MeetingBoardController {
@@ -60,7 +65,7 @@ public class MeetingBoardController {
 
 			String filter = req.getParameter("filter");
 
-			int size = 10;
+			int size = 7;
 			int offset = (current_page - 1) * size;
 			if (offset < 0)
 				offset = 0;
@@ -129,11 +134,15 @@ public class MeetingBoardController {
 	public ModelAndView writeSubmit(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		MeetingBoardDAO dao = new MeetingBoardDAO();
-
-		long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
+		FileManager fileManager = new FileManager();
 
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+		String root = session.getServletContext().getRealPath("/");
+		String pathname = root + "uploads" + File.separator + "photo";
+
+		long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
 
 		try {
 			MeetingBoardDTO dto = new MeetingBoardDTO();
@@ -141,12 +150,31 @@ public class MeetingBoardController {
 			dto.setUserNickName(info.getUserNickName());
 			dto.setMemberIdx(info.getMemberIdx());
 			dto.setMeetingIdx(meetingIdx);
-
 			dto.setSubject(req.getParameter("subject"));
 			dto.setContent(req.getParameter("content"));
 			dto.setFilter(req.getParameter("filter"));
 
-			dao.insertMeetingBoard(dto);
+			long num = dao.insertMeetingBoard(dto);
+
+			dto.setNum(num);
+
+			List<String> imageFileNames = new ArrayList<>();
+
+			for (Part part : req.getParts()) {
+				if (part.getName().equals("uploadFiles") && part.getSubmittedFileName() != null && part.getSize() > 0) {
+					
+					MyMultipartFile mf = fileManager.doFileUpload(part, pathname);
+					if (mf != null) {
+						imageFileNames.add(mf.getSaveFilename());
+					}
+				}
+			}
+
+			if (!imageFileNames.isEmpty()) {
+				dto.setImageFileNames(imageFileNames);
+				dao.insertMeetingBoardImg(dto);
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -193,6 +221,9 @@ public class MeetingBoardController {
 				return new ModelAndView("redirect:/meetingBoard/list?" + query);
 			}
 
+			List<String> imageList = dao.listMeetingBoardImage(num);
+			dto.setImageFileNames(imageList);
+
 			dto.setContent(util.htmlSymbols(dto.getContent()));
 
 			// 이전 글, 다음 글
@@ -207,11 +238,12 @@ public class MeetingBoardController {
 			int likeCount = dao.countMeetingBoardLike(num);
 
 			if (info != null) {
-				liked = dao.isUserBoardLike(num, info.getMemberIdx()); // 이 메서드가 필요합니다
+				liked = dao.isUserBoardLike(num, info.getMemberIdx());
 			}
 
 			ModelAndView mav = new ModelAndView("meetingBoard/view");
 			mav.addObject("dto", dto);
+			mav.addObject("imageList", imageList);
 			mav.addObject("meetingIdx", meetingIdx);
 			mav.addObject("page", page);
 			mav.addObject("query", query);
@@ -522,11 +554,6 @@ public class MeetingBoardController {
 
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
-
-		if (info == null) {
-			resp.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 응답
-			return null;
-		}
 
 		try {
 			long parentNum = Long.parseLong(req.getParameter("parentNum"));

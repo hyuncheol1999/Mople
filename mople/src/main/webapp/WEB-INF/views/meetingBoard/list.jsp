@@ -1,11 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${meetingName}모임소식</title>
+<title>${meetingName} 모임 소식</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css"
@@ -29,7 +31,7 @@
 
 
 
-		<h3 class="board-title">${meetingName}모임소식</h3>
+		<h3 class="board-title">${meetingName} 모임 소식</h3>
 
 		<div class="category-tabs">
 			<a href="?meetingIdx=${meetingIdx}"
@@ -52,15 +54,24 @@
 					<c:forEach var="dto" items="${list}">
 						<div class="board-item"
 							onclick="location.href='${pageContext.request.contextPath}/meetingBoard/view?num=${dto.num}&meetingIdx=${meetingIdx}'">
-							<div class="board-item-content">
+
+							<!-- 썸네일이 있을 경우에만 이미지 출력 -->
+							<c:if test="${not empty dto.thumbnail}">
+								<div class="thumbnail">
+									<img
+										src="${pageContext.request.contextPath}/uploads/photo/${dto.thumbnail}"
+										alt="썸네일" width="100">
+								</div>
+							</c:if>
+
+							<!-- 제목/내용/작성자 등 텍스트 정보 -->
+							<div class="board-content">
 								<div class="board-item-title">${dto.subject}</div>
-								<div class="board-item-text">${fn:substring(dto.content, 0, 100)}...</div>
-								<div class="board-item-meta">${dto.userNickName}·
-									${dto.reg_date}</div>
+								<div class="board-item-text">${empty dto.content ? '내용 없음' : fn:substring(dto.content, 0, 100)}...
+								</div>
+								<div class="board-item-meta">${dto.userNickName} · ${dto.reg_date}</div>
 							</div>
-							<img
-								src="${pageContext.request.contextPath}/images/default-thumb.jpg"
-								class="board-item-img" alt="썸네일" />
+
 						</div>
 					</c:forEach>
 				</div>

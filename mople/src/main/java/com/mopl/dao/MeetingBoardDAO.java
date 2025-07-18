@@ -15,9 +15,11 @@ public class MeetingBoardDAO {
 	private Connection conn = DBConn.getConnection();
 
 	// 데이터 추가
-	public void insertMeetingBoard(MeetingBoardDTO dto) throws SQLException {
+	public long insertMeetingBoard(MeetingBoardDTO dto) throws SQLException {
 		PreparedStatement pstmt = null;
+		ResultSet rs = null;
 		String sql;
+		long num = 0;
 
 		try {
 			sql = "INSERT INTO meetingBoard(num, memberIdx, meetingIdx, subject, content, filter, reg_date)"
@@ -32,6 +34,14 @@ public class MeetingBoardDAO {
 			pstmt.setString(5, dto.getFilter());
 
 			pstmt.executeUpdate();
+			
+			DBUtil.close(pstmt);
+			sql = "SELECT meetingBoard_seq.CURRVAL FROM dual";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				num = rs.getLong(1);
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -39,6 +49,8 @@ public class MeetingBoardDAO {
 		} finally {
 			DBUtil.close(pstmt);
 		}
+		
+		return num;
 	}
 
 	// 게시글 총 개수 (필터, 검색 조건 포함)
@@ -129,10 +141,12 @@ public class MeetingBoardDAO {
 			StringBuilder sb = new StringBuilder();
 
 			sb.append("SELECT mb.num, mb.memberIdx, mb.meetingIdx, mb.subject, mb.content, mb.filter, ");
-			sb.append("TO_CHAR(mb.reg_date, 'YYYY-MM-DD') reg_date, m.userNickName ");
+			sb.append("TO_CHAR(mb.reg_date, 'YYYY-MM-DD') reg_date, m.userNickName, ");
+			sb.append(" (SELECT imageFileName FROM meetingBoardImg img WHERE img.num = mb.num AND ROWNUM = 1) imageFileName  ");
 			sb.append("FROM meetingBoard mb ");
 			sb.append("JOIN member1 m ON mb.memberIdx = m.memberIdx ");
 			sb.append("WHERE mb.meetingIdx = ? ");
+			
 			if (filter != null && !filter.trim().isEmpty()) {
 				sb.append(" AND mb.filter = ? ");
 			}
@@ -209,6 +223,7 @@ public class MeetingBoardDAO {
 				dto.setFilter(rs.getString("filter"));
 				dto.setReg_date(rs.getString("reg_date"));
 				dto.setUserNickName(rs.getString("userNickName"));
+				dto.setThumbnail(rs.getString("imageFileName"));
 
 				list.add(dto);
 			}
@@ -261,6 +276,61 @@ public class MeetingBoardDAO {
 		}
 
 		return dto;
+	}
+
+	// 이미지 저장
+	public void insertMeetingBoardImg(MeetingBoardDTO dto) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "INSERT INTO meetingBoardImg(fileNum, num, imageFileName) VALUES (meetingBoardImg_seq.NEXTVAL, ?, ?)";
+			pstmt = conn.prepareStatement(sql);
+
+			List<String> imageList = dto.getImageFileNames();
+			if (imageList != null) {
+				for (String fileName : imageList) {
+					pstmt.setLong(1, dto.getNum());
+					pstmt.setString(2, fileName);
+					pstmt.executeUpdate();
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			DBUtil.close(pstmt);
+			DBUtil.close(rs);
+		}
+	}
+
+	// 이미지 목록 조회
+	public List<String> listMeetingBoardImage(long num) throws SQLException {
+		List<String> list = new ArrayList<String>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "SELECT imageFileName FROM meetingBoardImg WHERE num = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, num);
+
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				list.add(rs.getString("imageFileName"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return list;
 	}
 
 	// 이전 글
@@ -748,11 +818,12 @@ public class MeetingBoardDAO {
 		StringBuilder sb = new StringBuilder();
 
 		try {
-			sb.append(" SELECT mb.replyNum, mb.num, mb.memberIdx, m.userNickName, mb.content, mb.reg_date, mb.parentNum ");
+			sb.append(
+					" SELECT mb.replyNum, mb.num, mb.memberIdx, m.userNickName, mb.content, mb.reg_date, mb.parentNum ");
 			sb.append(" FROM meetingBoardReply mb ");
 			sb.append(" JOIN member1 m ON m.memberIdx = mb.memberIdx ");
 			sb.append(" WHERE mb.parentNum = ? ");
-			sb.append(" ORDER BY mb.replyNum DESC ");
+			sb.append(" ORDER BY mb.replyNum ASC ");
 
 			pstmt = conn.prepareStatement(sb.toString());
 

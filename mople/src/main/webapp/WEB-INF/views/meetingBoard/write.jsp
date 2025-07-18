@@ -1,13 +1,16 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${mode == 'update' ? '글 수정' : '글쓰기'}-모임 소식</title>
+<title>${mode == 'update' ? '글 수정' : '글쓰기'}-모임소식</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css">
+	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css"
+	type="text/css">
 </head>
 <body>
 
@@ -23,7 +26,9 @@
 
 		<!-- 폼 -->
 		<form method="post"
-			action="${pageContext.request.contextPath}/meetingBoard/${mode == 'update' ? 'update' : 'write'}">
+			action="${pageContext.request.contextPath}/meetingBoard/${mode == 'update' ? 'update' : 'write'}"
+			enctype="multipart/form-data">
+
 
 			<input type="hidden" name="meetingIdx" value="${meetingIdx}">
 			<c:if test="${mode == 'update'}">
@@ -56,6 +61,14 @@
 				<label for="content">내용</label>
 				<textarea id="content" name="content" rows="10" required
 					class="form-control" placeholder="내용을 입력하세요">${dto.content}</textarea>
+			</div>
+
+			<!-- 이미지 첨부 -->
+			<div class="form-group">
+				<label for="uploadFiles">이미지 첨부</label> <input type="file"
+					id="uploadFiles" name="uploadFiles" multiple accept="image/*"
+					class="form-control"> <small class="form-text text-muted">여러
+					이미지를 선택하려면 Ctrl/Command 키를 누르고 클릭하세요.</small>
 			</div>
 
 			<!-- 버튼 -->

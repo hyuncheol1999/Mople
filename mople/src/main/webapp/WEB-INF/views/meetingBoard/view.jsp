@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,7 +8,8 @@
 <title>${dto.subject}-모임소식</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css">
+	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css"
+	type="text/css">
 </head>
 <body>
 
@@ -34,13 +36,22 @@
 			<div class="profile-circle"></div>
 			<div>
 				<div class="nickname">${dto.userNickName}</div>
-				<div class="meta">${dto.reg_date}·조회10</div>
+				<div class="meta">${dto.reg_date}</div>
 			</div>
 		</div>
 
-		<!-- 본문 -->
-		<div class="view-content">
-			<c:out value="${dto.content}" escapeXml="false" />
+		<div class="post-content">
+
+			<div class="post-text">${dto.content}</div>
+
+			<c:if test="${not empty imageList}">
+				<div class="post-images">
+					<c:forEach var="img" items="${imageList}">
+						<img src="${pageContext.request.contextPath}/uploads/photo/${img}"
+							alt="게시글 이미지" style="max-width: 100%; margin-top: 10px;" />
+					</c:forEach>
+				</div>
+			</c:if>
 		</div>
 
 		<!-- 카테고리 -->
@@ -68,6 +79,10 @@
 
 		<!-- 댓글 영역 -->
 		<div class="comment-section">
+
+			<!-- 댓글 리스트 출력 위치 -->
+			<div id="listReply"></div>
+
 			<form name="replyForm" method="post">
 				<table class="table table-borderless reply-form">
 					<tr>
@@ -80,13 +95,13 @@
 								등록</button>
 						</td>
 					</tr>
+
 				</table>
 			</form>
-
-			<!-- 댓글 리스트 출력 위치 -->
-			<div id="listReply"></div>
 		</div>
 
+		<!-- 페이징 -->
+		<div class="reply-pagination">${paging}</div>
 
 		<!-- 이전 글 -->
 		<div class="nav-item">
@@ -334,7 +349,7 @@
 	$('#listReply').on('click', '.btnReplyAnswerSubmit', function() {
 			const $form = $(this).closest('.reply-form');
 			let content = $form.find('textarea').val().trim();
-			let replyNum = $(this).attr('data-replyNum');
+			let replyNum = $(this).data('replynum');
 			let num = '${dto.num}';
 			
 			if(!content) {
@@ -348,8 +363,11 @@
 			const fn = function(data){
 				if(data.state === 'true') {
 					$form.find('textarea').val('');
+					$('#listReplyAnswer' + replyNum).removeClass('d-none');
 					listReplyAnswer(replyNum);
 					countReplyAnswer(replyNum);
+				} else {
+					alert('답글을 등록하지 못했습니다.');
 				}
 			};
 			sendAjaxRequest(url, 'post', params, 'json', fn);
