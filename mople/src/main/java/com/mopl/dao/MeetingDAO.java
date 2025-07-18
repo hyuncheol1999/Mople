@@ -423,4 +423,48 @@ public class MeetingDAO {
 		return result;
 	}
 	
+	// 관리자 모임관리 리스트
+    public List<MeetingDTO> selectMeetingList() {
+        List<MeetingDTO> list = new ArrayList<MeetingDTO>();
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        String sql = "SELECT m.meetingIdx, m.meetingName, TO_CHAR(m.createdDate, 'YYYY-MM-DD') createdDate, "
+                   + "r.regionName, s.sportName "
+                   + "FROM meeting m "
+                   + "LEFT JOIN regionCategory r ON m.regionIdx = r.regionIdx "
+                   + "LEFT JOIN sportCategory s ON m.sportIdx = s.sportIdx "
+                   + "ORDER BY m.createdDate DESC";
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                MeetingDTO dto = new MeetingDTO();
+                dto.setMeetingIdx(rs.getInt("meetingIdx"));
+                dto.setMeetingName(rs.getString("meetingName"));
+                dto.setCreatedDate(rs.getString("createdDate"));
+                dto.setRegionName(rs.getString("regionName"));
+                dto.setSportName(rs.getString("sportName"));
+
+                list.add(dto);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try { 
+            	if (rs != null) rs.close(); 
+            } catch (Exception e) {
+            }
+            try { 
+            	if (pstmt != null) pstmt.close(); 
+            } catch (Exception e) {
+            }
+        }
+
+        return list;
+    }
+	
 }
