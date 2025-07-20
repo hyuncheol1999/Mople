@@ -41,18 +41,17 @@
 		</div>
 
 		<div class="post-content">
-
 			<div class="post-text">${dto.content}</div>
 
 			<c:if test="${not empty imageList}">
 				<div class="post-images">
 					<c:forEach var="img" items="${imageList}">
-						<img src="${pageContext.request.contextPath}/uploads/photo/${img}"
-							alt="게시글 이미지" style="max-width: 100%; margin-top: 10px;" />
+						<img src="/uploads/photo/${img}" alt="게시글 이미지" />
 					</c:forEach>
 				</div>
 			</c:if>
 		</div>
+
 
 		<!-- 카테고리 -->
 		<div class="hashtags">
@@ -83,29 +82,19 @@
 			<!-- 댓글 리스트 출력 위치 -->
 			<div id="listReply"></div>
 
+			<!-- 댓글 입력 폼 -->
 			<form name="replyForm" method="post">
-				<table class="table table-borderless reply-form">
-					<tr>
-						<td><textarea class="form-control" name="content"
-								placeholder="댓글을 입력하세요."></textarea></td>
-					</tr>
-					<tr>
-						<td align="right">
-							<button type="button" class="btn btn-light btnSendReply">댓글
-								등록</button>
-						</td>
-					</tr>
-
-				</table>
+				<div class="comment-input-wrapper">
+					<textarea class="form-control reply-textarea" name="content"
+						placeholder="댓글을 입력하세요."></textarea>
+					<button type="button" class="btn btnSendReply">등록</button>
+				</div>
 			</form>
 		</div>
 
-		<!-- 페이징 -->
-		<div class="reply-pagination">${paging}</div>
 
 		<!-- 이전 글 -->
-		<div class="nav-item">
-			이전&nbsp;
+		<div class="post-nav-item"><strong>이전</strong>&nbsp;
 			<c:choose>
 				<c:when test="${not empty prevDto}">
 					<a
@@ -119,8 +108,8 @@
 		</div>
 
 		<!-- 다음 글 -->
-		<div class="nav-item">
-			다음&nbsp;
+		<div class="post-nav-item">
+			<strong>다음</strong>&nbsp;
 			<c:choose>
 				<c:when test="${not empty nextDto}">
 					<a
@@ -228,19 +217,41 @@
 	function listPage(page) {
 		let url = '${pageContext.request.contextPath}/meetingBoard/listReply';
 		let num = '${dto.num}';
-		let params = {num:num, pageNo:page};
+		let params = { num: num, pageNo: page };
 		let selector = '#listReply';
-		
-		const fn = function(data) {
+
+		const fn = function (data) {
 			$(selector).html(data);
+
+			$('.reply-item').each(function () {
+				const replyNum = $(this).find('.btnReplyAnswerSubmit').data('replynum');
+				if (replyNum) {
+					// AJAX로 답댓글 가져온 후 그 안에서 d-none 제거
+					listReplyAnswerAndShow(replyNum);
+				}
+			});
 		};
-		
+
 		sendAjaxRequest(url, 'get', params, 'text', fn);
 	}
+
+	function listReplyAnswerAndShow(parentNum) {
+		let url = "${pageContext.request.contextPath}/meetingBoard/listReplyAnswer";
+		let params = { parentNum: parentNum };
+
+		const fn = function (data) {
+			const $target = $('#listReplyAnswer' + parentNum);
+			$target.html(data);
+			$target.removeClass('d-none'); // AJAX 응답 받고 나서 d-none 제거
+		};
+
+		sendAjaxRequest(url, 'get', params, 'text', fn);
+	}
+
 	
 	// 댓글 등록
 	$(document).on('click', '.btnSendReply', function() {
-			const $form = $(this).closest('.reply-form');
+			const $form = $(this).closest('form[name="replyForm"]');
 			let num = '${dto.num}';
 			let content = $form.find('textarea').val().trim();
 			
@@ -310,18 +321,18 @@
 		});
 	});
 	
-	// 대댓글 보기 토글
-	$(document).on('click', '.btnReplyAnswerLayout', function() {
-			const replyNum = $(this).data('replynum');
-			const $container = $('#listReplyAnswer' + replyNum);
-			
-			if($container.hasClass('d-none')) {
-				listReplyAnswer(replyNum);
-				countReplyAnswer(replyNum);
-			}
-			
-			$container.toggleClass('d-none');
-		});
+	// 답댓글 입력 폼
+	$(document).on('click', '.btnReplyAnswerToggle', function (e) {
+		e.stopPropagation(); 
+		
+		$('.reply-form').addClass('d-none');
+		
+		const replyNum = $(this).data('replynum');
+		const $form = $(this).closest('.reply-item').find('.reply-form');
+		$form.removeClass('d-none');
+		
+		$('.reply-menu').addClass('d-none');
+	});
 	
 	// 대댓글 리스트
 	function listReplyAnswer(parentNum) {
