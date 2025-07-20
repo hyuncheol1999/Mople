@@ -109,7 +109,7 @@
 										<c:otherwise>
 											<div class="alert alert-info" role="alert">아직 가입된 모임이
 												없습니다. 새로운 모임을 찾아보세요!</div>
-											<a href="${pageContext.request.contextPath}/group/list"
+											<a href="${pageContext.request.contextPath}/meeting/meetingList?sportCategory=0&regionCategory=0"
 												class="btn btn-primary">모임 찾아보기</a>
 										</c:otherwise>
 									</c:choose>
@@ -121,17 +121,20 @@
 									<p>${dto.userName}님이 참여 예정이거나 생성한 정모 목록입니다.</p>
 
 									<c:choose>
-										<c:when test="${not empty myMeetups}">
+										<c:when test="${not empty myRegularMeetingList}">
 											<div class="list-group">
-												<c:forEach var="meetup" items="${myMeetups}">
+												<c:forEach var="dto" items="${myRegularMeetingList}">
 													<a
-														href="${pageContext.request.contextPath}/meetup/view?meetupId=${meetup.meetupId}"
+														href="${pageContext.request.contextPath}/meeting/meetingDetail?page=1&sportCategory=0&regionCategory=0&sortBy=latest&meetingIdx=${dto.meetingIdx}"
 														class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
 														<div>
-															<h5 class="mb-1">${meetup.meetupTitle}</h5>
-															<small class="text-muted">${meetup.groupName} | <fmt:formatDate
-																	value="${meetup.meetupDate}" pattern="yyyy.MM.dd HH:mm" /></small>
-														</div> <span class="badge bg-primary rounded-pill">${meetup.status}</span>
+															<h5 class="mb-1">${dto.subject}</h5>
+															<small class="text-muted"> 
+																<fmt:formatDate value="${dto.startDate}" pattern="yyyy.MM.dd" />~
+																<fmt:formatDate value="${dto.endDate}" pattern="yyyy.MM.dd" />
+															</small>
+														</div> 
+														<span class="badge bg-primary rounded-pill">${dto.status}</span>
 													</a>
 												</c:forEach>
 											</div>
@@ -139,7 +142,7 @@
 										<c:otherwise>
 											<div class="alert-info">예정된 정모가
 												없습니다. 모임에 가입하고 정모에 참여해보세요!</div>
-											<a href="${pageContext.request.contextPath}/meetup/list"
+											<a href="${pageContext.request.contextPath}/meeting/meetingList?sportCategory=0&regionCategory=0""
 												class="btn btn-primary">정모 찾아보기</a>
 										</c:otherwise>
 									</c:choose>

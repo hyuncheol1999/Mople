@@ -25,7 +25,7 @@
 		            다른 흥미로운 모임을 찾아보시거나, <br>새로운 모임을 직접 만들어보는 건 어떠세요?
 		        </p>
 		        <div class="button-group">
-		            <button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingList'">다른 모임 찾아보기</button>
+		            <button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingList?sportCategory=0&regionCategory=0'">다른 모임 찾아보기</button>
 		            <button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/meeting/meetingCreate'">새 모임 만들기</button>
 		        </div>
 	        </div>

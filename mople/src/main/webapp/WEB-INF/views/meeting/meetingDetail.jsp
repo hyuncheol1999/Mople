@@ -49,7 +49,7 @@
 								<div class="meeting-tags">
 									<span class="tag" id="sportTag">${sportName}</span> <span class="tag"
 										id="regionTag">${regionName}</span> <span class="tag"
-										id="membersTag">인원수 ${memberCount}명</span>
+										id="membersTag">인원수 ${currentMembers}명</span>
 								</div>
 							</div>
 						</div>
@@ -96,6 +96,5 @@
 		</c:if>
 			
 	</div>
-	<script src="${pageContext.request.contextPath}/dist/js/meeting-detail.js"></script>
 </body>
 </html>

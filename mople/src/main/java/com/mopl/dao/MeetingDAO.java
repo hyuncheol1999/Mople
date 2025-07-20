@@ -148,13 +148,14 @@ public class MeetingDAO {
 			sb.append("LEFT OUTER JOIN sportCategory sc ON m1.sportIdx = sc.sportIdx ");
 			sb.append("LEFT OUTER JOIN regionCategory rc ON m1.regionIdx = rc.regionIdx ");
 			if(sportCategory != 0 && regionCategory != 0) {
-				sb.append("WHERE m1.sportIdx = ? AND m1.regionIdx = ? ");	
+				sb.append("WHERE m1.sportIdx = ? AND m1.regionIdx = ? AND m2.role != 2 ");	
 			} else if(sportCategory == 0 && regionCategory == 0) {
 				// 전체 선택 시 조건 X
+				sb.append("WHERE m2.role != 2 ");
 			} else if(sportCategory == 0) {
-				sb.append("WHERE m1.regionIdx = ? ");
+				sb.append("WHERE m1.regionIdx = ? AND m2.role != 2 ");
 			} else if(regionCategory == 0) {
-				sb.append("WHERE m1.sportIdx = ? ");				
+				sb.append("WHERE m1.sportIdx = ? AND m2.role != 2 ");				
 			}
 			
 			sb.append("GROUP BY m1.meetingIdx, m1.meetingName, m1.meetingDesc, m1.createdDate,");
@@ -166,6 +167,7 @@ public class MeetingDAO {
 	        } else if(sortBy.equals("popular")) {
 	        	// 인원수 기준
 	        	sb.append("ORDER BY currentMembers DESC "); 
+	        	
 	        } else {
 	        	sb.append("ORDER BY m1.createdDate DESC ");	        	
 	        }
@@ -236,7 +238,7 @@ public class MeetingDAO {
 			sb.append("LEFT OUTER JOIN memberOfMeeting m2 ON m1.meetingIdx = m2.meetingIdx ");
 			sb.append("LEFT OUTER JOIN sportCategory sc ON m1.sportIdx = sc.sportIdx ");
 			sb.append("LEFT OUTER JOIN regionCategory rc ON m1.regionIdx = rc.regionIdx ");
-			sb.append("WHERE memberIdx = ?");
+			sb.append("WHERE memberIdx = ? AND m2.role != 2 ");
 			sb.append("GROUP BY m1.meetingIdx, m1.meetingName, m1.meetingDesc, m1.createdDate,");
 	        sb.append("  m1.meetingProfilePhoto, rc.regionName, sc.sportName ");
 			pstmt = conn.prepareStatement(sb.toString());
@@ -281,7 +283,7 @@ public class MeetingDAO {
 			sb.append("LEFT OUTER JOIN memberOfMeeting m2 ON m1.meetingIdx = m2.meetingIdx ");
 			sb.append("LEFT OUTER JOIN sportCategory sc ON m1.sportIdx = sc.sportIdx ");
 			sb.append("LEFT OUTER JOIN regionCategory rc ON m1.regionIdx = rc.regionIdx ");
-			sb.append("WHERE m1.meetingIdx = ?");
+			sb.append("WHERE m1.meetingIdx = ? AND m2.role != 2 ");
 			sb.append("GROUP BY m1.meetingIdx, m1.meetingName, m1.meetingDesc, m1.createdDate,");
 	        sb.append("  m1.meetingProfilePhoto, rc.regionName, sc.sportName ");
 			pstmt = conn.prepareStatement(sb.toString());

@@ -275,6 +275,69 @@ input[type="checkbox"]:focus + label::before {
 
 
 /* 반응형 디자인: 모바일 환경 (@media (max-width: 768px)) */
+@media (max-width: 1050px) {
+
+  .header {
+    top: 0;
+    position: static;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+	
+  .main {
+    padding-top: 0; /* 헤더가 static이므로 별도 padding-top이 필요 없음 */
+  }
+	
+  /* .header 내부 컨테이너 */
+  .header .container {
+    flex-direction: column; /* 요소들을 세로로 정렬 */
+    align-items: center;    /* 가운데 정렬 */
+    padding: 1rem 15px;     /* 패딩 조정 */
+  }
+
+  /* 로고 */
+  .logo {
+    margin-bottom: 1rem; /* 로고 아래에 여백 추가 */
+  }
+
+  /* 네비게이션 메뉴 */
+  .nav {
+    flex-direction: column; /* 메뉴 항목들을 세로로 정렬 */
+    width: 100%;            /* 전체 너비 차지 */
+    gap: 1rem;              /* 메뉴 항목 간격 조정 */
+    margin-bottom: 1rem;    /* 메뉴 아래에 여백 추가 */
+  }
+
+  .nav-link {
+    padding: 0.2rem 0;      /* 링크 패딩 조정 */
+    text-align: center;     /* 텍스트 가운데 정렬 */
+  }
+
+  .nav-link:last-child {
+    border-bottom: none; /* 마지막 링크에는 구분선 제거 */
+  }
+
+  /* 인증 섹션 (로그인/회원가입) */
+  .auth-section {
+    width: 100%;            /* 전체 너비 차지 */
+    justify-content: center; /* 버튼들을 가운데 정렬 */
+    gap: 2rem;            /* 버튼 간 간격 조정 */
+    margin-right: 0;        /* 기존 margin-right 제거 */
+    padding-top: 1rem;      /* 상단 패딩 추가 */
+    border-top: 1px solid #eee; /* 메뉴와 구분되는 선 추가 */
+    line-height: 10px;
+  }
+
+  .auth-section a{
+    font-size: 13px; /* 폰트 크기 미세 조정 */
+
+  }
+  .auth-section span {
+   	display: none;
+  }
+
+}
+/* 반응형 디자인: 모바일 환경 (@media (max-width: 768px)) */
 @media (max-width: 768px) {
 
   .header {

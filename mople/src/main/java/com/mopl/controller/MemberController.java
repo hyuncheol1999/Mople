@@ -401,6 +401,7 @@ public class MemberController {
 		ModelAndView mav = new ModelAndView("member/myPage");
 		MemberDAO dao = new MemberDAO();
 		MeetingDAO meetingDAO = new MeetingDAO();
+		// RegularMeetingDAO regularMeetingDAO = new RegularMeetingDAO();
 		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 		BoardDAO boardDAO = new BoardDAO();
 		MeetingAlbumDAO meetingAlbumDAO = new MeetingAlbumDAO();
@@ -415,7 +416,8 @@ public class MemberController {
 				dto = dao.findByMemberIdx(info.getMemberIdx());
 				List<MeetingDTO> myMeetingList = meetingDAO.findByMemberIdx(info.getMemberIdx());
 				List<BoardDTO> myBoardList = boardDAO.findByMemberIdx(info.getMemberIdx());
-				List<MeetingAlbumDTO> myMeetingAlbumList = meetingAlbumDAO.findByMemberIdx(info.getMemberIdx());				
+				List<MeetingAlbumDTO> myMeetingAlbumList = meetingAlbumDAO.findByMemberIdx(info.getMemberIdx());
+				// List<RegularMeetingDTO> myRegularMeetingList = regularMeetingDAO.findByMemberIdx(info.getMemberIdx());
 			
 			
 				for (MeetingDTO meetingDto : myMeetingList) {
@@ -427,6 +429,7 @@ public class MemberController {
 				mav.addObject("myMeetingList", myMeetingList);
 				mav.addObject("myBoardList", myBoardList);
 				mav.addObject("myMeetingAlbumList", myMeetingAlbumList);
+				// mav.addObject("myRegularMeetingList", myRegularMeetingList);
 			}
 			
 			mav.addObject("dto", dto);

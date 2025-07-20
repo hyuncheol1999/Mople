@@ -64,5 +64,3 @@
 	</div>
 </div>
 <div class="page-navigation">${dataCount == 0 ? "" : paging}</div>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/dist/js/meeting.js"></script>

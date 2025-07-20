@@ -16,7 +16,7 @@
 		    </div>
 		    <div class="stat-card">
 		        <img width="40" height="40" src="https://img.icons8.com/fluency-systems-filled/48/user.png" alt="user"/><h4>멤버</h4>
-		        <p>${memberCount}명</p>
+		        <p>${currentMembers}명</p>
 		    </div>
 		    <div class="stat-card">
 		        <img width="40" height="40" src="https://img.icons8.com/ios/50/calendar--v1.png" alt="calendar--v1"/><h4>생성일</h4>
@@ -109,13 +109,13 @@
 			<c:when test="${userStatus eq 'HOST'}">
 				<br>
 				<button type="button" class="btn btn-primary btn-small" onclick="deleteMeeting(${meetingIdx})">모임 해체</button>
-				<c:if test="${memberCount > 1}">
+				<c:if test="${currentMembers > 1}">
 					<button type="button" class="btn btn-primary btn-small" onclick="location.href='${pageContext.request.contextPath}/meeting/leaveLeader?meetingIdx=${meetingIdx}'">모임 탈퇴</button>
 				</c:if>
 			</c:when>
 			<c:when test="${userStatus eq 'JOINED'}">
 				<br>
-				<c:if test="${memberCount > 1}">
+				<c:if test="${currentMembers > 1}">
 					<button type="button" class="btn btn-primary btn-small" onclick="leaveMeeting(${meetingIdx}, ${currentUserIdx})">모임 탈퇴</button>
 				</c:if>
 			</c:when>
