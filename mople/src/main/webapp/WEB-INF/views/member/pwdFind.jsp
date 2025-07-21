@@ -5,15 +5,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Spring</title>
-<jsp:include page="/WEB-INF/views/layout/headerResources.jsp"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>모플 - 운동으로 만나다</title>
+<jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />  
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/meeting.css" type="text/css">
 </head>
 <body>
 
 <header>
 	<jsp:include page="/WEB-INF/views/layout/header.jsp"/>
 </header>
+<jsp:include page="/WEB-INF/views/layout/login.jsp"/>
 
 <main>
 	<div class="container">

@@ -5,18 +5,18 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>모플 - 운동으로 만나다</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />  
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/meeting.css" type="text/css">
 </head>
 <body>
 <div class="wrap">
-	<header>
+    <header class="header">
 		<jsp:include page="/WEB-INF/views/layout/header.jsp"/>
-	</header>
+    </header>
 	<jsp:include page="/WEB-INF/views/layout/login.jsp"/>
-	
+	<br><br><br><br>
 	<main>
 		<div class="container">
 			<div class="body-container row justify-content-center">
@@ -119,11 +119,11 @@
 								    <div class="row g-2">
 								        <div class="col-md-6 genderBlock">
 								            <div class="form-check form-check-inline pt-1">
-								                <input class="" type="radio" name="gender" id="genderMale" value="0" ${mode=="update"? "" :""}  ${dto.gender == 0 ? "checked" : ""}>
+								                <input class="" type="radio" name="gender" id="genderMale" value="0" ${mode=="update"? "disabled" :""}  ${dto.gender == 0 ? "checked" : ""}>
 								                <label class="" for="genderMale">남자</label>
 								            </div>
 								            <div class="form-check form-check-inline pt-1">
-								                <input class="" type="radio" name="gender" id="genderFemale" value="1" ${mode=="update"? "" :""}>
+								                <input class="" type="radio" name="gender" id="genderFemale" value="1" ${mode=="update"? "disabled" :""} ${dto.gender == 1 ? "checked" : ""}>
 								                <label class="" for="genderFemale">여자</label>
 								            </div>
 								        </div>
@@ -214,6 +214,7 @@
 									<input type="hidden" name="userIdValid" id="userIdValid" value="false">
 									<c:if test="${mode=='update'}">
 										<input type="hidden" name="profile_photo" value="${dto.profilePhoto}">
+										<input type="hidden" name="memberIdx" value="${dto.memberIdx}">
 									</c:if>
 								</div>
 	
@@ -231,7 +232,6 @@
 		</div>
 	</main>
 </div>
-
 <script type="text/javascript">
 window.addEventListener('DOMContentLoaded', ev => {
 	let img = '${dto.profilePhoto}';

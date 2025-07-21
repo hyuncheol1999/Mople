@@ -58,10 +58,6 @@
 										<fmt:formatDate value="${birthDate}" pattern="yyyy년 MM월 dd일" />
 									</p>
 									<br>
-									<button type="button"
-										class="btn btn-small btn-outline"
-										onclick="location.href='${pageContext.request.contextPath}/member/update';">정보
-										수정</button>
 								</div>
 							</div>
 						<nav class="meeting-nav">
@@ -127,8 +123,8 @@
 													<a
 														href="${pageContext.request.contextPath}/meeting/meetingDetail?page=1&sportCategory=0&regionCategory=0&sortBy=latest&meetingIdx=${dto.meetingIdx}"
 														class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-														<div>
-															<h5 class="mb-1">${dto.subject}</h5>
+														<span>
+															${dto.subject}
 															<small class="text-muted"> 
                     										<span class="date">${dto.startDateDay}일</span>
                     										<span class="day">${dto.startDateDow}요일 / </span> 
@@ -137,7 +133,7 @@
                         										~ ${dto.endTimeStr}
                     										</c:if>
 															</small>
-														</div> 
+														</span> 
 													</a>
 												</c:forEach>
 											</div>

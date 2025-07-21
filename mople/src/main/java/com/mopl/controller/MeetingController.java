@@ -919,8 +919,10 @@ public class MeetingController {
 	public ModelAndView leaveLeader(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("meeting/leaveLeader");
+		MeetingDAO meetingDao = new MeetingDAO();
 		MemberOfMeetingDAO dao = new MemberOfMeetingDAO();
 		mav.addObject("list", dao.findByMeetingIdx(Long.parseLong(req.getParameter("meetingIdx"))));
+		mav.addObject("dto", meetingDao.findByMeeetingIdx(Long.parseLong(req.getParameter("meetingIdx"))));
 		
 		return mav;
 	}
@@ -965,9 +967,14 @@ public class MeetingController {
 			throws ServletException, IOException {
 		Map<String, Object> map = new HashMap<>();
 		MeetingDAO dao = new MeetingDAO();
+		MeetingAlbumDAO meetingAlbumDao = new MeetingAlbumDAO();
+		FileManager fileManager = new FileManager();
 		
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		
+		String root = session.getServletContext().getRealPath("/");
+		String pathname = root + "uploads" + File.separator + "meetingProfilePhoto";
 		
 		try {
 			if(info == null) {
@@ -975,8 +982,19 @@ public class MeetingController {
 			}
 			
 			long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
+			MeetingDTO dto = dao.findByMeeetingIdx(meetingIdx);
+			List<MeetingAlbumDTO> list = meetingAlbumDao.findByMeeetingIdx(meetingIdx);
 			
 			dao.deleteMeeting(meetingIdx);
+			
+			// 모임 프로필 사진 삭제
+			fileManager.doFiledelete(pathname, dto.getMeetingProfilePhoto());
+			
+			// 모임 사진첩 사진 삭제
+			pathname = root + "uploads" + File.separator + "meetingAlbum";
+			for(MeetingAlbumDTO albumDTO : list) {
+				fileManager.doFiledelete(pathname, albumDTO.getImageFileName());
+			}
 			
 			map.put("success", true);
 		} catch (Exception e) {

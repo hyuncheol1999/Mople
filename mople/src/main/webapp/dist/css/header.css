@@ -298,6 +298,7 @@ input[type="checkbox"]:focus + label::before {
   /* 로고 */
   .logo {
     margin-bottom: 1rem; /* 로고 아래에 여백 추가 */
+    text-align: center;
   }
 
   /* 네비게이션 메뉴 */
@@ -361,6 +362,7 @@ input[type="checkbox"]:focus + label::before {
   /* 로고 */
   .logo {
     margin-bottom: 1rem; /* 로고 아래에 여백 추가 */
+    text-align: center;
   }
 
   /* 네비게이션 메뉴 */
