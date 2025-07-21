@@ -236,6 +236,44 @@ public class MemberDAO {
 
 	}
 
+	// 회원 탈퇴
+	public void deleteMember(long memberIdx) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+
+		try {
+			conn.setAutoCommit(false);
+			sql = "DELETE FROM member2 WHERE memberIdx = ?";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, memberIdx);
+
+			pstmt.executeUpdate();
+
+			pstmt.close();
+			pstmt = null;
+
+			sql = "DELETE FROM member1 WHERE memberIdx = ?";
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.setLong(1, memberIdx);
+
+			pstmt.executeUpdate();
+
+			conn.commit();
+		} catch (SQLException e) {
+			DBUtil.close(pstmt);
+			DBUtil.rollback(conn);
+		} finally {
+			DBUtil.close(pstmt);
+			try {
+				conn.setAutoCommit(true);
+			} catch (Exception e2) {
+			}
+		}
+
+	}
+	
 	public void deleteProfilePhoto(long memberIdx) throws SQLException {
 		PreparedStatement pstmt = null;
 		String sql;

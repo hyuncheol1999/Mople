@@ -364,5 +364,49 @@ public class RegularMeetingDAO {
 
 		    return list;
 		}
+		
+		// 참여하고 있는 정모 리스트
+		public List<RegularMeetingDTO> findByMemberIdx(long memberIdx) throws SQLException {
+			List<RegularMeetingDTO> list = new ArrayList<>();
+			PreparedStatement pstmt = null;
+			ResultSet rs = null;
+			String sql;
+
+			try {
+				sql = "SELECT r.regularMeetingIdx, meetingIdx, startDate, endDate, place, capacity, subject, status, "
+						+ " NVL( COUNT(m.memberIdx), 0 ) AS currentCnt " + " FROM regularMeeting r "
+						+ " LEFT JOIN memberOfRegularMeeting m ON m.regularMeetingIdx = r.regularMeetingIdx "
+						+ " WHERE r.memberIdx = ? AND endDate >= SYSDATE "
+						+ " GROUP BY r.regularMeetingIdx, meetingIdx, startDate, endDate, place, capacity, subject, status "
+						+ " ORDER BY startDate ASC";
+
+				pstmt = conn.prepareStatement(sql);
+
+				pstmt.setLong(1, memberIdx);
+				rs = pstmt.executeQuery();
+
+				while (rs.next()) {
+					RegularMeetingDTO dto = new RegularMeetingDTO();
+					dto.setRegularMeetingIdx(rs.getLong("regularMeetingIdx"));
+	                dto.setMeetingIdx(rs.getLong("meetingIdx"));
+	                dto.setStartDate(ts(rs, "startDate"));
+	                dto.setEndDate(ts(rs, "endDate"));
+					dto.setPlace(rs.getString("place"));
+					dto.setCapacity(rs.getInt("capacity"));
+					dto.setSubject(rs.getString("subject"));
+					dto.setStatus(rs.getInt("status"));
+					dto.setCurrentCnt(rs.getInt("currentCnt"));
+
+					list.add(dto);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				DBUtil.close(rs);
+				DBUtil.close(pstmt);
+			}
+			return list;
+
+		}
 
 }

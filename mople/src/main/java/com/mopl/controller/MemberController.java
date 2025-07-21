@@ -12,10 +12,12 @@ import com.mopl.dao.MeetingAlbumDAO;
 import com.mopl.dao.MeetingDAO;
 import com.mopl.dao.MemberDAO;
 import com.mopl.dao.MemberOfMeetingDAO;
+import com.mopl.dao.RegularMeetingDAO;
 import com.mopl.model.BoardDTO;
 import com.mopl.model.MeetingAlbumDTO;
 import com.mopl.model.MeetingDTO;
 import com.mopl.model.MemberDTO;
+import com.mopl.model.RegularMeetingDTO;
 import com.mopl.model.SessionInfo;
 import com.mopl.mvc.annotation.Controller;
 import com.mopl.mvc.annotation.RequestMapping;
@@ -279,8 +281,9 @@ public class MemberController {
 			
 			if(mode.equals("delete")) {
 				// 회원 탈퇴
+				dao.deleteMember(info.getMemberIdx());
 				
-				return new ModelAndView("redirect:/");
+				return new ModelAndView("redirect:/member/logout");
 			} 
 			
 			// 정보수정 화면
@@ -401,7 +404,7 @@ public class MemberController {
 		ModelAndView mav = new ModelAndView("member/myPage");
 		MemberDAO dao = new MemberDAO();
 		MeetingDAO meetingDAO = new MeetingDAO();
-		// RegularMeetingDAO regularMeetingDAO = new RegularMeetingDAO();
+		RegularMeetingDAO regularMeetingDAO = new RegularMeetingDAO();
 		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 		BoardDAO boardDAO = new BoardDAO();
 		MeetingAlbumDAO meetingAlbumDAO = new MeetingAlbumDAO();
@@ -417,7 +420,7 @@ public class MemberController {
 				List<MeetingDTO> myMeetingList = meetingDAO.findByMemberIdx(info.getMemberIdx());
 				List<BoardDTO> myBoardList = boardDAO.findByMemberIdx(info.getMemberIdx());
 				List<MeetingAlbumDTO> myMeetingAlbumList = meetingAlbumDAO.findByMemberIdx(info.getMemberIdx());
-				// List<RegularMeetingDTO> myRegularMeetingList = regularMeetingDAO.findByMemberIdx(info.getMemberIdx());
+				List<RegularMeetingDTO> myRegularMeetingList = regularMeetingDAO.findByMemberIdx(info.getMemberIdx());
 			
 			
 				for (MeetingDTO meetingDto : myMeetingList) {
@@ -429,7 +432,7 @@ public class MemberController {
 				mav.addObject("myMeetingList", myMeetingList);
 				mav.addObject("myBoardList", myBoardList);
 				mav.addObject("myMeetingAlbumList", myMeetingAlbumList);
-				// mav.addObject("myRegularMeetingList", myRegularMeetingList);
+				mav.addObject("myRegularMeetingList", myRegularMeetingList);
 			}
 			
 			mav.addObject("dto", dto);

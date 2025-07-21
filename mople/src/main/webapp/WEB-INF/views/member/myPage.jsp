@@ -130,11 +130,14 @@
 														<div>
 															<h5 class="mb-1">${dto.subject}</h5>
 															<small class="text-muted"> 
-																<fmt:formatDate value="${dto.startDate}" pattern="yyyy.MM.dd" />~
-																<fmt:formatDate value="${dto.endDate}" pattern="yyyy.MM.dd" />
+                    										<span class="date">${dto.startDateDay}일</span>
+                    										<span class="day">${dto.startDateDow}요일 / </span> 
+															${dto.startTimeStr}
+                    										<c:if test="${not empty dto.endTimeStr}">
+                        										~ ${dto.endTimeStr}
+                    										</c:if>
 															</small>
 														</div> 
-														<span class="badge bg-primary rounded-pill">${dto.status}</span>
 													</a>
 												</c:forEach>
 											</div>
@@ -214,12 +217,8 @@
 											onclick="location.href='${pageContext.request.contextPath}/member/pwd';">
 											개인 정보 수정</button>
 										<button type="button"
-											class="list-group-item list-group-item-action"
-											onclick="location.href='${pageContext.request.contextPath}/member/changePwd';">
-											비밀번호 변경</button>
-										<button type="button"
 											class="list-group-item list-group-item-action text-danger"
-											onclick="confirmWithdrawal();">회원 탈퇴</button>
+											onclick="confirmDelete();">회원 탈퇴</button>
 									</div>
 								</div>
 							</div>
@@ -235,9 +234,9 @@
 	</footer>
 	<jsp:include page="/WEB-INF/views/layout/footerResources.jsp" />
     <script type="text/javascript">
-        function confirmWithdrawal() {
+        function confirmDelete() {
             if (confirm('정말로 회원 탈퇴를 하시겠습니까? 탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.')) {
-                location.href = '${pageContext.request.contextPath}/member/withdrawal';
+                location.href = '${pageContext.request.contextPath}/member/pwd?mode=delete';
             }
         }
     </script>
