@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,13 +32,16 @@
 					</c:choose>
 				</h2>
 
-				<form name="regularMeetingForm" method="post" enctype="multipart/form-data"
+				<form name="regularMeetingForm" method="post"
 					action="${pageContext.request.contextPath}/meeting/regularMeetingCreate">
 
 					<input type="hidden" name="mode" value="${mode}">
 					<input type="hidden" name="meetingIdx" value="${meetingIdx}">
-					<input type="hidden" name="regularMeetingIdx" value="${dto.regularMeetingIdx}">
-
+					
+					<c:if test="${mode eq 'update'}">
+				    	<input type="hidden" name="regularMeetingIdx" value="${dto.regularMeetingIdx}">
+					</c:if>
+					
 					<div class="form-group">
 						<label class="title" for="subject">정모명</label>
 						<input type="text" id="subject" name="subject"
@@ -47,17 +51,16 @@
 					</div>
 
 					<div class="form-group">
-						<label for="startDate">정모진행날짜</label>
-						<input type="date" id="startDate" name="startDate"
-							value="${dto.startDate}" required>
+							<label>정모시작일</label>
+							<input type="date" name="startDate" id="startDate" value="${dto.startDateOnly}">
+							<label>정모시작시간</label>
+							<input type="time" name="startTime" id="startTime" value="${fn:substring(dto.startTimeOnly,0,5)}">
+							<label>정모종료일</label>
+							<input type="date" name="endDate" id="endDate" value="${dto.endDateOnly}">
+							<label>정모종료시간</label>
+							<input type="time" name="endTime" id="endTime" value="${fn:substring(dto.endTimeOnly,0,5)}">
 					</div>
 					
-					<div class="form-group">
-						<label for="endDate">정모끝나는날짜</label>
-						<input type="date" id="endDate" name="endDate"
-							value="${dto.endDate}" required>
-					</div>
-
 					<div class="form-group">
 						<label for="place">장소</label>
 						<input type="text" name="place" id="place"
