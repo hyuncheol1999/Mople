@@ -52,8 +52,6 @@
 				<div class="module-header">
 					<h2>🗓 정기모임(번개 전환)</h2>
 					<br><br>
-					<a href="${pageContext.request.contextPath}/bungaeMeeting/list"
-						class="more-link" style="text-decoration: underline;">전체보기</a>
 				</div>
 				<div class="card-row">
 					<c:choose>
@@ -76,13 +74,13 @@
 										</p>
 										<div class="card-footer">
 											<c:choose>
-												<c:when test="${r.joined}">
-													<button class="btn btn-primary" onclick="cancelSchedule(${r.regularMeetingIdx})">참여취소</button>
-												</c:when>
-												<c:otherwise>
-													<button class="btn btn-primary" onclick="joinSchedule(${r.regularMeetingIdx});" class="btn">참여</button>
-												</c:otherwise>
-											</c:choose>
+											    <c:when test="${r.joined}">
+											      <button type="button" class="btn btn-primary join-btn" data-schedule-id="${r.regularMeetingIdx}">참여취소</button>
+											    </c:when>
+											    <c:otherwise>
+											      <button type="button" class="btn btn-primary join-btn" data-schedule-id="${r.regularMeetingIdx}">참여</button>
+											    </c:otherwise>
+											  </c:choose>
 										</div>
 										<div class="tags">
 											<span class="tag capacity">👥
@@ -126,11 +124,13 @@
 											모임장소 : ${b.place}
 										</p>
 										<div class="tags">
-											<span class="tag capacity">👥 ${curr}/${b.capacity}명</span>
+										  <span class="tag capacity curr-count" id="count-${r.regularMeetingIdx}">
+										    👥 ${b.currentCnt}/${b.capacity}명
+										  </span>
+										</div>
 											<c:if test="${b.multiDay}">
 												<span class="tag warn">Multi-day</span>
 											</c:if>
-										</div>
 									</div>
 								</div>
 							</c:forEach>
@@ -147,6 +147,11 @@
 	</footer>
 	<jsp:include page="/WEB-INF/views/layout/footerResources.jsp" />
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-	<script src="${pageContext.request.contextPath}/dist/js/bungaeHome.js"></script>
+<script src="${pageContext.request.contextPath}/dist/js/bungaeMeetingSchedule.js"></script>
+<script type="text/javascript">
+  const contextPath = '${pageContext.request.contextPath}';
+</script>
+<script src="${pageContext.request.contextPath}/dist/js/bungaeMeetingSchedule.js"></script>
+
 </body>
 </html>

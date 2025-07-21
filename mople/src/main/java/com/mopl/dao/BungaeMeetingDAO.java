@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mopl.model.BungaeMeetingDTO;
+import com.mopl.model.MemberOfBungaeMeetingDTO;
 import com.mopl.util.DBConn;
 import com.mopl.util.DBUtil;
 
@@ -357,7 +358,6 @@ public class BungaeMeetingDAO {
 	    return list;
 	}
 
-
 	// 번개모임 수정
 	public void updateBungaeMeeting(BungaeMeetingDTO dto) throws SQLException {
 		PreparedStatement pstmt = null;
@@ -407,4 +407,57 @@ public class BungaeMeetingDAO {
 			DBUtil.close(pstmt);
 		}
 	}
+	
+	// 정모-> 번모 해당 회원 참여여부 확인
+	public boolean isMemberAlreadyJoined(long bungaeMeetingIdx, long memberIdx) throws SQLException {
+	    String sql = "SELECT COUNT(*) FROM memberOfBungaeMeeting WHERE bungaeMeetingIdx = ? AND memberIdx = ? AND role != 2";
+	    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        pstmt.setLong(1, bungaeMeetingIdx);
+	        pstmt.setLong(2, memberIdx);
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            return rs.next() && rs.getInt(1) > 0;
+	        }
+	    }
+	}
+	
+	public void insertMember(MemberOfBungaeMeetingDTO dto) throws SQLException {
+	    String sql = "INSERT INTO memberOfBungaeMeeting (bungaeMeetingIdx, memberIdx, role) VALUES (?, ?, ?)";
+	    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        pstmt.setLong(1, dto.getBungaeMeetingIdx());
+	        pstmt.setLong(2, dto.getMemberIdx());
+	        pstmt.setInt(3, dto.getRole());
+	        pstmt.executeUpdate();
+	    }
+	}
+
+	public void leaveMeeting(MemberOfBungaeMeetingDTO dto) throws SQLException {
+	    String sql = "DELETE FROM memberOfBungaeMeeting WHERE bungaeMeetingIdx = ? AND memberIdx = ?";
+	    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        pstmt.setLong(1, dto.getBungaeMeetingIdx());
+	        pstmt.setLong(2, dto.getMemberIdx());
+	        pstmt.executeUpdate();
+	    }
+	}
+
+	// 정모->번모 참여 
+	public boolean changeJoin(long bungaeMeetingIdx, long memberIdx) throws Exception {
+	    if (isMemberAlreadyJoined(bungaeMeetingIdx, memberIdx)) {
+	        
+	    	MemberOfBungaeMeetingDTO dto = new MemberOfBungaeMeetingDTO();
+	    	dto.setBungaeMeetingIdx(bungaeMeetingIdx);
+	    	dto.setMemberIdx(memberIdx);
+	    	leaveMeeting(dto);
+
+	        return false; 
+	    } else {
+	       
+	        MemberOfBungaeMeetingDTO dto = new MemberOfBungaeMeetingDTO();
+	        dto.setBungaeMeetingIdx(bungaeMeetingIdx);
+	        dto.setMemberIdx(memberIdx);
+	        dto.setRole(1); 
+	        insertMember(dto);
+	        return true;
+	    }
+	}
+
 }

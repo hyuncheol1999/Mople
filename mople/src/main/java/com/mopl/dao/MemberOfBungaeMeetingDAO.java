@@ -274,6 +274,29 @@ public class MemberOfBungaeMeetingDAO  {
 		}
 	}
 	
+	// 번개모임에 이미 등록된 멤버인지 확인
+	public boolean exists(long bungaeMeetingIdx, long memberIdx) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = "SELECT COUNT(*) FROM memberOfBungaeMeeting WHERE bungaeMeetingIdx = ? AND memberIdx = ?";
+
+		try {
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, bungaeMeetingIdx);
+			pstmt.setLong(2, memberIdx);
+
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				return rs.getInt(1) > 0;
+			}
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return false;
+	}
 }
 
 
