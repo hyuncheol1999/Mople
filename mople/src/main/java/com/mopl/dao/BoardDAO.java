@@ -359,7 +359,7 @@ public class BoardDAO {
 
 			try {
 				if (kwd != null && kwd.length() != 0) {
-					sb.append(" SELECT num, subject ");
+					sb.append(" SELECT b.num, b.subject ");
 					sb.append(" FROM bbs b ");
 					sb.append(" JOIN member1 m ON b.memberIdx = m.memberIdx ");
 					sb.append(" WHERE num < ?  ");
@@ -377,19 +377,21 @@ public class BoardDAO {
 					pstmt = conn.prepareStatement(sb.toString());
 					
 					pstmt.setLong(1, num);
-					pstmt.setString(2, kwd);
 					if (schType.equals("all")) {
+						pstmt.setString(2, kwd);
 						pstmt.setString(3, kwd);
+					} else {
+						pstmt.setString(2, kwd);
 					}
 				} else {
 					sb.append(" SELECT num, subject ");
 					sb.append(" FROM bbs ");
-					sb.append(" WHERE AND num < ? ");
+					sb.append(" WHERE num < ?");
 					sb.append(" ORDER BY num DESC ");
-					sb.append(" FETCH FIRST 1 ROWS ONLY ");
+					sb.append(" FETCH FIRST 1 ROWS ONLY");
 
 					pstmt = conn.prepareStatement(sb.toString());
-					
+
 					pstmt.setLong(1, num);
 				}
 
@@ -720,6 +722,72 @@ public class BoardDAO {
 			
 			return list;
 		}
+		public List<ReplyDTO> listReply(long num, int offset, int size) {
+		    List<ReplyDTO> list = new ArrayList<>();
+		    PreparedStatement pstmt = null;
+		    ResultSet rs = null;
+		    StringBuilder sb = new StringBuilder();
+
+		    try {
+		        sb.append(" SELECT r.replyNum, r.memberIdx, userNickName , num, content, r.reg_date, r.showReply ,");
+		        sb.append(" 	NVL(answerCount, 0) answerCount, ");
+		        sb.append(" 	NVL(likeCount, 0) likeCount, ");
+		        sb.append(" 	NVL(disLikeCount, 0) disLikeCount ");
+		        sb.append(" FROM bbsReply r");
+		        sb.append(" JOIN member1 m ON r.memberIdx = m.memberIdx");
+		        sb.append(" LEFT OUTER JOIN (");
+		        sb.append(" 	SELECT parentNum, COUNT(*) answerCount ");
+		        sb.append(" 	FROM bbsReply ");
+		        sb.append(" 	WHERE parentNum != 0 AND showReply = 1 "); // 비회원은 공개 댓글만
+		        sb.append(" 	GROUP BY parentNum ");
+		        sb.append(" ) a ON r.replyNum = a.parentNum ");
+		        sb.append(" LEFT OUTER JOIN (");
+		        sb.append(" 	SELECT replyNum, ");
+		        sb.append(" 		COUNT(DECODE(replyLike,1,1)) likeCount, ");
+		        sb.append(" 		COUNT(DECODE(replyLike,0,1)) disLikeCount ");
+		        sb.append(" 	FROM bbsReplyLike ");
+		        sb.append(" 	GROUP BY replyNum ");
+		        sb.append(" ) b ON r.replyNum = b.replyNum");
+		        sb.append(" WHERE num = ? AND r.parentNum = 0 AND r.showReply = 1 "); // 비회원은 공개 댓글만
+		        sb.append(" ORDER BY r.replyNum DESC");
+		        sb.append(" OFFSET ? ROWS FETCH FIRST ? ROWS ONLY");
+
+		        pstmt = conn.prepareStatement(sb.toString());
+
+		        pstmt.setLong(1, num);
+		        pstmt.setInt(2, offset);
+		        pstmt.setInt(3, size);
+
+		        rs = pstmt.executeQuery();
+
+		        while (rs.next()) {
+		            ReplyDTO dto = new ReplyDTO();
+
+		            dto.setReplyNum(rs.getLong("replyNum"));
+		            dto.setNum(rs.getLong("num"));
+		            dto.setMemberIdx(rs.getLong("memberIdx"));
+		            dto.setUserNickName(rs.getString("userNickName"));
+		            dto.setContent(rs.getString("content"));
+		            dto.setReg_date(rs.getString("reg_date"));
+		            dto.setShowReply(rs.getInt("showReply"));
+
+		            dto.setAnswerCount(rs.getInt("answerCount"));
+		            dto.setLikeCount(rs.getInt("likeCount"));
+		            dto.setDisLikeCount(rs.getInt("disLikeCount"));
+
+		            list.add(dto);
+		        }
+
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    } finally {
+		        DBUtil.close(rs);
+		        DBUtil.close(pstmt);
+		    }
+
+		    return list;
+		}
+
 
 		public ReplyDTO findByReplyId(long replyNum) {
 			ReplyDTO dto = null;
@@ -849,6 +917,51 @@ public class BoardDAO {
 			}
 			return list;
 		}
+		public List<ReplyDTO> listReplyAnswer(long parentNum) {
+		    List<ReplyDTO> list = new ArrayList<>();
+		    PreparedStatement pstmt = null;
+		    ResultSet rs = null;
+		    StringBuilder sb = new StringBuilder();
+
+		    try {
+		        sb.append(" SELECT r.replyNum, r.memberIdx, userNickName, num, content, r.reg_date, parentNum, r.showReply ");
+		        sb.append(" FROM bbsReply r ");
+		        sb.append(" JOIN member1 m ON r.memberIdx = m.memberIdx ");
+		        sb.append(" WHERE parentNum = ? ");
+		        sb.append(" AND r.showReply = 1 "); // 비회원은 공개 답글만
+		        sb.append(" ORDER BY r.replyNum DESC ");
+
+		        pstmt = conn.prepareStatement(sb.toString());
+		        pstmt.setLong(1, parentNum);
+
+		        rs = pstmt.executeQuery();
+
+		        while (rs.next()) {
+		            ReplyDTO dto = new ReplyDTO();
+
+		            dto.setReplyNum(rs.getLong("replyNum"));
+		            dto.setNum(rs.getLong("num"));
+		            dto.setMemberIdx(rs.getLong("memberIdx"));
+		            dto.setUserNickName(rs.getString("userNickName"));
+		            dto.setContent(rs.getString("content"));
+		            dto.setReg_date(rs.getString("reg_date"));
+		            dto.setParentNum(rs.getLong("parentNum"));
+		            dto.setShowReply(rs.getInt("showReply"));
+
+		            list.add(dto);
+		        }
+
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    } finally {
+		        DBUtil.close(rs);
+		        DBUtil.close(pstmt);
+		    }
+
+		    return list;
+		}
+
+		
 		
 		// 댓글의 답글 개수
 		public int dataCountReplyAnswer(long parentNum,long memberIdx, long role) {

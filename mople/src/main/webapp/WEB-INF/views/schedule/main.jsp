@@ -100,6 +100,8 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+  width: 60%;
+  margin: 0 auto;
 }
 
 .day-section {

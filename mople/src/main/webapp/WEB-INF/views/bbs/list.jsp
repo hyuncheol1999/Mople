@@ -64,32 +64,6 @@
 		<div class="footer-wrapper">ⓒ 2025 Mople. All rights reserved.</div>
 	</footer>
 </body>
-<script type="text/javascript">
-// 검색 키워드 입력란에서 엔터를 누른 경우 서버 전송 막기 
-window.addEventListener('DOMContentLoaded', () => {
-	const inputEL = document.querySelector('form input[name=kwd]'); 
-	inputEL.addEventListener('keydown', function (evt) {
-	    if(evt.key === 'Enter') {
-	    	evt.preventDefault();
-	    	
-	    	searchList();
-	    }
-	});
-});
 
-function searchList() {
-	const f = document.searchForm;
-	if(! f.kwd.value.trim()) {
-		return;
-	}
-	
-	// form 요소는 FormData를 이용하여 URLSearchParams 으로 변환
-	const formData = new FormData(f);
-	let params = new URLSearchParams(formData).toString();
-	
-	let url = '${pageContext.request.contextPath}/bbs/list';
-	location.href = url + '?' + params;
-}
-</script>
 	
 </html>

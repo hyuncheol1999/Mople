@@ -2,10 +2,13 @@ package com.mopl.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import com.mopl.crawler.ScheduleCrawler;
 import com.mopl.model.GameDTO;
@@ -54,7 +57,27 @@ public class ScheduleController {
 
 			url = url + sports + "/schedule/index?" + params +"2025-"+ date+"-01";
 			Map<String, List<GameDTO>> map = sc.getSchduleMonth(url);
-			Map<String, List<GameDTO>> sortedMap = new TreeMap<>(map); // 날짜 순 정렬
+			Map<String, List<GameDTO>> sortedMap = map.entrySet().stream()
+				    .sorted(Comparator.comparingInt(e -> {
+				        String key = e.getKey(); // 예: "7월 1일 (화)"
+				        try {
+				            // 숫자 추출: "7월 1일 (화)" → "1"
+				            String dayStr = key.replaceAll("\\s", "")  // "7월1일(화)"
+				                               .replaceAll(".*월", "")  // "1일(화)"
+				                               .replaceAll("일.*", ""); // "1"
+				            return Integer.parseInt(dayStr);
+				        } catch (Exception ex) {
+				            return Integer.MAX_VALUE;
+				        }
+				    }))
+				    .collect(Collectors.toMap(
+				        Map.Entry::getKey,
+				        Map.Entry::getValue,
+				        (e1, e2) -> e1,
+				        LinkedHashMap::new // 순서 유지
+				    ));
+
+				mav.addObject("map", sortedMap);
 			
 			mav.addObject("map", sortedMap);
 
