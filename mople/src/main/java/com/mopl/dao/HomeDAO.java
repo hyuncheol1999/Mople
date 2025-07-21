@@ -22,10 +22,13 @@ public class HomeDAO {
 
 		try {
 
-			sql = "SELECT m.meetingidx, m.meetingName, m.meetingProfilePhoto, " + "COUNT(mm.memberIdx) currentMembers "
-					+ "FROM meeting m " + "LEFT JOIN memberOfMeeting mm ON m.meetingIdx = mm.meetingIdx "
-					+ "GROUP BY m.meetingIdx, m.meetingName, m.meetingProfilePhoto " + "ORDER BY currentMembers DESC "
-					+ "FETCH FIRST ? ROWS ONLY";
+			sql = "SELECT m.meetingidx, m.meetingName, m.meetingProfilePhoto, r.regionName, s.sportName, "
+					+ "COUNT(mm.memberIdx) currentMembers " + "FROM meeting m "
+					+ "LEFT JOIN memberOfMeeting mm ON m.meetingIdx = mm.meetingIdx "
+					+ "LEFT JOIN regionCategory r ON m.regionIdx = r.regionIdx "
+					+ "LEFT JOIN sportCategory s ON m.sportIdx = s.sportIdx "
+					+ "GROUP BY m.meetingIdx, m.meetingName, m.meetingProfilePhoto, r.regionName, s.sportName "
+					+ "ORDER BY currentMembers DESC " + "FETCH FIRST ? ROWS ONLY";
 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, limit);
@@ -38,6 +41,8 @@ public class HomeDAO {
 				dto.setMeetingName(rs.getString("meetingName"));
 				dto.setMeetingProfilePhoto(rs.getString("meetingProfilePhoto"));
 				dto.setCurrentMembers(rs.getInt("currentMembers"));
+				dto.setRegionName(rs.getString("regionName"));
+				dto.setSportName(rs.getString("sportName"));
 
 				list.add(dto);
 			}
@@ -58,27 +63,32 @@ public class HomeDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String sql;
-		
+
 		try {
-			
-			sql = "SELECT m.meetingidx, m.meetingName, m.meetingProfilePhoto, " + "COUNT(mm.memberIdx) currentMembers "
-					+ "FROM meeting m " + "LEFT JOIN memberOfMeeting mm ON m.meetingIdx = mm.meetingIdx "
-					+ "GROUP BY m.meetingIdx, m.meetingName, m.meetingProfilePhoto " + "ORDER BY currentMembers DESC "
-					+ "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-			
+
+			sql = "SELECT m.meetingidx, m.meetingName, m.meetingProfilePhoto, r.regionName, s.sportName, "
+					+ "COUNT(mm.memberIdx) currentMembers " + "FROM meeting m "
+					+ "LEFT JOIN memberOfMeeting mm ON m.meetingIdx = mm.meetingIdx "
+					+ "LEFT JOIN regionCategory r ON m.regionIdx = r.regionIdx "
+					+ "LEFT JOIN sportCategory s ON m.sportIdx = s.sportIdx "
+					+ "GROUP BY m.meetingIdx, m.meetingName, m.meetingProfilePhoto, r.regionName, s.sportName "
+					+ "ORDER BY currentMembers DESC " + "OFFSET ? ROWS FETCH FIRST ? ROWS ONLY";
+
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, offset);
 			pstmt.setInt(2, limit);
-			
+
 			rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
 				MeetingDTO dto = new MeetingDTO();
 				dto.setMeetingIdx(rs.getLong("meetingIdx"));
 				dto.setMeetingName(rs.getString("meetingName"));
 				dto.setMeetingProfilePhoto(rs.getString("meetingProfilePhoto"));
 				dto.setCurrentMembers(rs.getInt("currentMembers"));
-				
+				dto.setRegionName(rs.getString("regionName"));
+				dto.setSportName(rs.getString("sportName"));
+
 				list.add(dto);
 			}
 		} catch (Exception e) {
@@ -87,9 +97,9 @@ public class HomeDAO {
 			DBUtil.close(rs);
 			DBUtil.close(pstmt);
 		}
-		
+
 		return list;
-		
+
 	}
-	
+
 }

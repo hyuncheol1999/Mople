@@ -10,7 +10,7 @@
 <title>모플 - 운동으로 만나다</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/dist/css/meeting.css"
+	href="${pageContext.request.contextPath}/dist/css/home.css"
 	type="text/css">
 </head>
 <body>
@@ -26,18 +26,18 @@
 					<h1 class="hero-title">스포츠로 하나 되는 우리</h1>
 					<p class="hero-subtitle">우리 동네 스포츠 모임에 참여하고, 새로운 친구를 사귀며 활기찬
 						커뮤니티 활동을 시작하세요!</p>
-					<div id="main-hero-buttons" class="hero-actions">
+					<div class="hero-actions">
 						<a href="${pageContext.request.contextPath}/meeting/meetingList"
-							class="btn btn-outline btn-large">모임 찾기</a>
-						<button class="btn btn-outline btn-large">모임 만들기</button>
+							class="btn btn-outline btn-large">모임 둘러보기</a>
+						<button class="btn btn-outline btn-large">모임 시작하기</button>
 					</div>
 				</div>
 			</section>
 
 			<section class="popular-meetings">
 				<div class="container">
-					<h2 class="section-title">🔥실시간 인기 모임</h2>
-					
+					<h2 class="section-title">실시간 인기 모임</h2>
+
 					<div id="popular-list" class="popular-slider">
 						<c:forEach var="dto" items="${popularMeetings}">
 							<div class="meeting-card">
@@ -61,6 +61,10 @@
 										${dto.meetingName} </a>
 								</h3>
 								<p>${dto.currentMembers}명 참여 중</p>
+
+								<div class="meeting-tags">
+									<span class="tag">#${dto.regionName}</span> <span class="tag">#${dto.sportName}</span>
+								</div>
 							</div>
 						</c:forEach>
 					</div>
@@ -72,7 +76,7 @@
 
 			<section class="features">
 				<div class="container">
-					<h2 class="section-title">모플을 선택해야 하는 이유!</h2>
+					<h2 class="section-title">모플을 선택해야 하는 이유?</h2>
 					<div class="features-grid">
 						<div class="feature-card">
 							<div class="feature-icon">🏀</div>
