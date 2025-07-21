@@ -225,40 +225,56 @@
   </div>
 
   <script>
-    function sendAjaxRequest(url, method, requestParams, responseType, fn) {
-      $.ajax({
-        type: method,
-        url: url,
-        data: requestParams,
-        dataType: responseType,
-        beforeSend: function(xhr) {
-          xhr.setRequestHeader('AJAX', true);
-        },
-        success: fn,
-        error: function(xhr) {
-          if(xhr.status === 403) {
-            alert('권한이 없습니다.');
-          } else {
-            console.log(xhr.responseText);
-          }
-        }
-      });
-    }
+  function sendAjaxRequest(url, method, requestParams, responseType, fn) {
+	    $.ajax({
+	      type: method,
+	      url: url,
+	      data: requestParams,
+	      dataType: responseType,
+	      beforeSend: function(xhr) {
+	        xhr.setRequestHeader('AJAX', true);
+	      },
+	      success: fn,
+	      error: function(xhr) {
+	        if(xhr.status === 403) {
+	          alert('권한이 없습니다.');
+	        } else {
+	          console.log(xhr.responseText);
+	        }
+	      }
+	    });
+	  }
 
-    document.querySelectorAll(".month-list li").forEach(item => {
-      item.addEventListener("click", () => {
-        const month = item.dataset.month;
-        document.getElementById("selectedMonth").value = month;
-        const sports = document.querySelector("input[name='sports']:checked").value;
+	  function loadSchedule(month, sports) {
+	    const url = '${pageContext.request.contextPath}/schedule/matcharea';
+	    const params = { month: month, sports: sports };
 
-        const url = '${pageContext.request.contextPath}/schedule/matcharea';
-        const params = { month: month, sports: sports };
+	    sendAjaxRequest(url, 'post', params, 'html', data => {
+	      document.querySelector(".schedule-area").innerHTML = data;
+	    });
+	  }
 
-        sendAjaxRequest(url, 'post', params, 'html', data => {
-          document.querySelector(".schedule-area").innerHTML = data;
-        });
-      });
-    });
+	  document.addEventListener("DOMContentLoaded", () => {
+	    // 초기 로딩 시 7월 야구 자동 로딩
+	    const initialMonth = document.getElementById("selectedMonth").value;
+	    const initialSports = document.querySelector("input[name='sports']:checked").value;
+
+	    loadSchedule(initialMonth, initialSports);
+	  });
+
+	  document.querySelectorAll(".month-list li").forEach(item => {
+	    item.addEventListener("click", () => {
+	      const month = item.dataset.month;
+	      document.getElementById("selectedMonth").value = month;
+
+	      // 스타일 초기화 및 적용
+	      document.querySelectorAll(".month-list li").forEach(li => li.classList.remove("active"));
+	      item.classList.add("active");
+
+	      const sports = document.querySelector("input[name='sports']:checked").value;
+	      loadSchedule(month, sports);
+	    });
+	  });
   </script>
 </body>
 </html>
