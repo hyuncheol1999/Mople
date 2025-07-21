@@ -1,19 +1,15 @@
 package com.mopl.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.mopl.dao.BungaeMeetingDAO;
-import com.mopl.dao.MeetingDAO;
 import com.mopl.dao.MemberOfBungaeMeetingDAO;
-import com.mopl.dao.MemberOfMeetingDAO;
 import com.mopl.dao.RegionCategoryDAO;
 import com.mopl.dao.RegularMeetingDAO;
 import com.mopl.dao.SportCategoryDAO;
 import com.mopl.model.BungaeMeetingDTO;
-import com.mopl.model.MeetingDTO;
 import com.mopl.model.MemberOfBungaeMeetingDTO;
 import com.mopl.model.RegionCategoryDTO;
 import com.mopl.model.SessionInfo;
@@ -194,15 +190,10 @@ public class BungaeMeetingController {
 		    dto.setRegionIdx(regionIdx);
 		    dto.setBungaeMemberIdx(info.getMemberIdx());
 
-		    System.out.println("[CREATE DTO] " + dto.getSubject() + " start=" + dto.getStartDate() +
-		            " member=" + dto.getBungaeMemberIdx());
-
 		    try {
 		        new BungaeMeetingDAO().insertBungaeMeeting(dto);
-		    } catch (Exception e) {
-		        System.err.println("[INSERT ERROR]");
+		    } catch (Exception e) {		      
 		        e.printStackTrace();
-		        throw new ServletException("INSERT_FAIL", e);
 		    }
 		    return new ModelAndView("redirect:/bungaeMeeting/home");
 		}
@@ -348,6 +339,9 @@ public class BungaeMeetingController {
 
 					mav.addObject("bungaeMeetingIdx", bungaeMeetingIdx);
 					mav.addObject("subject", bungaeMeetingDto.getSubject());
+					mav.addObject("place", bungaeMeetingDto.getPlace());
+					mav.addObject("startDate", bungaeMeetingDto.getStartDate());					
+					mav.addObject("content", bungaeMeetingDto.getContent());
 					mav.addObject("sportName", bungaeMeetingDto.getSportName());
 					mav.addObject("regionName", bungaeMeetingDto.getRegionName());
 					// 대기인원 포함

@@ -17,7 +17,6 @@
 		<jsp:include page="/WEB-INF/views/layout/header.jsp" />
 	</header>
 	<jsp:include page="/WEB-INF/views/layout/login.jsp" />
-
 	<main class="main">
 		<div class="container bungae-home">
 
@@ -40,13 +39,7 @@
 					action="${pageContext.request.contextPath}/bungaeMeeting/home"
 					class="search-form">
 					<input type="hidden" name="page" value="1">
-					<div class="search-type-group">
-						<select name="searchType" class="search-type-select">
-							<option value="all" ${searchType=='all'?'selected':''}>전체</option>
-							<option value="subject" ${searchType=='subject'?'selected':''}>제목</option>
-							<option value="content" ${searchType=='content'?'selected':''}>내용</option>
-						</select>
-					</div>
+					
 					<div class="search-input-group">
 						<input type="text" name="q" placeholder="지금 참여할 번개 검색" value="${fn:escapeXml(q)}">
 						<button type="submit" class="btn btn-outline">검색</button>
@@ -60,7 +53,7 @@
 					<h2>🗓 정기모임(번개 전환)</h2>
 					<br><br>
 					<a href="${pageContext.request.contextPath}/bungaeMeeting/list"
-						class="more-link">전체보기 →</a>
+						class="more-link" style="text-decoration: underline;">전체보기</a>
 				</div>
 				<div class="card-row">
 					<c:choose>
@@ -74,12 +67,12 @@
 									<div class="card-body">
 										<h3 class="card-title">${r.subject}</h3>
 										<p class="card-text">
-											<c:if test="${not empty r.startDateOnly}">     
+											일시 : <c:if test="${not empty r.startDateOnly}">      
 						                    <c:out value="${fn:substring(r.startDateOnly,5,7)}/${fn:substring(r.startDateOnly,8,10)}"/>&nbsp;${r.startTimeStr}
-						                    <c:if test="${not empty r.endDateOnly}">~ ${r.endTimeStr}</c:if>
+						                    <c:if test="${not empty r.endDateOnly}">~${r.endTimeStr}</c:if>
 						                    <br/>
 						                  </c:if>
-											${r.place}
+											모임장소 : ${r.place}
 										</p>
 										<div class="card-footer">
 											<c:choose>
@@ -121,16 +114,16 @@
 									onclick="location.href='${pageContext.request.contextPath}/bungaeMeeting/detail?bungaeMeetingIdx=${b.bungaeMeetingIdx}'">
 									<div class="card-body">
 										<h3 class="card-title">${b.subject}</h3>
-										<p class="card-text">
+										<p class="card-text"> 날짜 :
 											<c:if test="${b.startDateAsDate ne null}">
 												<fmt:formatDate value="${b.startDateAsDate}"
 													pattern="MM/dd HH:mm" />
-												<c:if test="${b.endDateAsDate ne null}"> ~ <fmt:formatDate
+												<c:if test="${b.endDateAsDate ne null}">~<fmt:formatDate
 														value="${b.endDateAsDate}" pattern="HH:mm" />
 												</c:if>
 												<br />
 											</c:if>
-											${b.place}
+											모임장소 : ${b.place}
 										</p>
 										<div class="tags">
 											<span class="tag capacity">👥 ${curr}/${b.capacity}명</span>

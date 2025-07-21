@@ -1078,3 +1078,27 @@ input[type="date"]:focus {
   box-shadow: 0 0 0 3px rgba(240, 137, 121, 0.2);
   outline: none;
 }
+
+input[type="time"] {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1.05em;
+  color: #333;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  appearance: none;          
+  -webkit-appearance: none;  
+  background-color: #fff;
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg width="20" height="20" fill="gray" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5H7z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+}
+
+input[type="time"]:focus {
+  border-color: #f08979;
+  box-shadow: 0 0 0 3px rgba(240, 137, 121, 0.2);
+  outline: none;
+}

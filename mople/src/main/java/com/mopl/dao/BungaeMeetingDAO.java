@@ -157,7 +157,7 @@ public class BungaeMeetingDAO {
 					"SELECT bm.bungaeMeetingIdx, bm.startDate, bm.endDate, bm.place, bm.capacity, bm.subject, bm.content, status, sportName, regionName, bm.bungaeMemberIdx, COUNT(mb.bungaeMemberIdx) currentCnt");
 			sb.append(" FROM bungaeMeeting bm ");
 			sb.append(" LEFT OUTER JOIN memberOfBungaeMeeting mb ON bm.bungaeMeetingIdx = mb.bungaeMeetingIdx ");
-			sb.append(" LEFT OUTER JOIN member1 m1 ON bm.memberIdx = m1.memberIdx ");
+			sb.append(" LEFT OUTER JOIN member1 m1 ON bm.bungaeMemberIdx = m1.memberIdx ");
 			sb.append(" LEFT OUTER JOIN sportCategory s ON bm.categoryIdx = s.sportIdx ");
 			sb.append(" LEFT OUTER JOIN regionCategory r ON bm.regionIdx = r.regionIdx ");
 
@@ -283,15 +283,13 @@ public class BungaeMeetingDAO {
 		StringBuilder sb = new StringBuilder();
 
 		try {
-			sb.append(
-					"SELECT bm.bungaeMeetingIdx, startDate, endDate, place, capacity, subject, content, status, sportName, regionName, bungaeMemberIdx, COUNT(mb.bungaeMemberIdx) currentCnt ");
+			sb.append("SELECT bm.bungaeMeetingIdx, startDate, endDate, place, capacity, subject, content, status, sportName, regionName, COUNT(mb.memberIdx) currentCnt ");
 			sb.append(" FROM bungaeMeeting bm ");
 			sb.append(" LEFT OUTER JOIN memberOfBungaeMeeting mb ON bm.bungaeMeetingIdx = mb.bungaeMeetingIdx ");
-			sb.append(" LEFT OUTER JOIN sportCategory s ON mb.categoryIdx = s.sportIdx ");
-			sb.append(" LEFT OUTER JOIN regionCategory r ON mb.regionIdx = r.regionIdx ");
-			sb.append(" WHERE mb.bungaeMeetingIdx = ?");
-			sb.append(
-					" GROUP BY bm.bungaeMeetingIdx, startDate, endDate, place, capacity, subject, content, status, s.sportIdx, r.regionIdx, bungaeMemberIdx ");
+			sb.append(" LEFT OUTER JOIN sportCategory s ON bm.categoryIdx = s.sportIdx ");
+			sb.append(" LEFT OUTER JOIN regionCategory r ON bm.regionIdx = r.regionIdx ");
+			sb.append(" WHERE bm.bungaeMeetingIdx = ? AND mb.role != 2 ");
+			sb.append(" GROUP BY bm.bungaeMeetingIdx, bm.startDate, bm.endDate, bm.place, bm.capacity, bm.subject, bm.content, bm.status, s.sportName, r.regionName");
 			pstmt = conn.prepareStatement(sb.toString());
 
 			pstmt.setLong(1, bungaeMeetingIdx);
