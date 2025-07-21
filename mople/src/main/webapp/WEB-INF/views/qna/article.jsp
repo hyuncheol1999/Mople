@@ -62,7 +62,8 @@
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 20px;
-			margin-left: 220px;
+            margin: 0px 150px;
+            
         }
         .card h4 {
             margin-top: 0;
@@ -80,7 +81,16 @@
             border-radius: 8px;
             text-align: center;
         }
-    </style>
+.btn {
+    height: 40px;
+    font-size: 16px;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+.btn i {
+    vertical-align: middle;
+}
+</style>
     
 <style type="text/css">
 .min-h-150 {
@@ -237,12 +247,13 @@
 									<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/qna/list?${query}';">리스트</button>
 								</div>
 							</div>
-
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-</main>
+	</main>
+</div>
 
 <c:if test="${sessionScope.member.memberIdx==dto.memberIdx || sessionScope.member.role == 0}">
 	<script type="text/javascript">

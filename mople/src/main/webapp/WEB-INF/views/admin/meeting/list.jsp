@@ -85,6 +85,25 @@
 	    table { width: 100%; border-collapse: collapse; }
 	    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
 	    th { background-color: #f1f1f1; }
+	    
+.table thead th {
+    background-color: #f5f6fa;
+    color: #333;
+}
+
+.table tbody tr:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.btn-outline-danger {
+    transition: 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
     </style>
 
 
@@ -102,41 +121,52 @@
 		<div class="main-content">
 			<div class="meetings-layout">
 			    <div class="main-content">
-			        <div class="card">
-
-					    <h2>모임 관리</h2>
+					<div class="card">
+					    <h2 style="margin-bottom: 20px;">모임 관리</h2>
 					
-					    <div class="table-box">
-					        <table>
-					            <thead>
+					    <div class="table-responsive">
+					        <table class="table table-hover align-middle text-center">
+					            <thead class="table-light">
 					                <tr>
 					                    <th>모임번호</th>
 					                    <th>모임명</th>
 					                    <th>생성일</th>
 					                    <th>지역명</th>
 					                    <th>카테고리명</th>
+					                    <th>관리</th>
 					                </tr>
 					            </thead>
 					            <tbody>
 					                <c:forEach var="list" items="${list}">
-					                    <tr>
+					                    <tr data-id="${list.meetingIdx}">
 					                        <td>${list.meetingIdx}</td>
 					                        <td>${list.meetingName}</td>
 					                        <td>${list.createdDate}</td>
 					                        <td>${list.regionName}</td>
 					                        <td>${list.sportName}</td>
+					                        <td>
+					                            <button type="button" class="btn btn-outline rounded" onclick="deleteMeeting('${list.meetingIdx}')">삭제</button>
+					                        </td>
 					                    </tr>
 					                </c:forEach>
 					            </tbody>
 					        </table>
 					    </div>
-				    </div>	
+					</div>
 			    </div>			
 			</div>
 		</div>	
     </main>
-
-
 </div>
+
+<script type="text/javascript">
+function deleteMeeting(meetingIdx) {
+    if (confirm('해당 모임을 삭제하시겠습니까?')) {
+        let url = '${pageContext.request.contextPath}/admin/meeting/delete?meetingIdx=' + meetingIdx;
+        location.href = url;
+    }
+}
+
+</script>
 </body>
 </html>
