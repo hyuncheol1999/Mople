@@ -49,7 +49,6 @@ public class MeetingController {
 		ModelAndView mav = new ModelAndView("meeting/meetingList");
 
 		MeetingDAO dao = new MeetingDAO();
-		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 		SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
 		RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
 		MyUtil util = new MyUtil();
@@ -90,7 +89,6 @@ public class MeetingController {
 			for (MeetingDTO dto : list) {
 				dto.setMeetingName(util.htmlSymbols(dto.getMeetingName()));
 				dto.setContent(util.htmlSymbols(dto.getContent()));				
-				dto.setCurrentMembers(mDao.findMemberCount(dto.getMeetingIdx()));
 			}
 
 			List<SportCategoryDTO> sportCategoryList = sportCategoryDao.findAllSportCategory();
@@ -134,7 +132,6 @@ public class MeetingController {
 		ModelAndView mav = new ModelAndView("meeting/meetingLayout");
 
 		MeetingDAO dao = new MeetingDAO();
-		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 		MyUtil util = new MyUtil();
 
 		try {
@@ -173,7 +170,6 @@ public class MeetingController {
 			for (MeetingDTO dto : list) {
 				dto.setMeetingName(util.htmlSymbols(dto.getMeetingName()));
 				dto.setContent(util.htmlSymbols(dto.getContent()));
-				dto.setCurrentMembers(mDao.findMemberCount(dto.getMeetingIdx()));
 			}
 
 			String query = "sportCategory=" + sportCategory + "&regionCategory=" + regionCategory + "&sortBy=" + sortBy;
@@ -211,7 +207,6 @@ public class MeetingController {
 		// 정모장인지아닌지 확인
 		ModelAndView mav = new ModelAndView("meeting/meetingDetail");
 		MeetingDAO dao = new MeetingDAO();
-		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 
 		MeetingDTO meetingDto = null;
 
@@ -259,8 +254,6 @@ public class MeetingController {
 					
 				}
 
-				// 대기인원 제외 카운트
-				mav.addObject("memberCount", mDao.findMemberCount(meetingIdx));
 				mav.addObject("userStatus", userStatus);
 
 			} else {
@@ -281,7 +274,6 @@ public class MeetingController {
 		ModelAndView mav = new ModelAndView("meeting/meetingHome");
 		MeetingDAO meetingDao = new MeetingDAO();
 		MemberOfMeetingDAO memberOfMeetingDao = new MemberOfMeetingDAO();
-		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 		MeetingBoardDAO meetingBoardDAO = new MeetingBoardDAO();
 		MyUtil util = new MyUtil();
 		
@@ -322,8 +314,6 @@ public class MeetingController {
 			mav.addObject("waitingList", waitingList);
 			mav.addObject("meetingBoardList", meetingBoardList);
 			
-			// 대기인원 제외 카운트
-			mav.addObject("memberCount", mDao.findMemberCount(meetingIdx));
 			
 			if (info != null) {
 				userStatus = "NOT_JOINED";

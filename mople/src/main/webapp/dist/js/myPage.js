@@ -1,11 +1,11 @@
 
 // 탭 기능 JavaScript (순수 JavaScript로 구현)
 document.addEventListener('DOMContentLoaded', function() {
-    const tabLinks = document.querySelectorAll('.mypage-nav .nav-link');
+    const tabLinks = document.querySelectorAll('.nav-tab');
     const tabPanes = document.querySelectorAll('.tab-content .tab-pane');
 
     // 페이지 로드 시, active 클래스가 있는 탭 컨텐츠를 보이도록 설정
-    const initialActiveTabLink = document.querySelector('.mypage-nav .nav-link.active');
+    const initialActiveTabLink = document.querySelector('.nav-tab.active');
     if (initialActiveTabLink) {
         const initialTargetId = initialActiveTabLink.getAttribute('data-target');
         const initialTargetPane = document.querySelector(initialTargetId);

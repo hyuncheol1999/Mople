@@ -8,6 +8,8 @@ public class MeetingAlbumDTO {
 	private long memberIdx;
 	private String userNickName;
 	
+	private String meetingName;
+	
 	public long getPhotoNum() {
 		return photoNum;
 	}
@@ -43,5 +45,11 @@ public class MeetingAlbumDTO {
 	}
 	public void setUserNickName(String userNickName) {
 		this.userNickName = userNickName;
+	}
+	public String getMeetingName() {
+		return meetingName;
+	}
+	public void setMeetingName(String meetingName) {
+		this.meetingName = meetingName;
 	}
 }

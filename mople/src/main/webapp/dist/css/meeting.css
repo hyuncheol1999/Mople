@@ -315,6 +315,25 @@ div.form-check {
 }
 
 /* Responsive adjustments for smaller screens */
+@media (max-width: 1050px) {
+    .meeting-empty-container {
+        padding: 40px 15px;
+        margin: 30px auto;
+    }
+
+    .meeting-empty-container h3 {
+        font-size: 1.8em;
+    }
+
+    .meeting-empty-container p {
+        font-size: 1em;
+    }
+
+    .meeting-empty-container img {
+        max-width: 200px;
+    }
+}
+/* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     .meeting-empty-container {
         padding: 40px 15px;
@@ -349,7 +368,7 @@ div.form-check {
 }
 
 /* 데스크탑 (1024px 이상): 3열 */
-@media (min-width: 1024px) {
+@media (min-width: 1050px) {
   .meetings-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -969,6 +988,25 @@ img.managerLogo {
 
 
 
+/* 반응형 디자인 고려 (모바일에서는 고정 해제) */
+@media (max-width: 1050px) {
+  .meetings-layout {
+    margin-left: 0; /* 모바일에서는 왼쪽 여백 제거 */
+    grid-template-columns: 1fr; /* 그리드 레이아웃 다시 설정 */
+  }
+  
+  .list {
+	margin-left: 0;
+	}
+  
+  .meetings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 30px;
+  }
+  
+}
 /* 반응형 디자인 고려 (모바일에서는 고정 해제) */
 @media (max-width: 768px) {
   .meetings-layout {

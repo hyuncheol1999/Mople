@@ -34,7 +34,7 @@ public class MeetingBoardDAO {
 			pstmt.setString(5, dto.getFilter());
 
 			pstmt.executeUpdate();
-			
+
 			DBUtil.close(pstmt);
 			sql = "SELECT meetingBoard_seq.CURRVAL FROM dual";
 			pstmt = conn.prepareStatement(sql);
@@ -49,7 +49,7 @@ public class MeetingBoardDAO {
 		} finally {
 			DBUtil.close(pstmt);
 		}
-		
+
 		return num;
 	}
 
@@ -142,11 +142,12 @@ public class MeetingBoardDAO {
 
 			sb.append("SELECT mb.num, mb.memberIdx, mb.meetingIdx, mb.subject, mb.content, mb.filter, ");
 			sb.append("TO_CHAR(mb.reg_date, 'YYYY-MM-DD') reg_date, m.userNickName, ");
-			sb.append(" (SELECT imageFileName FROM meetingBoardImg img WHERE img.num = mb.num AND ROWNUM = 1) imageFileName  ");
+			sb.append(
+					" (SELECT imageFileName FROM meetingBoardImg img WHERE img.num = mb.num AND ROWNUM = 1) imageFileName  ");
 			sb.append("FROM meetingBoard mb ");
 			sb.append("JOIN member1 m ON mb.memberIdx = m.memberIdx ");
 			sb.append("WHERE mb.meetingIdx = ? ");
-			
+
 			if (filter != null && !filter.trim().isEmpty()) {
 				sb.append(" AND mb.filter = ? ");
 			}
@@ -705,7 +706,7 @@ public class MeetingBoardDAO {
 
 		try {
 			sb.append(" SELECT mb.replyNum, mb.num, mb.memberIdx, m.userNickName, mb.content, ");
-			sb.append(" TO_CHAR(mb.reg_date, 'YYYY-MM-DD') reg_date, ");
+			sb.append(" TO_CHAR(mb.reg_date, 'YYYY-MM-DD HH24:MI:SS') reg_date, ");
 			sb.append(" NVL(a.answerCount, 0) answerCount  ");
 			sb.append(" FROM meetingBoardReply mb ");
 			sb.append(" JOIN member1 m ON m.memberIdx = mb.memberIdx ");
@@ -716,7 +717,7 @@ public class MeetingBoardDAO {
 			sb.append(" GROUP BY parentNum ");
 			sb.append(" ) a ON mb.replyNum = a.parentNum ");
 			sb.append(" WHERE mb.num = ? AND mb.parentNum = 0 ");
-			sb.append(" ORDER BY mb.replyNum DESC ");
+			sb.append(" ORDER BY mb.replyNum ASC ");
 			sb.append(" OFFSET ? ROWS FETCH FIRST ? ROWS ONLY ");
 
 			pstmt = conn.prepareStatement(sb.toString());

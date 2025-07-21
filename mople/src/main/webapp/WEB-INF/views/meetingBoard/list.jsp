@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${meetingName} 모임 소식</title>
+<title>${meetingName}모임 소식</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css"
@@ -29,9 +29,7 @@
 				class="btn btn-outline">←</a>
 		</div>
 
-
-
-		<h3 class="board-title">${meetingName} 모임 소식</h3>
+		<h3 class="board-title">${meetingName}모임 소식</h3>
 
 		<div class="category-tabs">
 			<a href="?meetingIdx=${meetingIdx}"
@@ -67,9 +65,20 @@
 							<!-- 제목/내용/작성자 등 텍스트 정보 -->
 							<div class="board-content">
 								<div class="board-item-title">${dto.subject}</div>
-								<div class="board-item-text">${empty dto.content ? '내용 없음' : fn:substring(dto.content, 0, 100)}...
-								</div>
-								<div class="board-item-meta">${dto.userNickName} · ${dto.reg_date}</div>
+								<c:choose>
+									<c:when test="${empty dto.content}">
+										<div class="board-item-text">내용 없음</div>
+									</c:when>
+									<c:when test="${fn:length(dto.content) > 100}">
+										<div class="board-item-text">${fn:substring(dto.content, 0, 100)}...</div>
+									</c:when>
+									<c:otherwise>
+										<div class="board-item-text">${dto.content}</div>
+									</c:otherwise>
+								</c:choose>
+
+								<div class="board-item-meta">${dto.userNickName} ·
+									${dto.reg_date}</div>
 							</div>
 
 						</div>

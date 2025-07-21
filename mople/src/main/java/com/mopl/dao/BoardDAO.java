@@ -992,5 +992,53 @@ public class BoardDAO {
 			} finally {
 				DBUtil.close(pstmt);
 			}
-		}	
+		}
+		
+	// 회원이 작성한 게시글 목록
+	public List<BoardDTO> findByMemberIdx(long memberIdx) {
+		List<BoardDTO> list = new ArrayList<BoardDTO>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "SELECT b.num, b.memberIdx, m.userNickName, b.subject, b.content, "
+				    + "b.reg_date, b.hitCount, NVL(bc.boardLikeCount, 0) AS boardLikeCount "
+				    + "FROM bbs b "
+				    + "JOIN member1 m ON b.memberIdx = m.memberIdx "
+				    + "LEFT OUTER JOIN ("
+				    + "SELECT bl.num, COUNT(*) AS boardLikeCount "
+				    + "FROM bbsLike bl GROUP BY bl.num"
+				    + ") bc ON b.num = bc.num "
+				    + "WHERE b.memberIdx = ?";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, memberIdx);
+
+			rs = pstmt.executeQuery();
+
+			while(rs.next()) {
+				BoardDTO dto = new BoardDTO();
+				
+				dto.setNum(rs.getLong("num"));
+				dto.setMemberIdx(rs.getLong("memberIdx"));
+				dto.setUserNickName(rs.getString("userNickName"));
+				dto.setSubject(rs.getString("subject"));
+				dto.setContent(rs.getString("content"));
+				dto.setHitCount(rs.getInt("hitCount"));
+				dto.setReg_date(rs.getString("reg_date"));
+				
+				dto.setBoardLikeCount(rs.getInt("boardLikeCount"));
+				
+				list.add(dto);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+
+		return list;
+	}
 }

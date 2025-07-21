@@ -5,6 +5,29 @@ public class MemberOfBungaeMeetingDTO {
 	private long bungaeMeetingIdx;
 	private int role;
 	
+	private String memberName;
+	private String memberNickName;
+	private String memberProfilePhoto;
+	
+	
+	public String getMemberName() {
+		return memberName;
+	}
+	public void setMemberName(String memberName) {
+		this.memberName = memberName;
+	}
+	public String getMemberNickName() {
+		return memberNickName;
+	}
+	public void setMemberNickName(String memberNickName) {
+		this.memberNickName = memberNickName;
+	}
+	public String getMemberProfilePhoto() {
+		return memberProfilePhoto;
+	}
+	public void setMemberProfilePhoto(String memberProfilePhoto) {
+		this.memberProfilePhoto = memberProfilePhoto;
+	}
 	public long getMemberIdx() {
 		return memberIdx;
 	}

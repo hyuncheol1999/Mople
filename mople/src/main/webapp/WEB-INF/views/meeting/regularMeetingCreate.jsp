@@ -47,9 +47,15 @@
 					</div>
 
 					<div class="form-group">
-						<label for="startDate">정모날짜</label>
+						<label for="startDate">정모진행날짜</label>
 						<input type="date" id="startDate" name="startDate"
 							value="${dto.startDate}" required>
+					</div>
+					
+					<div class="form-group">
+						<label for="endDate">정모끝나는날짜</label>
+						<input type="date" id="endDate" name="endDate"
+							value="${dto.endDate}" required>
 					</div>
 
 					<div class="form-group">
