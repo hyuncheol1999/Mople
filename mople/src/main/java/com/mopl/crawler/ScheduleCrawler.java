@@ -122,6 +122,7 @@ public class ScheduleCrawler {
 	    	    new String[]{"KT", "https://sports-phinf.pstatic.net/team/kbo/default/KT.png?type=f108_108"},
 	    	    new String[]{"키움", "https://sports-phinf.pstatic.net/team/kbo/default/WO.png?type=f108_108"}
 	    	);
+	   
 	    
 	    try {
 	        driver.get(url);
