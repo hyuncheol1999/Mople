@@ -64,11 +64,23 @@ public class MeetingController {
 			if (page != null) {
 				current_page = Integer.parseInt(page);
 			}
-
-			int sportCategory = Integer.parseInt(req.getParameter("sportCategory"));
-			int regionCategory = Integer.parseInt(req.getParameter("regionCategory"));
+			
+			String scp = req.getParameter("sportCategory");
+			String rcp = req.getParameter("regionCategory");
+			
+			if(scp == null || rcp == null) {
+				scp = "0";
+				rcp = "0";
+			}
+			
+			int sportCategory = Integer.parseInt(scp);
+			int regionCategory = Integer.parseInt(rcp);
 			String sortBy = req.getParameter("sortBy");
 
+			if(sortBy == null) {
+				sortBy = "latest";
+			}
+			
 			int dataCount;
 			if (sportCategory == 0 && regionCategory == 0) {
 				dataCount = dao.dataCount();

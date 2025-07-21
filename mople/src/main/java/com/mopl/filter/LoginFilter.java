@@ -52,9 +52,6 @@ public class LoginFilter implements Filter{
 		// 세션에 저장된 로그인 정보
 		SessionInfo info = (SessionInfo)session.getAttribute("member");
 		
-		System.out.println(req.getRequestURI());
-		System.out.println(isExcludeUri(req));
-		
 		// 로그인이 되어 있지 않은 경우
 		if(info == null && isExcludeUri(req) == false) {
 			// 로그인 전 주소가 존재하는 경우 로그인 전 주소를 세션에 저장하여
