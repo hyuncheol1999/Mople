@@ -34,7 +34,7 @@
 .board-list-header { padding-top: 7px; padding-bottom: 7px; }
 
 .board-list { width: 100%; }
-.board-list > thead { color: #787878; }
+.board-list > thead { color: #fff4ef; }
 .board-list > thead tr:first-child { border-top: 2px solid #454545; }
 .board-list tr > th, .board-list tr > td { text-align: center; }
 .board-list .left { text-align: left; padding-left: 5px; }

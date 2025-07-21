@@ -1,0 +1,125 @@
+@charset "UTF-8";
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .nav-bar {
+            background-color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 32px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .nav-bar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6A0DAD;
+        }
+        .nav-bar .menu {
+            display: flex;
+            gap: 20px;
+        }
+        .side-bar {
+            width: 200px;
+            background: white;
+            height: 100vh;
+            padding: 20px;
+            border-right: 1px solid #e0e0e0;
+        }
+        .side-bar h3 {
+            margin-bottom: 20px;
+        }
+        .side-bar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .side-bar ul li {
+            padding: 10px 0;
+            cursor: pointer;
+        }
+        .container {
+            display: flex;
+        }
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        .card {
+            background: white;
+            padding: 0px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .card h4 {
+            margin-top: 0;
+        }
+        .stats-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-box {
+            flex: 1;
+            min-width: 200px;
+            background: #fff4ef;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+.board-list-footer .form-select{
+	width: 110px;
+}      
+  
+.form-select,
+.form-control,
+.btn {
+    height: 40px;
+    font-size: 16px;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+
+.btn i {
+    vertical-align: middle;
+}
+
+input[type="checkbox"].form-check-input {
+    display: inline-block;
+}
+
+
+.body-title,
+.body-main {
+	padding: 10px 20px;
+}
+
+.body-title{
+	margin-top: 10px;
+}
+
+.main-content{
+	margin-left: 120px;
+}
+
+.input-group{
+	margin: 15px 0px;
+}
+
+.min-h-150 {
+   min-height: 150px;
+}
+
+.min-h-70 {
+   min-height: 70px !important;
+}
+
+.answer-container textarea {
+   width: 100%;
+   height: 70px;
+   resize: none;
+}
+

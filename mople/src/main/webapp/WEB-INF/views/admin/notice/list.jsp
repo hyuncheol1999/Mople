@@ -11,100 +11,8 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/board.css" type="text/css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/paginate.css" type="text/css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/meeting.css" type="text/css">
-<style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-        }
-        .nav-bar {
-            background-color: white;
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 32px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .nav-bar .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6A0DAD;
-        }
-        .nav-bar .menu {
-            display: flex;
-            gap: 20px;
-        }
-        .side-bar {
-            width: 200px;
-            background: white;
-            height: 100vh;
-            padding: 20px;
-            border-right: 1px solid #e0e0e0;
-        }
-        .side-bar h3 {
-            margin-bottom: 20px;
-        }
-        .side-bar ul {
-            list-style: none;
-            padding: 0;
-        }
-        .side-bar ul li {
-            padding: 10px 0;
-            cursor: pointer;
-        }
-        .container {
-            display: flex;
-        }
-        .main-content {
-            flex: 1;
-            padding: 30px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-			margin-left: 220px;
-        }
-        .card h4 {
-            margin-top: 0;
-        }
-        .stats-grid {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .stat-box {
-            flex: 1;
-            min-width: 200px;
-            background: #f1f3f5;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-        }
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/adminList.css" type="text/css">
 
-.board-list-footer .form-select{
-	width: 110px;
-}      
-  
-.form-select,
-.form-control,
-.btn {
-    height: 40px;
-    font-size: 16px;
-    border-radius: 6px;
-    padding: 6px 12px;
-}
-
-.btn i {
-    vertical-align: middle;
-}
-
-
-input[type="checkbox"].form-check-input {
-    display: inline-block;
-}
-</style>
 </head>
 <body>
  <div class="wrap">
@@ -125,12 +33,12 @@ input[type="checkbox"].form-check-input {
 							<h4> 🚨 공지사항 </h4>
 		    			</div>
 		    			
-		   			 	<div class="stats-grid row">
+		   			 	<div class="body-main stats-grid row">
 							<div class="col-md-12 text-start">
 								<form name="listForm" method="post">
 									<div class="row board-list-header">
 										<div class="col-auto me-auto dataCount">
-											<button type="button" class="btn btn-light" id="btnDeleteList" title="삭제"><i class="bi bi-trash"></i></button>
+											<button type="button" class="btn btn-outline rounded" id="btnDeleteList" title="삭제"><i class="bi bi-trash"></i></button>
 										</div>
 										<div class="col-auto">
 											<input type="hidden" name="size" value="10">
@@ -201,7 +109,7 @@ input[type="checkbox"].form-check-input {
 					
 								<div class="row board-list-footer">
 									<div class="col">
-										<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/admin/notice/list';" title="새로고침"><i class="bi bi-arrow-counterclockwise"></i></button>
+										<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/admin/notice/list';" title="새로고침"><i class="bi bi-arrow-counterclockwise"></i></button>
 									</div>
 									<div class="col-6 d-flex justify-content-center">
 										<form class="row" name="searchForm">
@@ -219,12 +127,12 @@ input[type="checkbox"].form-check-input {
 												<input type="hidden" name="size" value="10">
 											</div>
 											<div class="col-auto p-1">
-												<button type="button" class="btn btn-light" onclick="searchList()"> <i class="bi bi-search"></i> </button>
+												<button type="button" class="btn btn-outline rounded" onclick="searchList()"> <i class="bi bi-search"></i> </button>
 											</div>
 										</form>
 									</div>
 									<div class="col text-end">
-										<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/admin/notice/write?size=10';">글올리기</button>
+										<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/admin/notice/write?size=10';">글올리기</button>
 									</div>
 								</div>
 							</div>

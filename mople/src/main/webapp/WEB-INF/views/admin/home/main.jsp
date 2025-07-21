@@ -9,79 +9,7 @@
 <title>모플 - 운동으로 만나다</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />  
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/meeting.css" type="text/css">
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-        }
-        .nav-bar {
-            background-color: white;
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 32px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .nav-bar .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6A0DAD;
-        }
-        .nav-bar .menu {
-            display: flex;
-            gap: 20px;
-        }
-        .side-bar {
-            width: 200px;
-            background: white;
-            height: 100vh;
-            padding: 20px;
-            border-right: 1px solid #e0e0e0;
-        }
-        .side-bar h3 {
-            margin-bottom: 20px;
-        }
-        .side-bar ul {
-            list-style: none;
-            padding: 0;
-        }
-        .side-bar ul li {
-            padding: 10px 0;
-            cursor: pointer;
-        }
-        .container {
-            display: flex;
-        }
-        .main-content {
-            flex: 1;
-            padding: 30px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-			margin-left: 220px;
-        }
-        .card h4 {
-            margin-top: 0;
-        }
-        .stats-grid {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .stat-box {
-            flex: 1;
-            min-width: 200px;
-            background: #f1f3f5;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-        }
-    </style>
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/adminList.css" type="text/css">
 
 </head>
 <body>
@@ -99,7 +27,7 @@
 			    <div class="main-content">
 			        <div class="card">
 			            <h4>요약 통계</h4>
-			            <div class="stats-grid">
+			            <div class="body-main stats-grid">
 			                <div class="stat-box">
 			                    <strong>총 회원 수</strong>
 			                    <p>${countMember}명</p>
@@ -121,7 +49,7 @@
 			
 			        <div class="card">
 			            <h4>최근 생성된 정모</h4>
-			            <table border="1" cellpadding="10" cellspacing="0" width="100%">
+			            <table class="table-meeting"  cellpadding="10" cellspacing="0" width="100%">
 			                <tr>
 			                    <th>정모제목</th>
 			                    <th>시작날짜</th>

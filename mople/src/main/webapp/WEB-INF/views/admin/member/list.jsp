@@ -9,84 +9,34 @@
 <title>모플 - 운동으로 만나다</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />  
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/meeting.css" type="text/css">
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-        }
-        .nav-bar {
-            background-color: white;
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 32px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .nav-bar .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6A0DAD;
-        }
-        .nav-bar .menu {
-            display: flex;
-            gap: 20px;
-        }
-        .side-bar {
-            width: 200px;
-            background: white;
-            height: 100vh;
-            padding: 20px;
-            border-right: 1px solid #e0e0e0;
-        }
-        .side-bar h3 {
-            margin-bottom: 20px;
-        }
-        .side-bar ul {
-            list-style: none;
-            padding: 0;
-        }
-        .side-bar ul li {
-            padding: 10px 0;
-            cursor: pointer;
-        }
-        .container {
-            display: flex;
-        }
-        .main-content {
-            flex: 1;
-            padding: 30px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-			margin-left: 220px;
-        }
-        .card h4 {
-            margin-top: 0;
-        }
-        .stats-grid {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .stat-box {
-            flex: 1;
-            min-width: 200px;
-            background: #f1f3f5;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-	    .table-box { margin-top: 20px; }
-	    table { width: 100%; border-collapse: collapse; }
-	    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
-	    th { background-color: #f1f1f1; }
-    </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/adminList.css" type="text/css">
 
+<style>
+
+.table-box { margin-top: 20px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+th { background-color: #f1f1f1; }
+
+.table thead th {
+background-color: #f5f6fa;
+color: #333;
+}
+
+.table tbody tr:hover {
+background-color: #f0f0f0;
+cursor: pointer;
+}
+
+.btn-outline-danger {
+transition: 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+background-color: #dc3545;
+color: white;
+}
+</style>
 
 </head>
 <body>
@@ -104,17 +54,17 @@
 			    <div class="main-content">
 			        <div class="card">
 
-					    <h2>회원 관리</h2>
+					    <h2 style="margin: 10px 20px;"> 👤 회원 관리</h2>
 					
-					    <div class="table-box">
-					        <table>
-					            <thead>
+	   					<div class="table-responsive" style="padding:10px 30px;">
+					        <table class="table table-hover align-middle text-center">
+					            <thead class="table-light">
 					                <tr>
-					                    <th>회원번호</th>
+					                    <th width="120px;">회원번호</th>
 					                    <th>아이디</th>
-					                    <th>이름</th>
-					                    <th>닉네임</th>
-					                    <th>가입일</th>
+					                    <th width="120px;">이름</th>
+					                    <th width="120px;">닉네임</th>
+					                    <th width="180px;">가입일</th>
 					                </tr>
 					            </thead>
 					            <tbody>

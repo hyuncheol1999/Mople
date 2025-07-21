@@ -9,6 +9,104 @@
 <title>Spring</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp"/>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/board.css" type="text/css">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .nav-bar {
+            background-color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 32px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .nav-bar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6A0DAD;
+        }
+        .nav-bar .menu {
+            display: flex;
+            gap: 20px;
+        }
+        .side-bar {
+            width: 200px;
+            background: white;
+            height: 100vh;
+            padding: 20px;
+            border-right: 1px solid #e0e0e0;
+        }
+        .side-bar h3 {
+            margin-bottom: 20px;
+        }
+        .side-bar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .side-bar ul li {
+            padding: 10px 0;
+            cursor: pointer;
+        }
+        .container {
+            display: flex;
+        }
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            margin: 0px 150px;
+            
+        }
+        .card h4 {
+            margin-top: 0;
+        }
+        .stats-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-box {
+            flex: 1;
+            min-width: 200px;
+            background: #f1f3f5;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+.btn {
+    height: 40px;
+    font-size: 16px;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+.btn i {
+    vertical-align: middle;
+}
+</style>
+    
+<style type="text/css">
+.min-h-150 {
+   min-height: 150px;
+}
+
+.min-h-70 {
+   min-height: 70px !important;
+}
+
+.answer-container textarea {
+   width: 100%;
+   height: 70px;
+   resize: none;
+}
+</style>
 </head>
 <body>
 
@@ -23,11 +121,10 @@
 			    <div class="main-content">
 			        <div class="card">
 
-				<div class="container">
 					<div class="body-container row justify-content-center">
 						<div class="col-md-10 my-3 p-3">
 							<div class="body-title">
-								<h3><i class="bi bi-whatsapp"></i> 문의하기 </h3>
+								<h3> ❓ 문의하기 </h3>
 							</div>
 							
 							<div class="body-main">
@@ -71,9 +168,9 @@
 									<table class="table table-borderless">
 					 					<tr>
 											<td class="text-center">
-												<button type="button" class="btn btn-dark" onclick="sendOk();">${mode=='update'?'수정완료':'등록완료'}&nbsp;<i class="bi bi-check2"></i></button>
-												<button type="reset" class="btn btn-light">다시입력</button>
-												<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/qna/list';">${mode=='update'?'수정취소':'등록취소'}&nbsp;<i class="bi bi-x"></i></button>
+												<button type="button" class="btn btn-outline rounded" onclick="sendOk();">${mode=='update'?'수정완료':'등록완료'}&nbsp;<i class="bi bi-check2"></i></button>
+												<button type="reset" class="btn btn-outline rounded">다시입력</button>
+												<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/qna/list';">${mode=='update'?'수정취소':'등록취소'}&nbsp;<i class="bi bi-x"></i></button>
 												<c:if test="${mode=='update'}">
 													<input type="hidden" name="num" value="${dto.num}">
 													<input type="hidden" name="page" value="${page}">
@@ -82,7 +179,6 @@
 										</tr>
 									</table>
 								</form>
-							</div>
 								</div>
 							</div>
 						</div>

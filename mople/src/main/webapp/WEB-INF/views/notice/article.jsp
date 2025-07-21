@@ -122,7 +122,7 @@
 			        <div class="card">
 		
 					    <div class="body-title">
-							<h3><i class="bi bi-app"></i> 문의하기 </h3>
+							<h3> 🚨 공지사항 </h3>
 					    </div>
 					    
 						<div class="body-main">
@@ -191,7 +191,7 @@
 										&nbsp;
 									</td>
 									<td class="text-end">
-										<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/notice/list?${query}';">리스트</button>
+										<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/notice/list?${query}';">리스트</button>
 									</td>
 								</tr>
 							</table>

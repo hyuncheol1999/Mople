@@ -59,7 +59,7 @@ public class MapsServlet extends HttpServlet {
 			// GET 방식으로 요청한 경우
 			if (uri.contains("/facilities")) {
 				main(req, resp);
-			} else if(uri.contains("/regions.do")) {
+			} else if(uri.contains("/regions")) {
 				regions(req, resp);
 			} 
 		} else if (method.equals("POST")) {

@@ -236,15 +236,15 @@
 		
 								<div class="col-md-6 p-2 ps-0">
 									<c:if test="${sessionScope.member.memberIdx==dto.memberIdx && empty dto.answer}">
-										<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/qna/update?num=${dto.num}&page=${page}';">수정</button>
+										<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/qna/update?num=${dto.num}&page=${page}';">수정</button>
 									</c:if>
 							    	
 						    		<c:if test="${sessionScope.member.memberIdx==dto.memberIdx || sessionScope.member.role == 0}">
-						    			<button type="button" class="btn btn-light" onclick="deleteOk('question');">삭제</button>
+						    			<button type="button" class="btn btn-outline rounded" onclick="deleteOk('question');">삭제</button>
 						    		</c:if>
 								</div>
 								<div class="col-md-6 p-2 pe-0 text-end">
-									<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/qna/list?${query}';">리스트</button>
+									<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/qna/list?${query}';">리스트</button>
 								</div>
 							</div>
 						</div>

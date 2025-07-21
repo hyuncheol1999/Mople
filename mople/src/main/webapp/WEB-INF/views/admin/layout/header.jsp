@@ -17,10 +17,8 @@
 				<span class="img-person" style="background-image: url('${pageContext.request.contextPath}/dist/images/avatar.png');"></span>
 			</c:otherwise>
 		</c:choose>
-		<span>|</span>
 		<a class="nav-link"
 			href="${pageContext.request.contextPath}/main"
-			title="로그아웃">로그아웃</a>
+			title="메인화면">메인화면</a>
 	</div>
 </div>
-

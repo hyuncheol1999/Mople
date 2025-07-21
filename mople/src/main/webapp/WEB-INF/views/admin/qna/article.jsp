@@ -9,108 +9,7 @@
 <title>Spring</title>
 <jsp:include page="/WEB-INF/views/admin/layout/headerResources.jsp"/>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/board.css" type="text/css">
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-        }
-        .nav-bar {
-            background-color: white;
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 32px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .nav-bar .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6A0DAD;
-        }
-        .nav-bar .menu {
-            display: flex;
-            gap: 20px;
-        }
-        .side-bar {
-            width: 200px;
-            background: white;
-            height: 100vh;
-            padding: 20px;
-            border-right: 1px solid #e0e0e0;
-        }
-        .side-bar h3 {
-            margin-bottom: 20px;
-        }
-        .side-bar ul {
-            list-style: none;
-            padding: 0;
-        }
-        .side-bar ul li {
-            padding: 10px 0;
-            cursor: pointer;
-        }
-        .container {
-            display: flex;
-        }
-        .main-content {
-            flex: 1;
-            padding: 30px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-			margin-left: 220px;
-        }
-        .card h4 {
-            margin-top: 0;
-        }
-        .stats-grid {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .stat-box {
-            flex: 1;
-            min-width: 200px;
-            background: #f1f3f5;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-        }
-.btn {
-    height: 40px;
-    font-size: 16px;
-    border-radius: 6px;
-    padding: 6px 12px;
-}
-.btn i {
-    vertical-align: middle;
-}
-
-.body-title,
-.body-main{
-	padding-left: 350px;
-}
-</style>
-    
-<style type="text/css">
-.min-h-150 {
-   min-height: 150px;
-}
-
-.min-h-70 {
-   min-height: 70px !important;
-}
-
-.answer-container textarea {
-   width: 100%;
-   height: 70px;
-   resize: none;
-}
-</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/adminList.css" type="text/css">
 
 </head>
 <body>
@@ -130,7 +29,7 @@
 			        <div class="card">
 		
 					    <div class="body-title">
-							<h3><i class="bi bi-app"></i> 문의하기 </h3>
+							<h3> ❓ 문의하기 </h3>
 					    </div>
 					    
 					    <div class="body-main">
@@ -221,17 +120,17 @@
 									</div>
 			
 									<div class="col-md-6 p-2 ps-0">
-						    			<button type="button" class="btn btn-light" onclick="deleteOk('question');">문의삭제</button>
+						    			<button type="button" class="btn btn-outline rounded" onclick="deleteOk('question');">문의삭제</button>
 							    		
 										<c:if test="${not empty dto.answer and sessionScope.member.memberIdx==dto.answerIdx}">
-											<button type="button" class="btn btn-light btnUpdateAnswer" data-mode="update">답변수정</button>
+											<button type="button" class="btn btn-outline rounded btnUpdateAnswer" data-mode="update">답변수정</button>
 										</c:if>
 										<c:if test="${not empty dto.answer && (sessionScope.member.memberIdx==dto.answerIdx || sessionScope.member.role == 0)}">
-											<button type="button" class="btn btn-light" onclick="deleteOk('answer');">답변삭제</button>
+											<button type="button" class="btn btn-outline rounded" onclick="deleteOk('answer');">답변삭제</button>
 										</c:if>
 									</div>
 									<div class="col-md-6 p-2 pe-0 text-end">
-										<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/admin/qna/list?${query}';">리스트</button>
+										<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/admin/qna/list?${query}';">리스트</button>
 									</div>
 								</div>
 								
@@ -252,7 +151,7 @@
 										   		<input type="hidden" name="num" value="${dto.num}">	
 										   		<input type="hidden" name="page" value="${page}">
 										   		
-								       			<button type="button" class="btn btn-light btnSendAnswer">답변등록</button>
+								       			<button type="button" class="btn btn-outline rounded btnSendAnswer">답변등록</button>
 											</div>
 									</div>
 								</form>

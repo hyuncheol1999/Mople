@@ -9,95 +9,7 @@
 <title>Spring</title>
 <jsp:include page="/WEB-INF/views/admin/layout/headerResources.jsp"/>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/board.css" type="text/css">
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-        }
-        .nav-bar {
-            background-color: white;
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 32px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .nav-bar .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6A0DAD;
-        }
-        .nav-bar .menu {
-            display: flex;
-            gap: 20px;
-        }
-        .side-bar {
-            width: 200px;
-            background: white;
-            height: 100vh;
-            padding: 20px;
-            border-right: 1px solid #e0e0e0;
-        }
-        .side-bar h3 {
-            margin-bottom: 20px;
-        }
-        .side-bar ul {
-            list-style: none;
-            padding: 0;
-        }
-        .side-bar ul li {
-            padding: 10px 0;
-            cursor: pointer;
-        }
-        .container {
-            display: flex;
-        }
-        .main-content {
-            flex: 1;
-            padding: 30px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-			margin-left: 220px;
-        }
-        .card h4 {
-            margin-top: 0;
-        }
-        .stats-grid {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .stat-box {
-            flex: 1;
-            min-width: 200px;
-            background: #f1f3f5;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-.btn {
-    height: 40px;
-    font-size: 16px;
-    border-radius: 6px;
-    padding: 6px 12px;
-}
-.btn i {
-    vertical-align: middle;
-}
-
-.body-title,
-.body-main {
-	padding-left: 350px;
-}
-
-</style>
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/adminList.css" type="text/css">
 
 </head>
 <body>
@@ -117,11 +29,11 @@
 			        <div class="card">
 		
 					    <div class="body-title">
-							<h3><i class="bi bi-app"></i> 공지사항 </h3>
+							<h3> 🚨 공지사항 </h3>
 					    </div>
 					    
 					    <div class="body-main row">
-							<div class="col-xxl-9">
+							<div class="col-xxl-12">
 								<table class="table board-article">
 									<thead>
 										<tr>
@@ -185,17 +97,17 @@
 										<td width="50%">
 											<c:choose>
 												<c:when test="${sessionScope.member.userId==dto.userId}">
-													<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/admin/notice/update?num=${dto.num}&page=${page}&size=${size}';">수정</button>
+													<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/admin/notice/update?num=${dto.num}&page=${page}&size=${size}';">수정</button>
 												</c:when>
 												<c:otherwise>
-													<button type="button" class="btn btn-light" disabled>수정</button>
+													<button type="button" class="btn btn-outline rounded" disabled>수정</button>
 												</c:otherwise>
 											</c:choose>
 				
-											<button type="button" class="btn btn-light" onclick="deleteOk();">삭제</button>
+											<button type="button" class="btn btn-outline rounded" onclick="deleteOk();">삭제</button>
 										</td>
 										<td class="text-end">
-											<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/admin/notice/list?${query}';">리스트</button>
+											<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/admin/notice/list?${query}';">리스트</button>
 										</td>
 									</tr>
 								</table>

@@ -10,95 +10,8 @@
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />  
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/paginate.css" type="text/css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/meeting.css" type="text/css">
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-        }
-        .nav-bar {
-            background-color: white;
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 32px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .nav-bar .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6A0DAD;
-        }
-        .nav-bar .menu {
-            display: flex;
-            gap: 20px;
-        }
-        .side-bar {
-            width: 200px;
-            background: white;
-            height: 100vh;
-            padding: 20px;
-            border-right: 1px solid #e0e0e0;
-        }
-        .side-bar h3 {
-            margin-bottom: 20px;
-        }
-        .side-bar ul {
-            list-style: none;
-            padding: 0;
-        }
-        .side-bar ul li {
-            padding: 10px 0;
-            cursor: pointer;
-        }
-        .container {
-            display: flex;
-        }
-        .main-content {
-            flex: 1;
-            padding: 30px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-			margin-left: 220px;
-        }
-        .card h4 {
-            margin-top: 0;
-        }
-        .stats-grid {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .stat-box {
-            flex: 1;
-            min-width: 200px;
-            background: #f1f3f5;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-        }
- 
-.form-select,
-.form-control,
-.btn {
-    height: 40px;
-    font-size: 16px;
-    border-radius: 6px;
-    padding: 6px 12px;
-}
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/adminList.css" type="text/css">
 
-.btn i {
-    vertical-align: middle;
-}
-
-.input-group{
-	margin: 15px 0px;
-}
-</style>
 </head>
 <body>
  <div class="wrap">
@@ -114,13 +27,16 @@
 			<div class="meetings-layout">
 			    <div class="main-content">
 			        <div class="card">
-						<h4> ❓ 문의하기 </h4>
+			        	<div class="body-title">
+							<h4> ❓ 문의하기 </h4>
+						</div>
 		    
-		   			 	<div class="stats-grid row">
+		   			 	<div class="body-main stats-grid row">
+		   			 	<div class="col-md-12 text-start">
 							<div class="col-md-4 text-start">
 								<form name="searchForm" class="input-group">
 									<input type="text" name="kwd" value="${kwd}" class="form-control rounded me-1" placeholder="검색어를 입력하세요">
-									<button type="button" class="btn btn-light rounded" onclick="searchList();"><i class="bi bi-search"></i></button>
+									<button type="button" class="btn btn-outline rounded" onclick="searchList();"><i class="bi bi-search"></i></button>
 								</form>							
 							</div>
 							<div class="col-auto">&nbsp;</div>
@@ -160,6 +76,7 @@
 						<div class="page-navigation">
 							${dataCount == 0 ? "등록된 게시물이 없습니다." : paging}
 						</div>
+					</div>
 					</div>
 				</div>
 			</div>
