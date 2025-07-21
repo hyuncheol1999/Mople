@@ -8,6 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>모플 - 운동으로 만나다</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />  
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/board.css" type="text/css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/paginate.css" type="text/css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/meeting.css" type="text/css">
     <style>
@@ -63,7 +64,7 @@
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 20px;
-			margin-left: 220px;
+            margin: 0px 150px;
         }
         .card h4 {
             margin-top: 0;
@@ -81,7 +82,24 @@
             border-radius: 8px;
             text-align: center;
         }
-    </style>
+  
+.board-list-footer .form-select{
+	width: 110px;
+}      
+  
+.board-list-footer .form-select,
+.board-list-footer .form-control,
+.board-list-footer .btn {
+    height: 40px;
+    font-size: 16px;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+
+.board-list-footer .btn i {
+    vertical-align: middle;
+}
+</style>
 </head>
 <body>
  <div class="wrap">
@@ -94,7 +112,7 @@
 			<div class="meetings-layout">
 			    <div class="main-content">
 			        <div class="card">
-						<h4><i class="bi bi-whatsapp"></i> 문의하기 </h4>
+						<h4> ❓ 문의하기 </h4>
 		    
 		   			 	<div class="stats-grid row">
 						<div class="body-main">
@@ -151,7 +169,7 @@
 				
 							<div class="row board-list-footer">
 								<div class="col">
-									<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/qna/list';" title="새로고침"><i class="bi bi-arrow-counterclockwise"></i></button>
+									<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/qna/list';" title="새로고침">새로고침</button>
 								</div>
 								<div class="col-6 d-flex justify-content-center">
 									<form class="row" name="searchForm">
@@ -168,12 +186,12 @@
 											<input type="text" name="kwd" value="${kwd}" class="form-control">
 										</div>
 										<div class="col-auto p-1">
-											<button type="button" class="btn btn-light" onclick="searchList()"> <i class="bi bi-search"></i> </button>
+											<button type="button" class="btn btn-outline rounded" onclick="searchList()">검색</button>
 										</div>
 									</form>
 								</div>
 								<div class="col text-end">
-									<button type="button" class="btn btn-light" onclick="location.href='${pageContext.request.contextPath}/qna/write';">문의등록</button>
+									<button type="button" class="btn btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/qna/write';">문의등록</button>
 								</div>
 							</div>
 							

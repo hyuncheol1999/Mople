@@ -33,4 +33,27 @@ public class MeetingManagerController {
 		
 		return mav;
 	}
+	
+	
+	@RequestMapping(value = "/admin/meeting/delete", method = RequestMethod.GET)
+	public ModelAndView memberList(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		MeetingDAO dao = new MeetingDAO();
+		
+		try {
+			long num = Long.parseLong(req.getParameter("meetingIdx"));
+			
+			MeetingDTO dto = dao.findByMeeetingIdx(num);
+			
+			if (dto == null) {
+				return new ModelAndView("redirect:/admin/meeting/list");
+			}
+			
+			dao.deleteMeeting(num);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return new ModelAndView("redirect:/admin/meeting/list");
+	}
 }

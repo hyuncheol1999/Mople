@@ -80,7 +80,21 @@
             border-radius: 8px;
             text-align: center;
         }
-    </style>
+.btn {
+    height: 40px;
+    font-size: 16px;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+.btn i {
+    vertical-align: middle;
+}
+
+.body-title,
+.body-main{
+	padding-left: 350px;
+}
+</style>
     
 <style type="text/css">
 .min-h-150 {

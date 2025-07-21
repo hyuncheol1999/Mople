@@ -12,10 +12,13 @@ import com.mopl.dao.MeetingAlbumDAO;
 import com.mopl.dao.MeetingDAO;
 import com.mopl.dao.MemberDAO;
 import com.mopl.dao.MemberOfMeetingDAO;
+import com.mopl.dao.RegularMeetingDAO;
 import com.mopl.model.BoardDTO;
 import com.mopl.model.MeetingAlbumDTO;
 import com.mopl.model.MeetingDTO;
 import com.mopl.model.MemberDTO;
+import com.mopl.model.MemberOfMeetingDTO;
+import com.mopl.model.RegularMeetingDTO;
 import com.mopl.model.SessionInfo;
 import com.mopl.mvc.annotation.Controller;
 import com.mopl.mvc.annotation.RequestMapping;
@@ -111,6 +114,13 @@ public class MemberController {
 		ModelAndView mav = new ModelAndView("member/member");
 		mav.addObject("mode", "account");
 		return mav;
+	}
+	
+	@RequestMapping(value = "/member/withdrawal", method = RequestMethod.GET)
+	public String withdrawal(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 회원탈퇴 완료
+		
+		return "member/withdrawal";
 	}
 
 	@RequestMapping(value = "/member/account", method = RequestMethod.POST)
@@ -253,10 +263,17 @@ public class MemberController {
 	@RequestMapping(value = "/member/pwd", method = RequestMethod.POST)
 	public ModelAndView pwdSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 패스워드 확인
+		ModelAndView mav = new ModelAndView("redirect:/member/withdrawal");
 		MemberDAO dao = new MemberDAO();
+		MeetingDAO meetingDao = new MeetingDAO();
+		MeetingAlbumDAO meetingAlbumDao = new MeetingAlbumDAO();
+		FileManager fileManager = new FileManager();
 		
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		
+		String root = session.getServletContext().getRealPath("/");
+		String pathname = root + "uploads" + File.separator + "member";
 		
 		try {
 			MemberDTO dto = dao.findById(info.getUserId());
@@ -269,27 +286,66 @@ public class MemberController {
 			String mode = req.getParameter("mode");
 			
 			if(! dto.getUserPwd().equals(userPwd)) {
-				ModelAndView mav = new ModelAndView("member/pwd");
+				ModelAndView mav3 = new ModelAndView("member/pwd");
 				
-				mav.addObject("mode", mode);
-				mav.addObject("message", "패스워드가 일치하지 않습니다.");
+				mav3.addObject("mode", mode);
+				mav3.addObject("message", "패스워드가 일치하지 않습니다.");
+				
+				return mav3;
+			}
+
+			// 회원 탈퇴
+			if(mode.equals("delete")) {
+				// 가입한 모임이 있으면
+				MemberOfMeetingDAO memberOfMeetingDao = new MemberOfMeetingDAO();
+				if(memberOfMeetingDao.isMeetingMember(info.getMemberIdx())) {
+					List<MemberOfMeetingDTO> list2 = memberOfMeetingDao.findByMemberIdx(info.getMemberIdx());
+					for(MemberOfMeetingDTO dto2 : list2) {
+						// 탈퇴하는 회원이 모임장이면
+						if(dto2.getRole() == 0) {
+							MeetingDTO meetingDto = meetingDao.findByMeeetingIdx(dto2.getMeetingIdx());
+				
+							long meetingIdx = meetingDto.getMeetingIdx();
+							List<MeetingAlbumDTO> list = meetingAlbumDao.findByMeeetingIdx(meetingIdx);
+							
+							// 모임 해체
+							meetingDao.deleteMeeting(meetingIdx);
+							
+							// 모임 프로필 사진 삭제
+							fileManager.doFiledelete(pathname, meetingDto.getMeetingProfilePhoto());
+							
+							// 모임 사진첩 사진 삭제
+							pathname = root + "uploads" + File.separator + "meetingAlbum";
+							for(MeetingAlbumDTO albumDTO : list) {
+								fileManager.doFiledelete(pathname, albumDTO.getImageFileName());
+							}				
+						} else {
+							// 참여하고 있던 모임 탈퇴
+							memberOfMeetingDao.leaveMeeting(dto2);					
+						}
+					}					
+				}
+				dao.deleteMember(info.getMemberIdx());
+				
+				// 회원 프로필사진 삭제
+				fileManager.doFiledelete(pathname, dto.getProfilePhoto());
+				
+				// member라는 이름으로 세션에 저장된 속성 삭제
+				session.removeAttribute("member");
+				
+				// 세션에 저장된 모든 속성을 지우고, 세션을 초기화
+				session.invalidate();
 				
 				return mav;
-			}
-			
-			if(mode.equals("delete")) {
-				// 회원 탈퇴
-				
-				return new ModelAndView("redirect:/");
 			} 
 			
 			// 정보수정 화면
-			ModelAndView mav = new ModelAndView("member/member");
+			ModelAndView mav2 = new ModelAndView("member/member");
 			
-			mav.addObject("dto", dto);
-			mav.addObject("mode", "update");
+			mav2.addObject("dto", dto);
+			mav2.addObject("mode", "update");
 			
-			return mav;
+			return mav2;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -343,7 +399,7 @@ public class MemberController {
 			info.setProfilePhoto(dto.getProfilePhoto());
 			
 			session.setAttribute("mode", "update");
-			session.setAttribute("userName", dto.getUserName());
+			session.setAttribute("userName", info.getUserName());
 			
 			return new ModelAndView("redirect:/member/complete");
 		} catch (Exception e) {
@@ -401,6 +457,7 @@ public class MemberController {
 		ModelAndView mav = new ModelAndView("member/myPage");
 		MemberDAO dao = new MemberDAO();
 		MeetingDAO meetingDAO = new MeetingDAO();
+		RegularMeetingDAO regularMeetingDAO = new RegularMeetingDAO();
 		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 		BoardDAO boardDAO = new BoardDAO();
 		MeetingAlbumDAO meetingAlbumDAO = new MeetingAlbumDAO();
@@ -415,7 +472,8 @@ public class MemberController {
 				dto = dao.findByMemberIdx(info.getMemberIdx());
 				List<MeetingDTO> myMeetingList = meetingDAO.findByMemberIdx(info.getMemberIdx());
 				List<BoardDTO> myBoardList = boardDAO.findByMemberIdx(info.getMemberIdx());
-				List<MeetingAlbumDTO> myMeetingAlbumList = meetingAlbumDAO.findByMemberIdx(info.getMemberIdx());				
+				List<MeetingAlbumDTO> myMeetingAlbumList = meetingAlbumDAO.findByMemberIdx(info.getMemberIdx());
+				List<RegularMeetingDTO> myRegularMeetingList = regularMeetingDAO.findByMemberIdx(info.getMemberIdx());
 			
 			
 				for (MeetingDTO meetingDto : myMeetingList) {
@@ -427,6 +485,7 @@ public class MemberController {
 				mav.addObject("myMeetingList", myMeetingList);
 				mav.addObject("myBoardList", myBoardList);
 				mav.addObject("myMeetingAlbumList", myMeetingAlbumList);
+				mav.addObject("myRegularMeetingList", myRegularMeetingList);
 			}
 			
 			mav.addObject("dto", dto);

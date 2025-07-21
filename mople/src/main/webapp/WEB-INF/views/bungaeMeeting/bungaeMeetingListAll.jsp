@@ -22,7 +22,7 @@
 		</aside>
 
 		<div class="container">
-			<h2>🔥 전체 번개모임 리스트</h2>
+			<h2>🔥 전체 번개모임 </h2>
 
 			<!-- 검색창 -->
 			<form method="get" action="${pageContext.request.contextPath}/bungaeMeeting/bungaeListAll" style="margin-bottom: 20px;">

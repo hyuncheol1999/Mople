@@ -767,6 +767,25 @@ footer {
 /* ========================
    반응형 디자인
    ======================== */
+   
+@media ( max-width : 1050px) {
+	.board-wrapper, .view-container {
+		padding: 100px 1rem 3rem;
+	}
+	.board-item {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	.board-item-img {
+		width: 100%;
+		height: auto;
+		margin-top: 0.8rem;
+	}
+	.view-title {
+		font-size: 1.5rem;
+	}
+}
+
 @media ( max-width : 768px) {
 	.board-wrapper, .view-container {
 		padding: 100px 1rem 3rem;

@@ -1,8 +1,6 @@
 package com.mopl.controller;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +10,8 @@ import com.mopl.dao.RegionCategoryDAO;
 import com.mopl.dao.RegularMeetingDAO;
 import com.mopl.dao.SportCategoryDAO;
 import com.mopl.model.BungaeMeetingDTO;
-import com.mopl.model.MeetingDTO;
 import com.mopl.model.MemberOfBungaeMeetingDTO;
 import com.mopl.model.RegionCategoryDTO;
-import com.mopl.model.RegularMeetingDTO;
 import com.mopl.model.SessionInfo;
 import com.mopl.model.SportCategoryDTO;
 import com.mopl.mvc.annotation.Controller;
@@ -32,87 +28,101 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class BungaeMeetingController {
-	/*
-		// 번개모임 전용 리스트 페이지
-		@RequestMapping(value = "/bungaeMeeting/bungaeMeetingList", method = RequestMethod.GET)
-		public ModelAndView bungaeMeetingList(HttpServletRequest req, HttpServletResponse resp)
-				throws ServletException, IOException {
-			ModelAndView mav = new ModelAndView("bungaeMeeting/bungaeMeetingList");
+	@RequestMapping(value = "/bungaeMeeting/home", method = RequestMethod.GET)
+	public ModelAndView home(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+	    ModelAndView mav = new ModelAndView("bungaeMeeting/bungaeMeetingHome");
 
-			BungaeMeetingDAO dao = new BungaeMeetingDAO();
-			SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
-			RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
-			MyUtil util = new MyUtil();
+	    String keyword    = defaultString(req.getParameter("q"), "");
+	    String searchType = defaultString(req.getParameter("searchType"), "all"); 
 
-			try {
-				String page = req.getParameter("page");
-				int current_page = 1;
+	    RegularMeetingDAO regularMeetingDAO = new RegularMeetingDAO();
+	    BungaeMeetingDAO  bungaeMeetingDAO  = new BungaeMeetingDAO();
 
-				// 처음 접속
-				if (page != null) {
-					current_page = Integer.parseInt(page);
-				}
+	    try {
+	        var urgentRegularMeetings = regularMeetingDAO.selectUrgentRegularMeetings(keyword);
+	        var weeklyBungaeMeetings = bungaeMeetingDAO.selectWeeklyBungaeMeetings(keyword, searchType);
 
-				int sportCategory = Integer.parseInt(req.getParameter("sportCategory"));
-				int regionCategory = Integer.parseInt(req.getParameter("regionCategory"));
-				String sortBy = req.getParameter("sortBy");
+	        mav.addObject("urgentRegularMeetings", urgentRegularMeetings);
+	        mav.addObject("weeklyBungaeMeetings", weeklyBungaeMeetings);
+	        mav.addObject("dowFormatterPattern", "E"); 
+	        mav.addObject("q", keyword);
+	        mav.addObject("search", keyword);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return mav;
+	}
 
-				int dataCount;
-				if (sportCategory == 0 && regionCategory == 0) {
-					dataCount = dao.dataCount();
-				} else {
-					dataCount = dao.dataCount(sportCategory, regionCategory);
-				}
 
-				int size = 18;
-				int total_page = util.pageCount(dataCount, size);
+    // 2) 번개모임 전체 리스트 
+    @RequestMapping(value = "/bungaeMeeting/list", method = RequestMethod.GET)
+    public ModelAndView list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ModelAndView mav = new ModelAndView("bungaeMeeting/bungaeMeetingList");
 
-				if (current_page > total_page) {
-					current_page = total_page;
-				}
+        BungaeMeetingDAO dao = new BungaeMeetingDAO();
+        SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
+        RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
+        MyUtil util = new MyUtil();
 
-				int offset = (current_page - 1) * size;
-				if (offset < 0)
-					offset = 0;
+        try {
+            int currentPage   = parseIntOrDefault(req.getParameter("page"), 1);
+            int sportCategory = parseIntOrDefault(req.getParameter("sportCategory"), 0);
+            int regionCategory= parseIntOrDefault(req.getParameter("regionCategory"), 0);
+            String sortBy     = defaultString(req.getParameter("sortBy"), "latest");
 
-				List<BungaeMeetingDTO> list = dao.findAllBungaeMeetings(offset, size, sportCategory, regionCategory, sortBy);
+            int dataCount = (sportCategory == 0 && regionCategory == 0)?dao.dataCount(): dao.dataCount(sportCategory, regionCategory);
 
-				List<SportCategoryDTO> sportCategoryList = sportCategoryDao.findAllSportCategory();
-				List<RegionCategoryDTO> regionCategoryList = regionCategoryDao.findAllRegionCategory();
+            int size = 18;
+            int totalPage = util.pageCount(dataCount, size);
+            if (totalPage == 0) totalPage = 1;
+            if (currentPage > totalPage) currentPage = totalPage;
 
-				String query = "sportCategory=" + sportCategory + "&regionCategory=" + regionCategory + "&sortBy=" + sortBy;
+            int offset = (currentPage - 1) * size;
+            if (offset < 0) offset = 0;
 
-				String cp = req.getContextPath();
+            List<BungaeMeetingDTO> list =
+                    dao.findAllBungaeMeetings(offset, size, sportCategory, regionCategory, sortBy);
 
-				String listUrl = cp + "/bungaeMeeting/bungaeMeetingList?" + query;
-				String articleUrl = cp + "/bungaeMeeting/bungaeMeetingDetail?page=" + current_page + "&" + query;
+            for (BungaeMeetingDTO dto : list) {
+                dto.setSubject(util.htmlSymbols(dto.getSubject()));
+                dto.setContent(util.htmlSymbols(dto.getContent()));
+            }
 
-				String paging = util.paging(current_page, total_page, listUrl);
+            List<SportCategoryDTO> sportCategoryList = sportCategoryDao.findAllSportCategory();
+            List<RegionCategoryDTO> regionCategoryList = regionCategoryDao.findAllRegionCategory();
 
-				mav.addObject("list", list);
-				mav.addObject("sportCategoryList", sportCategoryList);
-				mav.addObject("regionCategoryList", regionCategoryList);
-				mav.addObject("dataCount", dataCount);
-				mav.addObject("size", size);
-				mav.addObject("page", current_page);
-				mav.addObject("total_page", total_page);
-				mav.addObject("articleUrl", articleUrl);
-				mav.addObject("paging", paging);
-				mav.addObject("sportCategory", sportCategory);
-				mav.addObject("regionCategory", regionCategory);
-				mav.addObject("sortBy", sortBy);
+            String query = "sportCategory=" + sportCategory + "&regionCategory=" + regionCategory + "&sortBy=" + sortBy;
+            String cp = req.getContextPath();
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+            String listUrl    = cp + "/bungaeMeeting/bungaeMeetingDetail?" + query;
+            String detailUrl  = cp + "/bungaeMeeting/detail?page=" + currentPage + "&" + query;
+            String paging = util.paging(currentPage, totalPage, listUrl);
 
-			return mav;
-		}
-		*/
+            mav.addObject("list", list);
+            mav.addObject("sportCategoryList", sportCategoryList);
+            mav.addObject("regionCategoryList", regionCategoryList);
+
+            mav.addObject("dataCount", dataCount);
+            mav.addObject("size", size);
+            mav.addObject("page", currentPage);
+            mav.addObject("total_page", totalPage);
+            mav.addObject("articleUrl", detailUrl);
+            mav.addObject("paging", paging);
+
+            mav.addObject("sportCategory", sportCategory);
+            mav.addObject("regionCategory", regionCategory);
+            mav.addObject("sortBy", sortBy);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return mav;
+    }
+
 	// 번개모임 생성 폼
 		@RequestMapping(value = "/bungaeMeeting/bungaeMeetingCreate", method = RequestMethod.GET)
-		public ModelAndView meetingCreateForm(HttpServletRequest req, HttpServletResponse resp)
-				throws ServletException, IOException {
+		public ModelAndView meetingCreateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 			ModelAndView mav = new ModelAndView("bungaeMeeting/bungaeMeetingCreate");
 			SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
 			RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
@@ -131,40 +141,68 @@ public class BungaeMeetingController {
 			return mav;
 		}
 
-
 		// 번개모임 생성
-		@RequestMapping(value = "/bungaeMeeting/bungaeMeetingCreate", method = RequestMethod.POST)
+		@RequestMapping(value="/bungaeMeeting/bungaeMeetingCreate", method=RequestMethod.POST)
 		public ModelAndView meetingCreateSubmit(HttpServletRequest req, HttpServletResponse resp)
-				throws ServletException, IOException {
-			BungaeMeetingDAO dao = new BungaeMeetingDAO();
+		        throws ServletException {
 
-			HttpSession session = req.getSession();
-			SessionInfo info = (SessionInfo) session.getAttribute("member");
+		    HttpSession session = req.getSession(false);
+		    SessionInfo info = (session != null) ? (SessionInfo) session.getAttribute("member") : null;
+		    if (info == null) throw new ServletException("LOGIN_REQUIRED");
 
-			try {
-				BungaeMeetingDTO dto = new BungaeMeetingDTO();
-				dto.setSubject(req.getParameter("subject"));
-				dto.setContent(req.getParameter("content"));
-				dto.setStartDate(req.getParameter("startDate"));
-				dto.setStartDate(req.getParameter("endDate"));
-				dto.setPlace(req.getParameter("place"));
-				dto.setCapacity(Integer.parseInt(req.getParameter("capacity")));
-				
-				dto.setBungaeMemberIdx(info.getMemberIdx());
-				
-				dao.insertBungaeMeeting(dto);
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		    String subject   = req.getParameter("subject");
+		    String content   = req.getParameter("content");
+		    String startRaw  = req.getParameter("startDate");
+		    String endRaw    = req.getParameter("endDate");
+		    String place     = req.getParameter("place");
+		    String capacityS = req.getParameter("capacity");
+		    String catS      = req.getParameter("categoryIdx");
+		    String regS      = req.getParameter("regionIdx");
+  
+		    java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+		    java.time.LocalDateTime start, end;
+		    try {
+		        start = java.time.LocalDateTime.parse(startRaw, fmt);
+		        end   = java.time.LocalDateTime.parse(endRaw, fmt);
+		    } catch (Exception pe) {
+		        pe.printStackTrace();
+		        throw new ServletException("DATETIME_PARSE_FAIL", pe);
+		    }
+		    if (end.isBefore(start)) throw new ServletException("END_BEFORE_START");
 
-			return new ModelAndView("redirect:/bungaeMeeting/home?sportCategory=0&regionCategory=0");
+		    int capacity, categoryIdx, regionIdx;
+		    try {
+		        capacity   = Integer.parseInt(capacityS);
+		        categoryIdx = Integer.parseInt(catS);
+		        regionIdx   = Integer.parseInt(regS);
+		    } catch (NumberFormatException nfe) {
+		        throw new ServletException("NUMBER_PARSE_FAIL", nfe);
+		    }
+
+		    BungaeMeetingDTO dto = new BungaeMeetingDTO();
+		    dto.setSubject(subject);
+		    dto.setContent(content);
+		    dto.setStartDate(start);
+		    dto.setEndDate(end);
+		    dto.setPlace(place);
+		    dto.setCapacity(capacity);
+		    dto.setCategoryIdx(categoryIdx);
+		    dto.setRegionIdx(regionIdx);
+		    dto.setBungaeMemberIdx(info.getMemberIdx());
+
+		    try {
+		        new BungaeMeetingDAO().insertBungaeMeeting(dto);
+		    } catch (Exception e) {		      
+		        e.printStackTrace();
+		    }
+		    return new ModelAndView("redirect:/bungaeMeeting/home");
 		}
+
+
 		
 		// 번개모임 수정 폼
 		@RequestMapping(value = "/bungaemeeting/bungaeMeetingUpdate", method = RequestMethod.GET)
-		public ModelAndView meetingUpdateForm(HttpServletRequest req, HttpServletResponse resp)
-				throws ServletException, IOException {
+		public ModelAndView meetingUpdateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 			ModelAndView mav = new ModelAndView("bungaemeeting/bungaeMeetingCreate");
 			SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
 			RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
@@ -190,23 +228,20 @@ public class BungaeMeetingController {
 		
 		// 번개모임 수정
 		@RequestMapping(value = "/bungaemeeting/bungaeMeetingUpdate", method = RequestMethod.POST)
-		public ModelAndView meetingUpdateSubmit(HttpServletRequest req, HttpServletResponse resp)
-				throws ServletException, IOException {
+		public ModelAndView meetingUpdateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 			BungaeMeetingDAO dao = new BungaeMeetingDAO();
-
-			String bungaeMeetingIdxParam = req.getParameter("bungaeMeetingIdx");
+			long bungaeMeetingIdx = Long.parseLong(req.getParameter("bungaeMeetingIdx"));
+			
 			try {
 				BungaeMeetingDTO dto = new BungaeMeetingDTO();
-				dto.setBungaeMeetingIdx(Long.parseLong(bungaeMeetingIdxParam));
-				dto.setSubject(req.getParameter("subject"));
-				dto.setContent(req.getParameter("content"));
-				
+				dto = dao.findByBungaeMeetingIdx(bungaeMeetingIdx);
+
 				dao.updateBungaeMeeting(dto);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-			return new ModelAndView("redirect:/bungaeMeeting/bungaeMeetingDetail?sportCategory=0&regionCategory=0&bungaeMeetingIdx=" + bungaeMeetingIdxParam);
+			return new ModelAndView("redirect:/bungaeMeeting/bungaeMeetingDetail?sportCategory=0&regionCategory=0&bungaeMeetingIdx=" + bungaeMeetingIdx);
 		}
 		
 		// 번개모임 신청 승인
@@ -273,117 +308,82 @@ public class BungaeMeetingController {
 			return map;
 		}
 		
-		// 홈화면: 정기모임 임박 + 이번주 번개모임 표시
-		@RequestMapping(value = "/bungaeMeeting/bungaeMeetingList", method = RequestMethod.GET)
-		public ModelAndView bungaeMeetingHome(HttpServletRequest req, HttpServletResponse resp)
+		// 번개모임 상세
+		@RequestMapping(value = "/bungaeMeeting/detail", method = RequestMethod.GET)
+		public ModelAndView meetingDetail(HttpServletRequest req, HttpServletResponse resp)
 				throws ServletException, IOException {
-			ModelAndView mav = new ModelAndView("bungaeMeeting/bungaeMeetingList");
+			// 번개장인지아닌지 확인
+			ModelAndView mav = new ModelAndView("bungaeMeeting/bungaeMeetingDetail");
+			BungaeMeetingDAO dao = new BungaeMeetingDAO();
+			MemberOfBungaeMeetingDAO mDao = new MemberOfBungaeMeetingDAO();
 
-			RegularMeetingDAO rDao = new RegularMeetingDAO();
-			BungaeMeetingDAO bmDao = new BungaeMeetingDAO();
-			MemberOfBungaeMeetingDAO mbmDao = new MemberOfBungaeMeetingDAO();
-			SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
-			RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
-			MyUtil util = new MyUtil();
-			
-			String keyword = req.getParameter("search");
-			if (keyword == null) keyword = "";
+			BungaeMeetingDTO bungaeMeetingDto = null;
+
+			// 유저의 번개모임 참가 여부
+			String userStatus = "NOT_LOGIN";
+
+			HttpSession session = req.getSession();
+			SessionInfo info = (SessionInfo) session.getAttribute("member");
 
 			try {
-				String page = req.getParameter("page");
-				int current_page = 1;
-
-				// 처음 접속
-				if (page != null) {
-					current_page = Integer.parseInt(page);
+				// bungaeMeetingIdx 파라미터가 없을 경우
+				String param = req.getParameter("bungaeMeetingIdx");
+				if (param == null) {
+					return new ModelAndView("meeting/deletedMeeting");
 				}
-				
-				int sportCategory = Integer.parseInt(req.getParameter("sportCategory"));
-				int regionCategory = Integer.parseInt(req.getParameter("regionCategory"));
-				String sortBy = req.getParameter("sortBy");
-				
-				int dataCount;
-				if (sportCategory == 0 && regionCategory == 0) {
-					dataCount = bmDao.dataCount();
+
+				if (param != null && !param.isEmpty()) {
+					// 번개모임 정보
+					Long bungaeMeetingIdx = Long.parseLong(param);
+					bungaeMeetingDto = dao.findByBungaeMeetingIdx(bungaeMeetingIdx);
+
+					mav.addObject("bungaeMeetingIdx", bungaeMeetingIdx);
+					mav.addObject("subject", bungaeMeetingDto.getSubject());
+					mav.addObject("place", bungaeMeetingDto.getPlace());
+					mav.addObject("startDate", bungaeMeetingDto.getStartDate());					
+					mav.addObject("content", bungaeMeetingDto.getContent());
+					mav.addObject("sportName", bungaeMeetingDto.getSportName());
+					mav.addObject("regionName", bungaeMeetingDto.getRegionName());
+					// 대기인원 포함
+					mav.addObject("currentCnt", bungaeMeetingDto.getCurrentCnt());
+
+					if (info != null) {
+						userStatus = "NOT_JOINED";
+
+						MemberOfBungaeMeetingDAO mobDao = new MemberOfBungaeMeetingDAO();
+							// 번개장이면 
+							if (mobDao.isLeader(bungaeMeetingIdx, info.getMemberIdx())) {
+								userStatus = "HOST";
+							} else if (mobDao.isWaiting(bungaeMeetingIdx, info.getMemberIdx())) {
+								userStatus = "WAITING";
+							}
+						}
+
+					// 대기인원 제외 카운트
+					mav.addObject("memberCnt", mDao.findMemberCount(bungaeMeetingIdx));
+					mav.addObject("userStatus", userStatus);
+
 				} else {
-					dataCount = bmDao.dataCount(sportCategory, regionCategory);
+					System.out.println("meetingIdx 존재X");
 				}
 
-				int size = 18;
-				int total_page = util.pageCount(dataCount, size);
-
-				if (current_page > total_page) {
-					current_page = total_page;
-				}
-
-				int offset = (current_page - 1) * size;
-				if (offset < 0)
-					offset = 0;
-
-				List<RegularMeetingDTO> urgentRegularMeetings = rDao.selectUrgentRegularMeetings(keyword);
-				List<BungaeMeetingDTO> weeklyBungaeMeetings = bmDao.selectWeeklyBungaeMeetings(keyword);
-				
-				for (RegularMeetingDTO dto : urgentRegularMeetings) {
-					dto.setSubject(util.htmlSymbols(dto.getSubject()));
-					dto.setStartDate(util.htmlSymbols(dto.getStartDate()));				
-					dto.setPlace(util.htmlSymbols(dto.getPlace()));
-					dto.setCurrentCnt(mbmDao.findMemberCount(dto.getRegularMeetingIdx()));
-				}
-				
-				for(BungaeMeetingDTO dto : weeklyBungaeMeetings) {
-					dto.setSubject(util.htmlSymbols(dto.getSubject()));
-					dto.setContent(util.htmlSymbols(dto.getContent()));
-					dto.setStartDate(util.htmlSymbols(dto.getStartDate()));
-					dto.setEndDate(util.htmlSymbols(dto.getEndDate()));
-					dto.setPlace(util.htmlSymbols(dto.getPlace()));
-					dto.setCapacity(dto.getCapacity());
-					
-				}
-				
-				List<String> weekDates = new ArrayList<>();
-				LocalDate today = LocalDate.now();
-				for (int i = 0; i < 7; i++) {
-					weekDates.add(today.plusDays(i).toString());
-				}
-				
-				List<SportCategoryDTO> sportCategoryList = sportCategoryDao.findAllSportCategory();
-				List<RegionCategoryDTO> regionCategoryList = regionCategoryDao.findAllRegionCategory();
-
-				String query = "sportCategory=" + sportCategory + "&regionCategory=" + regionCategory + "&sortBy=" + sortBy;
-
-				String cp = req.getContextPath();
-
-				String listUrl = cp + "/meeting/meetingList?" + query;
-				String articleUrl = cp + "/meeting/meetingDetail?page=" + current_page + "&" + query;
-
-				String paging = util.paging(current_page, total_page, listUrl);
-
-				mav.addObject("list", urgentRegularMeetings);
-				mav.addObject("list2", weeklyBungaeMeetings);
-				mav.addObject("sportCategoryList", sportCategoryList);
-				mav.addObject("regionCategoryList", regionCategoryList);
-				mav.addObject("dataCount", dataCount);
-				mav.addObject("size", size);
-				mav.addObject("page", current_page);
-				mav.addObject("total_page", total_page);
-				mav.addObject("articleUrl", articleUrl);
-
-				mav.addObject("paging", paging);
-
-				mav.addObject("sportCategory", sportCategory);
-				mav.addObject("regionCategory", regionCategory);
-				mav.addObject("sortBy", sortBy);
-
-				
-				mav.addObject("urgentRegularMeetings", urgentRegularMeetings);
-				mav.addObject("weeklyBungaeMeetings", weeklyBungaeMeetings);
-				mav.addObject("weekDates", weekDates);
-				mav.addObject("search", keyword);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 			return mav;
 		}
-}
 
+		
+		
+
+	    private int parseIntOrDefault(String param, int def) {
+	        try {
+	            return (param == null || param.isBlank()) ? def : Integer.parseInt(param);
+	        } catch (NumberFormatException e) {
+	            return def;
+	        }
+	    }
+	    private String defaultString(String val, String def) {
+	        return (val == null) ? def : val;
+	    }
+	}

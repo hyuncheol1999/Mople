@@ -57,6 +57,52 @@ public class MemberOfMeetingDAO {
 		return list;
 	}
 	
+	// 회원이 참여한 모임
+	public List<MemberOfMeetingDTO> findByMemberIdx(long memberIdx) {
+		List<MemberOfMeetingDTO> list = new ArrayList<MemberOfMeetingDTO>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append("SELECT meetingIdx, mom.memberIdx, mom.role, userName, userNickName, profilePhoto, COUNT(mom.memberIdx) AS memberCount ");
+			sb.append("FROM memberOfMeeting mom ");
+			sb.append("LEFT OUTER JOIN member1 m1 ON mom.memberIdx = m1.memberIdx ");
+			sb.append("LEFT OUTER JOIN member2 m2 ON mom.memberIdx = m2.memberIdx ");
+			sb.append("WHERE mom.memberIdx = ? AND mom.role != 2 ");
+			sb.append("GROUP BY meetingIdx, mom.memberIdx, mom.role, userName, userNickName, profilePhoto ");
+			sb.append("ORDER BY mom.role");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setLong(1, memberIdx);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				MemberOfMeetingDTO dto = new MemberOfMeetingDTO();
+				dto.setMeetingIdx(rs.getLong("meetingIdx"));
+				dto.setMemberIdx(rs.getLong("memberIdx"));
+				dto.setRole(rs.getInt("role"));
+				dto.setMemberName(rs.getString("userName"));
+				dto.setMemberNickName(rs.getString("userNickName"));
+				dto.setMemberProfilePhoto(rs.getString("profilePhoto"));
+				
+				list.add(dto);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+		
+		return list;
+	}
+	
+	
+	
 	// 승인 대기 인원 조회
 	public List<MemberOfMeetingDTO> findWaitingList(long meetingIdx) {
 		List<MemberOfMeetingDTO> list = new ArrayList<MemberOfMeetingDTO>();
@@ -131,6 +177,43 @@ public class MemberOfMeetingDAO {
 		}
 		
 		return waitingCount;
+	}
+	
+	// 회원의 전체 모임 가입 여부
+	public boolean isMeetingMember(long memberIdx) {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+		
+		boolean result = false;
+		
+		try {
+			sb.append("SELECT COUNT(*) count ");
+			sb.append("FROM memberOfMeeting mom ");
+			sb.append("LEFT OUTER JOIN member1 m1 ON mom.memberIdx = m1.memberIdx ");
+			sb.append("LEFT OUTER JOIN member2 m2 ON mom.memberIdx = m2.memberIdx ");
+			sb.append("WHERE mom.memberIdx = ?");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setLong(1, memberIdx);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				if(rs.getInt(1) > 0) {
+					result = true;
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.close(rs);
+			DBUtil.close(pstmt);
+		}
+		
+		return result;
 	}
 	
 	

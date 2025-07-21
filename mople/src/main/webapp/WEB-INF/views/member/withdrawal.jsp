@@ -15,23 +15,21 @@
 		<jsp:include page="/WEB-INF/views/layout/header.jsp"/>
     </header>
 	<jsp:include page="/WEB-INF/views/layout/login.jsp"/>
-
 <main>
 	<div class="container">
 		<div class="body-container row justify-content-center">
 			<div class="col-md-6 my-5 p-3">
 
-	            <div class="border mt-5 p-4">
-	                <h4 class="text-center fw-bold">${title}</h4>
-	                <hr class="mt-4">
-	
+	            <div class="border mt-5 p-5">
 	                <div class="d-grid pt-3">
-	                   <p class="text-center">${message}</p>
+	                    <p class="text-center mb-4">
+	                        <strong>회원탈퇴가 완료되었습니다.</strong>
+	                    </p>
 	                </div>
 	
 	                <div class="d-grid">
-	                    <button type="button" class="btn btn-lg btn-primary" onclick="location.href='${pageContext.request.contextPath}/';">
-	                        메인화면 <i class="bi bi-arrow-counterclockwise"></i>
+	                    <button type="button" class="btn btn-lg btn-primary" onclick="location.href='${pageContext.request.contextPath}/main';">
+	                        메인화면으로 이동 <i class="bi bi-arrow-counterclockwise"></i>
 	                    </button>
 	                </div>
 	            </div>
@@ -41,11 +39,9 @@
 	</div>
 </main>
 
-<footer>
-	<jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
-</footer>
-
-<jsp:include page="/WEB-INF/views/layout/footerResources.jsp"/>
-
+	<footer>
+		<jsp:include page="/WEB-INF/views/layout/footer.jsp" />
+	</footer>
+	<jsp:include page="/WEB-INF/views/layout/footerResources.jsp" />
 </body>
 </html>

@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +15,13 @@ import com.mopl.util.DBUtil;
 
 public class BungaeMeetingDAO {
 	private Connection conn = DBConn.getConnection();
-
+	
+	private LocalDateTime ts(ResultSet rs, String col) throws SQLException {
+        Timestamp t = rs.getTimestamp(col);
+        return t != null ? t.toLocalDateTime() : null;
+    }
+	
+	// 번개모임 생성
 	public void insertBungaeMeeting(BungaeMeetingDTO dto) throws SQLException {
 		PreparedStatement pstmt = null;
 		StringBuilder sb = new StringBuilder();
@@ -21,16 +29,15 @@ public class BungaeMeetingDAO {
 		try {
 			conn.setAutoCommit(false);
 
-			sb.append(
-					"INSERT INTO bungaeMeeting(bungaeMeetingIdx, subject, content, startDate, endDate, place, capacity, status, categoryIdx, regionIdx, bungaeMemberIdx) ");
-			sb.append("VALUES(bungaeMeeting_seq.NEXTVAL, ?, ?, ?, ?, ?, ?,0,?,?,?)");
+			sb.append( "INSERT INTO bungaeMeeting(bungaeMeetingIdx, subject, content, startDate, endDate, place, capacity, status, categoryIdx, regionIdx, bungaeMemberIdx) ");
+			sb.append( " VALUES (bungaeMeeting_seq.NEXTVAL, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)");		        
 
 			pstmt = conn.prepareStatement(sb.toString());
 
 			pstmt.setString(1, dto.getSubject());
 			pstmt.setString(2, dto.getContent());
-			pstmt.setString(3, dto.getStartDate());
-			pstmt.setString(4, dto.getEndDate());
+			pstmt.setTimestamp(3, Timestamp.valueOf(dto.getStartDate()));
+	        pstmt.setTimestamp(4, Timestamp.valueOf(dto.getEndDate()));
 			pstmt.setString(5, dto.getPlace());
 			pstmt.setInt(6, dto.getCapacity());
 			pstmt.setInt(7, dto.getCategoryIdx());
@@ -43,11 +50,13 @@ public class BungaeMeetingDAO {
 			pstmt = null;
 			sb = new StringBuilder();
 
-			sb.append("INSERT INTO memberOfBungaeMeeting(bungaeMeetingIdx, bungaeMemberIdx) ");
-			sb.append("VALUES(bungaeMeetingIdx_seq.CURRVAL, ?)");
+			sb.append("INSERT INTO memberOfBungaeMeeting(bungaeMeetingIdx, memberIdx, role)" );
+			sb.append(" VALUES (bungaeMeeting_seq.CURRVAL, ?, 0)");
 
 			pstmt = conn.prepareStatement(sb.toString());
-
+			
+			pstmt.setLong(1, dto.getBungaeMemberIdx());
+			
 			pstmt.executeUpdate();
 
 			conn.commit();
@@ -145,10 +154,10 @@ public class BungaeMeetingDAO {
 
 		try {
 			sb.append(
-					"SELECT bm.bungaeMeetingIdx, startDate, endDate, place, capacity, subject, content, status, sportName, regionName, bungaeMemberIdx, COUNT(mb.bungaeMemberIdx) currentMembers");
+					"SELECT bm.bungaeMeetingIdx, bm.startDate, bm.endDate, bm.place, bm.capacity, bm.subject, bm.content, status, sportName, regionName, bm.bungaeMemberIdx, COUNT(mb.bungaeMemberIdx) currentCnt");
 			sb.append(" FROM bungaeMeeting bm ");
 			sb.append(" LEFT OUTER JOIN memberOfBungaeMeeting mb ON bm.bungaeMeetingIdx = mb.bungaeMeetingIdx ");
-			sb.append(" LEFT OUTER JOIN member1 m1 ON b.memberIdx = m1.memberIdx ");
+			sb.append(" LEFT OUTER JOIN member1 m1 ON bm.bungaeMemberIdx = m1.memberIdx ");
 			sb.append(" LEFT OUTER JOIN sportCategory s ON bm.categoryIdx = s.sportIdx ");
 			sb.append(" LEFT OUTER JOIN regionCategory r ON bm.regionIdx = r.regionIdx ");
 
@@ -162,7 +171,7 @@ public class BungaeMeetingDAO {
 			}
 
 			sb.append(
-					"GROUP BY bm.bungaeMeetingIdx, startDate, endDate, place, capacity, subject, content, status, s.sportIdx, r.regionIdx, bungaeMemberIdx ");
+					"GROUP BY bm.bungaeMeetingIdx, bm.startDate, bm.endDate, bm.place, bm.capacity, bm.subject, bm.content, status, s.sportIdx, r.regionIdx, bm.bungaeMemberIdx ");
 			sb.append("OFFSET ? ROWS FETCH FIRST ? ROWS ONLY");
 
 			// 정렬기준 생략 했음
@@ -192,15 +201,15 @@ public class BungaeMeetingDAO {
 			while (rs.next()) {
 				BungaeMeetingDTO dto = new BungaeMeetingDTO();
 				dto.setBungaeMeetingIdx(rs.getLong("bungaeMeetingIdx"));
-				dto.setStartDate(rs.getString("startDate"));
-				dto.setEndDate(rs.getString("endDate"));
+				dto.setStartDate(ts(rs, "startDate"));
+                dto.setEndDate(ts(rs, "endDate"));
 				dto.setPlace(rs.getString("place"));
 				dto.setCapacity(rs.getInt("capacity"));
 				dto.setSubject(rs.getString("subject"));
 				dto.setContent(rs.getString("content"));
 				dto.setSportName(rs.getString("sportName"));
 				dto.setRegionName(rs.getString("regionName"));
-				dto.setCurrentMembers(rs.getInt("currentMembers"));
+				dto.setCurrentCnt(rs.getInt("currentCnt"));
 
 				list.add(dto);
 			}
@@ -227,7 +236,7 @@ public class BungaeMeetingDAO {
 
 		try {
 			sb.append(
-					"SELECT bm.bungaeMeetingIdx, startDate, endDate, place, capacity, subject, content, status, sportName, regionName, bungaeMemberIdx, COUNT(mb.bungaeMemberIdx) currentMembers ");
+					"SELECT bm.bungaeMeetingIdx, startDate, endDate, place, capacity, subject, content, status, sportName, regionName, bungaeMemberIdx, COUNT(mb.bungaeMemberIdx) currentCnt ");
 			sb.append(" FROM bungaeMeeting bm ");
 			sb.append(" LEFT OUTER JOIN memberOfBungaeMeeting mb ON bm.bungaeMeetingIdx = mb.bungaeMeetingIdx ");
 			sb.append(" LEFT OUTER JOIN sportCategory s ON mb.categoryIdx = s.sportIdx ");
@@ -246,15 +255,15 @@ public class BungaeMeetingDAO {
 				BungaeMeetingDTO dto = new BungaeMeetingDTO();
 
 				dto.setBungaeMeetingIdx(rs.getLong("bungaeMeetingIdx"));
-				dto.setStartDate(rs.getString("startDate"));
-				dto.setEndDate(rs.getString("endDate"));
+				dto.setStartDate(ts(rs, "startDate"));
+                dto.setEndDate(ts(rs, "endDate"));
 				dto.setPlace(rs.getString("place"));
 				dto.setCapacity(rs.getInt("capacity"));
 				dto.setSubject(rs.getString("subject"));
 				dto.setContent(rs.getString("content"));
 				dto.setSportName(rs.getString("sportName"));
 				dto.setRegionName(rs.getString("regionName"));
-				dto.setCurrentMembers(rs.getInt("currentMembers"));
+				dto.setCurrentCnt(rs.getInt("currentCnt"));
 
 				list.add(dto);
 			}
@@ -274,15 +283,13 @@ public class BungaeMeetingDAO {
 		StringBuilder sb = new StringBuilder();
 
 		try {
-			sb.append(
-					"SELECT bm.bungaeMeetingIdx, startDate, endDate, place, capacity, subject, content, status, sportName, regionName, bungaeMemberIdx, COUNT(mb.bungaeMemberIdx) currentMembers ");
+			sb.append("SELECT bm.bungaeMeetingIdx, startDate, endDate, place, capacity, subject, content, status, sportName, regionName, COUNT(mb.memberIdx) currentCnt ");
 			sb.append(" FROM bungaeMeeting bm ");
 			sb.append(" LEFT OUTER JOIN memberOfBungaeMeeting mb ON bm.bungaeMeetingIdx = mb.bungaeMeetingIdx ");
-			sb.append(" LEFT OUTER JOIN sportCategory s ON mb.categoryIdx = s.sportIdx ");
-			sb.append(" LEFT OUTER JOIN regionCategory r ON mb.regionIdx = r.regionIdx ");
-			sb.append(" WHERE mb.bungaeMeetingIdx = ?");
-			sb.append(
-					" GROUP BY bm.bungaeMeetingIdx, startDate, endDate, place, capacity, subject, content, status, s.sportIdx, r.regionIdx, bungaeMemberIdx ");
+			sb.append(" LEFT OUTER JOIN sportCategory s ON bm.categoryIdx = s.sportIdx ");
+			sb.append(" LEFT OUTER JOIN regionCategory r ON bm.regionIdx = r.regionIdx ");
+			sb.append(" WHERE bm.bungaeMeetingIdx = ? AND mb.role != 2 ");
+			sb.append(" GROUP BY bm.bungaeMeetingIdx, bm.startDate, bm.endDate, bm.place, bm.capacity, bm.subject, bm.content, bm.status, s.sportName, r.regionName");
 			pstmt = conn.prepareStatement(sb.toString());
 
 			pstmt.setLong(1, bungaeMeetingIdx);
@@ -291,15 +298,15 @@ public class BungaeMeetingDAO {
 
 			while (rs.next()) {
 				dto.setBungaeMeetingIdx(rs.getLong("bungaeMeetingIdx"));
-				dto.setStartDate(rs.getString("startDate"));
-				dto.setEndDate(rs.getString("endDate"));
+				dto.setStartDate(ts(rs, "startDate"));
+                dto.setEndDate(ts(rs, "endDate"));
 				dto.setPlace(rs.getString("place"));
 				dto.setCapacity(rs.getInt("capacity"));
 				dto.setSubject(rs.getString("subject"));
 				dto.setContent(rs.getString("content"));
 				dto.setSportName(rs.getString("sportName"));
 				dto.setRegionName(rs.getString("regionName"));
-				dto.setCurrentMembers(rs.getInt("currentMembers"));
+				dto.setCurrentCnt(rs.getInt("currentCnt"));
 
 			}
 
@@ -310,43 +317,46 @@ public class BungaeMeetingDAO {
 		return dto;
 	}
 
-	// 오늘부터 7일 이내 번개모임 조회
-	public List<BungaeMeetingDTO> selectWeeklyBungaeMeetings(String keyword) throws Exception {
-		List<BungaeMeetingDTO> list = new ArrayList<>();
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String sql;
+	// 주간 번개모임 조회
+	public List<BungaeMeetingDTO> selectWeeklyBungaeMeetings(String keyword, String searchType) throws Exception {
+	    List<BungaeMeetingDTO> list = new ArrayList<>();
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("SELECT bm.bungaeMeetingIdx, bm.subject, bm.content, bm.startDate, bm.endDate, ");
+	    sb.append("       bm.place, bm.capacity, ");
+	    sb.append("       COUNT(mb.memberIdx) AS currentCnt ");
+	    sb.append("FROM bungaeMeeting bm ");
+	    sb.append("LEFT JOIN memberOfBungaeMeeting mb ");
+	    sb.append("  ON bm.bungaeMeetingIdx = mb.bungaeMeetingIdx ");
+	    sb.append("  AND mb.role IN (0,1) "); 
+	    sb.append("WHERE bm.startDate >= TRUNC(SYSDATE) ");
+	    sb.append("  AND bm.startDate < TRUNC(SYSDATE) + 7 ");
+	    sb.append("  AND (bm.subject LIKE ? OR bm.content LIKE ?) ");
+	    sb.append("GROUP BY bm.bungaeMeetingIdx, bm.subject, bm.content, bm.startDate, bm.endDate, bm.place, bm.capacity ");
+	    sb.append("ORDER BY bm.startDate ASC");
 
-		try {
-			sql = "SELECT bungaeMeetingIdx, subject, content, startDate, place, capacity " + "FROM BungaeMeeting "
-					+ "WHERE startDate BETWEEN SYSDATE AND SYSDATE + 7 " + "AND (subject LIKE ? OR content LIKE ?) "
-					+ "ORDER BY startDate ASC";
-
-			pstmt = conn.prepareStatement(sql);
-			String kw = "%" + keyword + "%";
-			pstmt.setString(1, kw);
-			pstmt.setString(2, kw);
-
-			rs = pstmt.executeQuery();
-
-			while (rs.next()) {
-				BungaeMeetingDTO dto = new BungaeMeetingDTO();
-				dto.setBungaeMeetingIdx(rs.getLong("bungaeMeetingIdx"));
-				dto.setSubject(rs.getString("subject"));
-				dto.setContent(rs.getString("content"));
-				dto.setStartDate(rs.getString("startDate"));
-				dto.setPlace(rs.getString("place"));
-				dto.setCapacity(rs.getInt("capacity"));
-				list.add(dto);
-			}
-
-		} finally {
-			DBUtil.close(rs);
-			DBUtil.close(pstmt);
-		}
-
-		return list;
+	    try (PreparedStatement pstmt = conn.prepareStatement(sb.toString())) {
+	        String kw = "%" + (keyword == null ? "" : keyword) + "%";
+	        pstmt.setString(1, kw);
+	        pstmt.setString(2, kw);
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            while (rs.next()) {
+	                BungaeMeetingDTO dto = new BungaeMeetingDTO();
+	                dto.setBungaeMeetingIdx(rs.getLong("bungaeMeetingIdx"));
+	                dto.setSubject(rs.getString("subject"));
+	                dto.setContent(rs.getString("content"));
+	                dto.setStartDate(rs.getTimestamp("startDate").toLocalDateTime());
+	                Timestamp te = rs.getTimestamp("endDate");
+	                dto.setEndDate(te != null ? te.toLocalDateTime() : null);
+	                dto.setPlace(rs.getString("place"));
+	                dto.setCapacity(rs.getInt("capacity"));
+	                dto.setCurrentCnt(rs.getInt("currentCnt"));
+	                list.add(dto);
+	            }
+	        }
+	    }
+	    return list;
 	}
+
 
 	// 번개모임 수정
 	public void updateBungaeMeeting(BungaeMeetingDTO dto) throws SQLException {
@@ -360,9 +370,8 @@ public class BungaeMeetingDAO {
 
 			pstmt = conn.prepareStatement(sb.toString());
 
-			pstmt.setString(1, dto.getStartDate());
-			pstmt.setString(2, dto.getEndDate());
-
+			pstmt.setTimestamp(1, Timestamp.valueOf(dto.getStartDate()));
+			pstmt.setTimestamp(2, Timestamp.valueOf(dto.getEndDate()));
 			pstmt.setString(3, dto.getPlace());
 			pstmt.setInt(4, dto.getCapacity());
 			pstmt.setString(5, dto.getSubject());

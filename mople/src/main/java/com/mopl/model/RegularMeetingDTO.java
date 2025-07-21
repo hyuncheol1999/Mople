@@ -1,9 +1,14 @@
 package com.mopl.model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Locale;
+
 public class RegularMeetingDTO {
 	private Long regularMeetingIdx;	
-	private String startDate;
-	private String endDate;
+	private LocalDateTime startDate;
+	private LocalDateTime endDate;
 	private String place;
 	private int capacity;
 	private String subject;
@@ -18,9 +23,19 @@ public class RegularMeetingDTO {
 	
 	private int currentCnt;
     private boolean joined;
-
-	
-	
+    
+	public LocalDateTime getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(LocalDateTime startDate) {
+		this.startDate = startDate;
+	}
+	public LocalDateTime getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(LocalDateTime endDate) {
+		this.endDate = endDate;
+	}
 	public int getCurrentCnt() {
 		return currentCnt;
 	}
@@ -39,18 +54,7 @@ public class RegularMeetingDTO {
 	public void setRegularMeetingIdx(Long regularMeetingIdx) {
 		this.regularMeetingIdx = regularMeetingIdx;
 	}
-	public String getStartDate() {
-		return startDate;
-	}
-	public void setStartDate(String startDate) {
-		this.startDate = startDate;
-	}
-	public String getEndDate() {
-		return endDate;
-	}
-	public void setEndDate(String endDate) {
-		this.endDate = endDate;
-	}
+	
 	public String getPlace() {
 		return place;
 	}
@@ -112,6 +116,28 @@ public class RegularMeetingDTO {
 		this.memberIdx = memberIdx;
 	}
 	
+	public String getStartDateDow() {
+        if (startDate == null) return "";
+        return startDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREA);  
+    }
+
+    public int getStartDateDay() {
+        return startDate != null ? startDate.getDayOfMonth() : 0;
+    }
+
+    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
+
+    public String getStartTimeStr() {
+        return startDate != null ? startDate.toLocalTime().format(TIME_FMT) : "";
+    }
+
+    public String getEndTimeStr() {
+        return endDate != null ? endDate.toLocalTime().format(TIME_FMT) : "";
+    }  
 	
-	
+    public String getStartDateOnly() { return startDate != null ? startDate.toLocalDate().toString() : ""; }
+    public String getStartTimeOnly() { return startDate != null ? startDate.toLocalTime().toString() : ""; }
+    public String getEndDateOnly()   { return endDate != null ? endDate.toLocalDate().toString() : ""; }
+    public String getEndTimeOnly()   { return endDate != null ? endDate.toLocalTime().toString() : ""; }
+    
 }

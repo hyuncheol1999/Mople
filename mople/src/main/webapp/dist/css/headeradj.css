@@ -1,0 +1,19 @@
+/* 반응형 디자인: 모바일 환경 (@media (max-width: 768px)) */
+@media (max-width: 1050px) {
+  /* 로고 */
+  .logo {
+    margin-bottom: 1rem; /* 로고 아래에 여백 추가 */
+    text-align: center;
+  }
+
+}
+
+/* 반응형 디자인: 모바일 환경 (@media (max-width: 768px)) */
+@media (max-width: 768px) {
+  /* 로고 */
+  .logo {
+    margin-bottom: 1rem; /* 로고 아래에 여백 추가 */
+    text-align: center;
+  }
+
+}

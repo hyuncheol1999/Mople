@@ -179,7 +179,12 @@ public class BoardController {
 			// 로그인 유저의 게시글 공감 여부
 			HttpSession session = req.getSession();
 			SessionInfo info = (SessionInfo)session.getAttribute("member");
-			boolean isUserLiked = dao.isUserBoardLike(num, info.getMemberIdx());
+			boolean isUserLiked = false;
+			if (info != null) {
+			    isUserLiked = dao.isUserBoardLike(num, info.getMemberIdx());
+			}
+
+			
 			
 			ModelAndView mav = new ModelAndView("bbs/article");
 			
@@ -324,6 +329,7 @@ public class BoardController {
 			if(userLiked.equals("true")) {
 				// 공감 취소
 				dao.deleteBoardLike(num, info.getMemberIdx());
+				
 			} else {
 				// 공감
 				dao.insertBoardLike(num, info.getMemberIdx());
@@ -365,9 +371,9 @@ public class BoardController {
 			int size = 5;
 			int total_page = 0;
 			int replyCount = 0;
-			
-			replyCount = dao.dataCountReply(num, info.getMemberIdx(), 
-					info.getRole());
+			if (info != null) {
+				replyCount = dao.dataCountReply(num, info.getMemberIdx(), info.getRole());
+			}
 			total_page = util.pageCount(replyCount, size);
 			if(current_page > total_page) {
 				current_page = total_page;
@@ -376,15 +382,21 @@ public class BoardController {
 			int offset = (current_page - 1) * size;
 			if(offset < 0) offset = 0;
 			
-			List<ReplyDTO> listReply = dao.listReply(num, offset, size, 
-					info.getMemberIdx(), info.getRole());
+			List<ReplyDTO> listReply;
+			if (info != null) {
+			    listReply = dao.listReply(num, offset, size, info.getMemberIdx(), info.getRole());
+			} else {
+			    listReply = dao.listReply(num, offset, size); 
+			}
 			
 			// 엔터를 <br>로
 			for(ReplyDTO dto : listReply) {
 				dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
 				
 				// 유저의 좋아요/싫어요 유무
-				dto.setUserReplyLike(dao.userReplyLike(dto.getReplyNum(), info.getMemberIdx()));
+				if (info != null) {
+					dto.setUserReplyLike(dao.userReplyLike(dto.getReplyNum(), info.getMemberIdx()));
+				}
 			}
 			
 			// 페이징 처리 : AJAX 용
@@ -531,8 +543,13 @@ public class BoardController {
 		try {
 			long parentNum = Long.parseLong(req.getParameter("parentNum"));
 			
-			List<ReplyDTO> listReplyAnswer = dao.listReplyAnswer(parentNum, 
-							info.getMemberIdx(), info.getRole());
+			List<ReplyDTO> listReplyAnswer;
+
+	        if (info != null) {
+	            listReplyAnswer = dao.listReplyAnswer(parentNum, info.getMemberIdx(), info.getRole());
+	        } else {
+	            listReplyAnswer = dao.listReplyAnswer(parentNum); // 비회원용 오버로딩 메서드
+	        }
 			
 			for(ReplyDTO dto : listReplyAnswer) {
 				dto.setContent(dto.getContent().replaceAll("\n", "<br>"));

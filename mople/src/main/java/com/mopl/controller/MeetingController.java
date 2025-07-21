@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +52,6 @@ public class MeetingController {
 		ModelAndView mav = new ModelAndView("meeting/meetingList");
 
 		MeetingDAO dao = new MeetingDAO();
-		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 		SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
 		RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
 		MyUtil util = new MyUtil();
@@ -90,7 +92,6 @@ public class MeetingController {
 			for (MeetingDTO dto : list) {
 				dto.setMeetingName(util.htmlSymbols(dto.getMeetingName()));
 				dto.setContent(util.htmlSymbols(dto.getContent()));				
-				dto.setCurrentMembers(mDao.findMemberCount(dto.getMeetingIdx()));
 			}
 
 			List<SportCategoryDTO> sportCategoryList = sportCategoryDao.findAllSportCategory();
@@ -134,7 +135,6 @@ public class MeetingController {
 		ModelAndView mav = new ModelAndView("meeting/meetingLayout");
 
 		MeetingDAO dao = new MeetingDAO();
-		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 		MyUtil util = new MyUtil();
 
 		try {
@@ -173,7 +173,6 @@ public class MeetingController {
 			for (MeetingDTO dto : list) {
 				dto.setMeetingName(util.htmlSymbols(dto.getMeetingName()));
 				dto.setContent(util.htmlSymbols(dto.getContent()));
-				dto.setCurrentMembers(mDao.findMemberCount(dto.getMeetingIdx()));
 			}
 
 			String query = "sportCategory=" + sportCategory + "&regionCategory=" + regionCategory + "&sortBy=" + sortBy;
@@ -211,7 +210,6 @@ public class MeetingController {
 		// 정모장인지아닌지 확인
 		ModelAndView mav = new ModelAndView("meeting/meetingDetail");
 		MeetingDAO dao = new MeetingDAO();
-		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 
 		MeetingDTO meetingDto = null;
 
@@ -259,8 +257,6 @@ public class MeetingController {
 					
 				}
 
-				// 대기인원 제외 카운트
-				mav.addObject("memberCount", mDao.findMemberCount(meetingIdx));
 				mav.addObject("userStatus", userStatus);
 
 			} else {
@@ -281,7 +277,6 @@ public class MeetingController {
 		ModelAndView mav = new ModelAndView("meeting/meetingHome");
 		MeetingDAO meetingDao = new MeetingDAO();
 		MemberOfMeetingDAO memberOfMeetingDao = new MemberOfMeetingDAO();
-		MemberOfMeetingDAO mDao = new MemberOfMeetingDAO();
 		MeetingBoardDAO meetingBoardDAO = new MeetingBoardDAO();
 		MyUtil util = new MyUtil();
 		
@@ -322,8 +317,6 @@ public class MeetingController {
 			mav.addObject("waitingList", waitingList);
 			mav.addObject("meetingBoardList", meetingBoardList);
 			
-			// 대기인원 제외 카운트
-			mav.addObject("memberCount", mDao.findMemberCount(meetingIdx));
 			
 			if (info != null) {
 				userStatus = "NOT_JOINED";
@@ -442,78 +435,81 @@ public class MeetingController {
 
 	// 정모 생성 폼
 	@RequestMapping(value = "/meeting/regularMeetingCreate", method = RequestMethod.GET)
-	public ModelAndView regularMeetingForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String mode = req.getParameter("mode");
-		long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
-		
-		SportCategoryDAO sportCategoryDao = new SportCategoryDAO();
-		RegionCategoryDAO regionCategoryDao = new RegionCategoryDAO();
+	public ModelAndView regularMeetingForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+	    String mode = req.getParameter("mode");           
+	    long meetingIdx = Long.parseLong(req.getParameter("meetingIdx")); 
 
-		ModelAndView mav = new ModelAndView("meeting/regularMeetingCreate");
-		mav.addObject("mode", mode);
-        mav.addObject("meetingIdx", meetingIdx);
-	    
-        if ("update".equals(mode)) {
-        	long regularMeetingIdx = Long.parseLong(req.getParameter("regularMeetingIdx"));
-        	RegularMeetingDTO dto = null;
-        	
-        	try {     		
-                dto = new RegularMeetingDAO().findByRegularMeetingIdx(regularMeetingIdx);  
-               
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-        	mav.addObject("dto", dto);
-        } else {
-        	List<SportCategoryDTO> sportCategoryList = sportCategoryDao.findAllSportCategory();
-			List<RegionCategoryDTO> regionCategoryList = regionCategoryDao.findAllRegionCategory();
+	    RegularMeetingDTO dto = new RegularMeetingDTO();
 
-			mav.addObject("sportCategoryList", sportCategoryList);
-			mav.addObject("regionCategoryList", regionCategoryList);
+	    if ("update".equals(mode)) {
+	        long regularMeetingIdx = Long.parseLong(req.getParameter("regularMeetingIdx"));
+	        RegularMeetingDAO rDao = new RegularMeetingDAO();
+	        try {
+	            dto = rDao.findByRegularMeetingIdx(regularMeetingIdx);
+	        } catch (Exception e) {
+	            throw new ServletException(e);
+	        }
+	        if (dto == null) {
+	            throw new ServletException("정모 없음: " + regularMeetingIdx);
+	        }
+	        mode = "update";
+	    } else {
+	        mode = "create";
+	    }
 
-            mav.addObject("dto", new RegularMeetingDTO()); 
-        }
-        return mav;
-    }
+	    ModelAndView mav = new ModelAndView("meeting/regularMeetingCreate");
+	    mav.addObject("mode", mode);
+	    mav.addObject("meetingIdx", meetingIdx);
+	    mav.addObject("dto", dto);
+	    return mav;
+	}
 
 	// 정모 생성
 	@RequestMapping(value = "/meeting/regularMeetingCreate", method = RequestMethod.POST)
-	public ModelAndView regularMeetingCreateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String mode = req.getParameter("mode");
-        HttpSession session = req.getSession();
-        long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
+	public ModelAndView regularMeetingCreateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+	    String mode = req.getParameter("mode"); 
+	    long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
 
-        RegularMeetingDTO dto = new RegularMeetingDTO();
-        dto.setMeetingIdx(meetingIdx);
-        dto.setStartDate(req.getParameter("startDate"));
-        dto.setPlace(req.getParameter("place"));
-        dto.setCapacity(Integer.parseInt(req.getParameter("capacity")));
-        dto.setSubject(req.getParameter("subject"));
+	    LocalDate startDate = LocalDate.parse(req.getParameter("startDate"));
+	    LocalTime startTime = LocalTime.parse(req.getParameter("startTime"));
+	    LocalDate endDate   = LocalDate.parse(req.getParameter("endDate"));
+	    LocalTime endTime   = LocalTime.parse(req.getParameter("endTime"));
 
-        RegularMeetingDAO rDao = new RegularMeetingDAO();
-        try {
-            if ("update".equals(mode)) {
-                dto.setRegularMeetingIdx(Long.parseLong(req.getParameter("regularMeetingIdx")));
-                rDao.updateRegularMeeting(dto);
-                 
-            } else {
-            	MeetingDAO mDao = new MeetingDAO();
-                MeetingDTO mDto = mDao.getMeetingDetails(meetingIdx);
-            	
-                dto.setSportIdx(mDto.getSportIdx());
-                dto.setRegionIdx(mDto.getRegionIdx());
-                
-                SessionInfo info = (SessionInfo) session.getAttribute("member");
-                dto.setMemberIdx(info.getMemberIdx());
-                
-                rDao.createRegularMeeting(dto);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+	    LocalDateTime startDt = LocalDateTime.of(startDate, startTime);
+	    LocalDateTime endDt   = LocalDateTime.of(endDate, endTime);
 
-        return new ModelAndView("redirect:/meeting/meetingDetail?sportCategory=0&regionCategory=0&meetingIdx=" + meetingIdx + "&afterCreate=true");
-    }
+	    HttpSession session = req.getSession(false);
+	    SessionInfo info = (SessionInfo) session.getAttribute("member"); 
+
+	    RegularMeetingDTO dto = new RegularMeetingDTO();
+	    dto.setMeetingIdx(meetingIdx);
+	    dto.setStartDate(startDt);
+	    dto.setEndDate(endDt);
+	    dto.setPlace(req.getParameter("place"));
+	    dto.setCapacity(Integer.parseInt(req.getParameter("capacity")));
+	    dto.setSubject(req.getParameter("subject"));
+	    dto.setMemberIdx(info.getMemberIdx());
+
+	    RegularMeetingDAO rDao = new RegularMeetingDAO();
+
+	    try {
+	        if ("update".equalsIgnoreCase(mode)) {
+	            long regIdx = Long.parseLong(req.getParameter("regularMeetingIdx"));
+	            dto.setRegularMeetingIdx(regIdx);
+	            rDao.updateRegularMeeting(dto);
+	        } else {
+	            MeetingDAO mDao = new MeetingDAO();
+	            MeetingDTO mDto = mDao.getMeetingDetails(meetingIdx); 
+	            dto.setSportIdx(mDto.getSportIdx());
+	            dto.setRegionIdx(mDto.getRegionIdx());
+	            rDao.createRegularMeeting(dto);
+	        }
+	    } catch (Exception e) {
+	        throw new ServletException(e);
+	    }
+
+	    return new ModelAndView("redirect:/meeting/meetingDetail?sportCategory=0&regionCategory=0&meetingIdx=" + meetingIdx + "&afterCreate=true");
+	}
 
 	// 정모 삭제
 	@RequestMapping(value = "/meeting/regularMeetingDelete", method = RequestMethod.POST)
@@ -923,8 +919,10 @@ public class MeetingController {
 	public ModelAndView leaveLeader(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		ModelAndView mav = new ModelAndView("meeting/leaveLeader");
+		MeetingDAO meetingDao = new MeetingDAO();
 		MemberOfMeetingDAO dao = new MemberOfMeetingDAO();
 		mav.addObject("list", dao.findByMeetingIdx(Long.parseLong(req.getParameter("meetingIdx"))));
+		mav.addObject("dto", meetingDao.findByMeeetingIdx(Long.parseLong(req.getParameter("meetingIdx"))));
 		
 		return mav;
 	}
@@ -969,9 +967,14 @@ public class MeetingController {
 			throws ServletException, IOException {
 		Map<String, Object> map = new HashMap<>();
 		MeetingDAO dao = new MeetingDAO();
+		MeetingAlbumDAO meetingAlbumDao = new MeetingAlbumDAO();
+		FileManager fileManager = new FileManager();
 		
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		
+		String root = session.getServletContext().getRealPath("/");
+		String pathname = root + "uploads" + File.separator + "meetingProfilePhoto";
 		
 		try {
 			if(info == null) {
@@ -979,8 +982,19 @@ public class MeetingController {
 			}
 			
 			long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
+			MeetingDTO dto = dao.findByMeeetingIdx(meetingIdx);
+			List<MeetingAlbumDTO> list = meetingAlbumDao.findByMeeetingIdx(meetingIdx);
 			
 			dao.deleteMeeting(meetingIdx);
+			
+			// 모임 프로필 사진 삭제
+			fileManager.doFiledelete(pathname, dto.getMeetingProfilePhoto());
+			
+			// 모임 사진첩 사진 삭제
+			pathname = root + "uploads" + File.separator + "meetingAlbum";
+			for(MeetingAlbumDTO albumDTO : list) {
+				fileManager.doFiledelete(pathname, albumDTO.getImageFileName());
+			}
 			
 			map.put("success", true);
 		} catch (Exception e) {
@@ -991,6 +1005,25 @@ public class MeetingController {
 		return map;
 	}
 	
+	// 정모 -> 번모
+	@ResponseBody
+	  @RequestMapping(value="/meeting/changeBungae", method=RequestMethod.POST)
+	  public Map<String,Object> changeBungae(HttpServletRequest req, HttpServletResponse resp) {
+	    Map<String,Object> map = new HashMap<>();
+	    try {
+	      long regularIdx = Long.parseLong(req.getParameter("regularMeetingIdx"));
+
+	      RegularMeetingDAO dao = new RegularMeetingDAO();
+	      dao.changeBungae(regularIdx);      
+
+	      map.put("success", true);
+	    } catch(Exception e) {
+	      e.printStackTrace();
+	      map.put("success", false);
+	      map.put("message", e.getMessage());
+	    }
+	    return map;
+	  }
 	
 	
 	// 이미 삭제된 모임 클릭시 페이지 전환

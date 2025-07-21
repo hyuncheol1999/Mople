@@ -7,9 +7,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>모플 - 운동으로 만나다</title>
-<jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />  
+<jsp:include page="/WEB-INF/views/layout/headerResources.jsp"/>  
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/board.css" type="text/css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/paginate.css" type="text/css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/dist/css/meeting.css" type="text/css">
-    <style>
+<style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
             margin: 0;
@@ -80,7 +82,29 @@
             border-radius: 8px;
             text-align: center;
         }
-    </style>
+
+.board-list-footer .form-select{
+	width: 110px;
+}      
+  
+.form-select,
+.form-control,
+.btn {
+    height: 40px;
+    font-size: 16px;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+
+.btn i {
+    vertical-align: middle;
+}
+
+
+input[type="checkbox"].form-check-input {
+    display: inline-block;
+}
+</style>
 </head>
 <body>
  <div class="wrap">
@@ -96,10 +120,13 @@
 			<div class="meetings-layout">
 			    <div class="main-content">
 			        <div class="card">
-						<h4><i class="bi bi-app"></i> 공지사항 </h4>
-		    
+			        	
+			        	<div class="body-title">
+							<h4> 🚨 공지사항 </h4>
+		    			</div>
+		    			
 		   			 	<div class="stats-grid row">
-							<div class="col-xxl-9">
+							<div class="col-md-12 text-start">
 								<form name="listForm" method="post">
 									<div class="row board-list-header">
 										<div class="col-auto me-auto dataCount">

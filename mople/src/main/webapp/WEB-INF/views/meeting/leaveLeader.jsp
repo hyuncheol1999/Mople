@@ -26,6 +26,8 @@
 		<main class="main">
 			<div class="meetingContainer">
 		    <h2>모임 탈퇴</h2>
+		    <h5>모임명 : ${dto.meetingName}</h5>
+		    <br>
 			<form name="leaveForm" method="post">
 				<div class="form-group">
 					<label for="memberCategory">모임장을 위임할 모임원을 선택해주세요.</label>

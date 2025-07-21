@@ -81,7 +81,24 @@
             border-radius: 8px;
             text-align: center;
         }
-    </style>
+ 
+.form-select,
+.form-control,
+.btn {
+    height: 40px;
+    font-size: 16px;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+
+.btn i {
+    vertical-align: middle;
+}
+
+.input-group{
+	margin: 15px 0px;
+}
+</style>
 </head>
 <body>
  <div class="wrap">
@@ -97,7 +114,7 @@
 			<div class="meetings-layout">
 			    <div class="main-content">
 			        <div class="card">
-						<h4><i class="bi bi-whatsapp"></i> 문의하기 </h4>
+						<h4> ❓ 문의하기 </h4>
 		    
 		   			 	<div class="stats-grid row">
 							<div class="col-md-4 text-start">
@@ -127,10 +144,10 @@
 										<td class="left">
 											<div class="text-wrap">
 												<a href="${articleUrl}&num=${dto.num}" class="text-reset">${dto.subject}</a>
+												<c:if test="${dto.secret==1}">
+													<i class="bi bi-file-lock2"></i>
+												</c:if>													
 											</div>
-											<c:if test="${dto.secret==1}">
-												<i class="bi bi-file-lock2"></i>
-											</c:if>										
 										</td>
 										<td>${dto.userNickName}</td>
 										<td>${dto.reg_date}</td>
