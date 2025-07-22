@@ -120,7 +120,7 @@ public class LoginFilter implements Filter{
 			"/member/account", "/member/userIdCheck", "/member/complete", "/member/withdrawal",
 			
 			"/meeting/meetingList", "/meeting/meetingDetail", "/meeting/meetingHome", "/meeting/meetingLayout", 
-			"/meeting/meetingAlbum", "/meeting/deletedMeeting", "/meeting/meetingSchedule", "meeting/deletedMeeting",
+			"/meeting/meetingAlbum", "/meeting/deletedMeeting", "/meeting/meetingSchedule", "/meeting/isDeletedMeeting",
 			
 			"/notice/list", "/notice/article", "/qna/list", "/sports/facilities",
 			

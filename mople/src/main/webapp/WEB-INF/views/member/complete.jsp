@@ -17,7 +17,7 @@
 	<jsp:include page="/WEB-INF/views/layout/login.jsp"/>
 
 <main>
-	<div class="container">
+	<div class="container completeMain">
 		<div class="body-container row justify-content-center">
 			<div class="col-md-6 my-5 p-3">
 

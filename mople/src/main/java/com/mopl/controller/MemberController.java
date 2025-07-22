@@ -213,10 +213,10 @@ public class MemberController {
 		
 		if(mode.equals("account")) {
 			title = "회원가입";
-			message += "회원가입이 완료 되었습니다.<br>로그인 하시면 정보를 이용할수 있습니다.";
+			message += "회원가입이 완료 되었습니다.<br>로그인 하시고 다양한 사람들을 만나보세요!";
 		} else {
 			title = "정보수정";
-			message += "회원정보가 수정되었습니다.<br>메인 화면으로 이동하시기 바랍니다.";
+			message += "회원정보가 수정되었습니다.<br>";
 		}
 		
 		ModelAndView mav = new ModelAndView("member/complete");

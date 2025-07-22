@@ -235,7 +235,7 @@ public class MeetingController {
 			// meetingIdx 파라미터가 없을 경우
 			String param = req.getParameter("meetingIdx");
 			if (param == null) {
-				return new ModelAndView("meeting/deletedMeeting");
+				return new ModelAndView("meeting/isDeletedMeeting");
 			}
 
 			if (param != null && !param.isEmpty()) {
@@ -1039,10 +1039,11 @@ public class MeetingController {
 	
 	
 	// 이미 삭제된 모임 클릭시 페이지 전환
-	@RequestMapping(value = "/meeting/deletedMeeting", method = RequestMethod.GET)
-	public ModelAndView deletedMeeting(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		return new ModelAndView("redirect:/meeting/deletedMeeting");
+	@RequestMapping(value = "/meeting/isDeletedMeeting", method = RequestMethod.GET)
+	public String deletedMeetingPage(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	    
+	    return "meeting/isDeletedMeeting";
+
 	}
 
 }
