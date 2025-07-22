@@ -50,7 +50,7 @@
 							<c:if test="${not empty dto.thumbnail}">
 								<div class="thumbnail">
 									<img
-										src="${pageContext.request.contextPath}/dist/images/${dto.thumbnail}"
+										src="${pageContext.request.contextPath}/uploads/photo/${dto.thumbnail}"
 										alt="썸네일" width="100">
 								</div>
 							</c:if>

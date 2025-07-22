@@ -46,7 +46,7 @@
 			<c:if test="${not empty imageList}">
 				<div class="post-images">
 					<c:forEach var="img" items="${imageList}">
-						<img src="${pageContext.request.contextPath}/dist/images/${img}" alt="이미지" />
+						<img src="${pageContext.request.contextPath}/uploads/photo/${img}" alt="이미지" />
 					</c:forEach>
 				</div>
 			</c:if>

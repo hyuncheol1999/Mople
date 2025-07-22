@@ -126,7 +126,7 @@ public class MeetingBoardController {
 		mav.addObject("meetingIdx", meetingIdx);
 		mav.addObject("mode", "write");
 
-		String imagePath = session.getServletContext().getRealPath("/dist/images");
+		String imagePath = session.getServletContext().getRealPath("/uploads/photo");
 
 		File imageDir = new File(imagePath);
 		String[] imageFiles = imageDir.list((dir, name) -> name.matches(".*\\.(png|jpg|jpeg|gif)$"));
@@ -147,7 +147,7 @@ public class MeetingBoardController {
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
 
 		String root = session.getServletContext().getRealPath("/");
-		String pathname = root + "dist" + File.separator + "images";
+		String pathname = root + "uploads" + File.separator + "photo";
 
 		long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
 
