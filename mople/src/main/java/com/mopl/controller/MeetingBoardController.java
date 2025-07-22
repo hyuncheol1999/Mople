@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.mopl.util.FileManager;
-import com.mopl.util.MyMultipartFile;
 import com.mopl.dao.MeetingBoardDAO;
 import com.mopl.model.MeetingBoardDTO;
 import com.mopl.model.SessionInfo;
@@ -17,6 +15,8 @@ import com.mopl.mvc.annotation.RequestMapping;
 import com.mopl.mvc.annotation.RequestMethod;
 import com.mopl.mvc.annotation.ResponseBody;
 import com.mopl.mvc.view.ModelAndView;
+import com.mopl.util.FileManager;
+import com.mopl.util.MyMultipartFile;
 import com.mopl.util.MyUtil;
 
 import jakarta.servlet.ServletException;
@@ -126,6 +126,13 @@ public class MeetingBoardController {
 		mav.addObject("meetingIdx", meetingIdx);
 		mav.addObject("mode", "write");
 
+		String imagePath = session.getServletContext().getRealPath("/dist/images");
+
+		File imageDir = new File(imagePath);
+		String[] imageFiles = imageDir.list((dir, name) -> name.matches(".*\\.(png|jpg|jpeg|gif)$"));
+
+		mav.addObject("imageList", imageFiles);
+
 		return mav;
 	}
 
@@ -140,7 +147,7 @@ public class MeetingBoardController {
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
 
 		String root = session.getServletContext().getRealPath("/");
-		String pathname = root + "uploads" + File.separator + "photo";
+		String pathname = root + "dist" + File.separator + "images";
 
 		long meetingIdx = Long.parseLong(req.getParameter("meetingIdx"));
 
@@ -162,7 +169,7 @@ public class MeetingBoardController {
 
 			for (Part part : req.getParts()) {
 				if (part.getName().equals("uploadFiles") && part.getSubmittedFileName() != null && part.getSize() > 0) {
-					
+
 					MyMultipartFile mf = fileManager.doFileUpload(part, pathname);
 					if (mf != null) {
 						imageFileNames.add(mf.getSaveFilename());

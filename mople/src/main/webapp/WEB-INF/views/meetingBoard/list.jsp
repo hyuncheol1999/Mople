@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${meetingName}모임 소식</title>
+<title>모임 소식</title>
 <jsp:include page="/WEB-INF/views/layout/headerResources.jsp" />
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/dist/css/meetingBoard.css"
@@ -22,14 +22,7 @@
 
 	<main class="board-wrapper mt-5">
 
-		<!-- 돌아가기 버튼 (왼쪽 정렬) -->
-		<div class="back-btn-left-list">
-			<a
-				href="${pageContext.request.contextPath}/meeting/view?idx=${meetingIdx}"
-				class="btn btn-outline">←</a>
-		</div>
-
-		<h3 class="board-title">${meetingName}모임 소식</h3>
+		<h3 class="board-title">모임 소식</h3>
 
 		<div class="category-tabs">
 			<a href="?meetingIdx=${meetingIdx}"
@@ -57,7 +50,7 @@
 							<c:if test="${not empty dto.thumbnail}">
 								<div class="thumbnail">
 									<img
-										src="${pageContext.request.contextPath}/uploads/photo/${dto.thumbnail}"
+										src="${pageContext.request.contextPath}/dist/images/${dto.thumbnail}"
 										alt="썸네일" width="100">
 								</div>
 							</c:if>
@@ -77,7 +70,7 @@
 									</c:otherwise>
 								</c:choose>
 
-								<div class="board-item-meta">${dto.userNickName} ·
+								<div class="board-item-meta">${dto.userNickName}·
 									${dto.reg_date}</div>
 							</div>
 

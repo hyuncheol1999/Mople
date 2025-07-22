@@ -46,7 +46,7 @@
 			<c:if test="${not empty imageList}">
 				<div class="post-images">
 					<c:forEach var="img" items="${imageList}">
-						<img src="/uploads/photo/${img}" alt="게시글 이미지" />
+						<img src="${pageContext.request.contextPath}/dist/images/${img}" alt="이미지" />
 					</c:forEach>
 				</div>
 			</c:if>
@@ -94,7 +94,8 @@
 
 
 		<!-- 이전 글 -->
-		<div class="post-nav-item"><strong>이전</strong>&nbsp;
+		<div class="post-nav-item">
+			<strong>이전</strong>&nbsp;
 			<c:choose>
 				<c:when test="${not empty prevDto}">
 					<a
