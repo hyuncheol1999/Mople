@@ -77,22 +77,13 @@
         text-align: right;
     }
     .btn {
-        background-color: #6A0DAD;
-        color: white;
         padding: 10px 20px;
-        border: none;
         border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
         margin-left: 10px;
     }
-    .btn:hover {
-        background-color: #580a9e;
-    }
-    .btn.cancel {
-        background-color: #ccc;
-        color: black;
-    }
+
 </style>
 </head>
 <body>
@@ -117,9 +108,9 @@
         </div>
 
         <div class="btn-box">
-            <button type="button" class="btn" onclick="sendOk();">${mode=='update'?'수정완료':'등록완료'}&nbsp;<i class="bi bi-check2"></i></button>
-            <button type="reset" class="btn cancel">다시입력</button>
-            <button type="button" class="btn cancel" onclick="location.href='${pageContext.request.contextPath}/admin/notice/list';">
+            <button type="button" class="btn btn-outline rounded" onclick="sendOk();">${mode=='update'?'수정완료':'등록완료'}&nbsp;<i class="bi bi-check2"></i></button>
+            <button type="reset" class="btn cancel btn-outline rounded">다시입력</button>
+            <button type="button" class="btn cancel btn-outline rounded" onclick="location.href='${pageContext.request.contextPath}/admin/notice/list';">
                 ${mode=='update'?'수정취소':'등록취소'}&nbsp;<i class="bi bi-x"></i>
             </button>
         </div>

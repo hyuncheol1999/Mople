@@ -25,8 +25,8 @@
 		<div class="main-content">
 			<div class="meetings-layout">
 			    <div class="main-content">
-			        <div class="card">
-			            <h4>요약 통계</h4>
+			        <div class="card" style="padding: 10px;">
+			            <h4> 📊 요약 통계 </h4>
 			            <div class="body-main stats-grid">
 			                <div class="stat-box">
 			                    <strong>총 회원 수</strong>
@@ -47,34 +47,35 @@
 			            </div>
 			        </div>
 			
-			        <div class="card">
-			            <h4>최근 생성된 정모</h4>
-			            <table class="table-meeting"  cellpadding="10" cellspacing="0" width="100%">
-			                <tr>
-			                    <th>정모제목</th>
-			                    <th>시작날짜</th>
-			                    <th>종료날짜</th>
-			                    <th>장소</th>
-			                    <th>정원</th>
-			                </tr>
-			                <c:forEach var="list" items="${list}">
-			                    <tr>
-			                        <td>${list.subject}</td>
-			                        <td>${list.startDate}</td>
-			                        <td>${list.endDate}</td>
-			                        <td>${list.place}</td>
-			                        <td>${list.capacity}</td>
-			                    </tr>
-			                </c:forEach>
-			            </table>
-			        </div>	
-			    </div>			
+					<div class="card" style="padding: 10px;">
+					    <h4 style="margin-bottom: 10px;"> 🔥 최근 생성된 정모 </h4>
+					    <table class="table-meeting" style="width: 100%; border-collapse: collapse; text-align: center; background-color: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+					        <thead style="background-color: #f9f9f9;">
+					            <tr style="border-bottom: 2px solid #eee;">
+					                <th style="padding: 12px;">정모 제목</th>
+					                <th style="padding: 12px;">시작 날짜</th>
+					                <th style="padding: 12px;">종료 날짜</th>
+					                <th style="padding: 12px;">장소</th>
+					                <th style="padding: 12px;">정원</th>
+					            </tr>
+					        </thead>
+					        <tbody>
+					            <c:forEach var="list" items="${list}">
+					                <tr style="border-bottom: 1px solid #f0f0f0;">
+					                    <td style="padding: 10px;">${list.subject}</td>
+					                    <td style="padding: 10px;">${list.startDateOnly} ${list.startTimeStr}</td>
+										<td style="padding: 10px;">${list.endDateOnly} ${list.endTimeStr}</td>
+					                    <td style="padding: 10px;">${list.place}</td>
+					                    <td style="padding: 10px;">${list.capacity}명</td>
+					                </tr>
+					            </c:forEach>
+					        </tbody>
+					    </table>
+					</div>			    
+				</div>			
 			</div>
 		</div>	
     </main>
-
-
-
 
 </div>
 </body>
