@@ -63,8 +63,8 @@
 					            <c:forEach var="list" items="${list}">
 					                <tr style="border-bottom: 1px solid #f0f0f0;">
 					                    <td style="padding: 10px;">${list.subject}</td>
-					                    <td style="padding: 10px;">${list.startDate}</td>
-										<td style="padding: 10px;">${list.endDate}</td>
+					                    <td style="padding: 10px;">${list.startDateOnly} ${list.startTimeStr}</td>
+										<td style="padding: 10px;">${list.endDateOnly} ${list.endTimeStr}</td>
 					                    <td style="padding: 10px;">${list.place}</td>
 					                    <td style="padding: 10px;">${list.capacity}명</td>
 					                </tr>
