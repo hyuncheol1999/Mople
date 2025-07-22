@@ -273,13 +273,14 @@ public class RegularMeetingDAO {
 	}
 	
 	// 정기모임 -> 번개모임으로 전환 
-		public void changeBungae(long regularMeetingIdx) throws SQLException {
-		    String sql = "UPDATE regularMeeting SET isBungaeMeeting = 1 WHERE regularMeetingIdx = ?";
-		    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-		        pstmt.setLong(1, regularMeetingIdx);
-		        pstmt.executeUpdate();
-		    }
-		}
+			public void changeBungae(long regularMeetingIdx) throws SQLException {
+			    String sql = "UPDATE regularMeeting SET isBungaeMeeting = 1 WHERE regularMeetingIdx = ?";
+			    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			        pstmt.setLong(1, regularMeetingIdx);
+			        pstmt.executeUpdate();
+			    }
+			}
+
 		
 	// 정기모임 중 번개로 전환된 모임 조회 (isBungaeMeeting = 1)
 		public List<RegularMeetingDTO> selectUrgentRegularMeetings(String keyword) throws Exception {

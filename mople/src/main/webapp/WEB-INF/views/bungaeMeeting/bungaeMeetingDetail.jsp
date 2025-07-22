@@ -113,13 +113,26 @@
     .btn-approve {
       background-color: #e6f7ff;
     }
-  
+  	.cc {
+  		border: 1px solid #D5D5D5;
+  		border-radius: 10px;
+  		background: #ffffff;
+  		margin: 50px 0;
+  		padding: 50px;
+  	}
+  	.btn-s {
+  		border: 1px solid #D5D5D5;
+  		border-radius: 10px;
+  	}
   </style>
   <script>
     const contextPath = '${pageContext.request.contextPath}';
     const bungaeMeetingIdx = '${bungaeMeetingIdx}';
   </script>
 </head>
+
+
+
 <body>
   <header class="header">
     <jsp:include page="/WEB-INF/views/layout/header.jsp" />
@@ -130,9 +143,12 @@
       <div class="bungaeMeeting-header">
         <h3>번개모임 소개</h3>
         <div class="BungaeMeeting-info">
-          <p><strong>제목:</strong> ${subject}</p>
-          <p><strong>날짜:</strong> ${fn:replace(startDate, 'T', ' ')}</p>
-          <p><strong>내용:</strong> ${content}</p>
+          <br>
+          <div class="cc">
+          <h3>${subject}</h3>
+          <p>📆 ${fn:replace(startDate, 'T', ' ')} | 🎈${place}</p><br>
+          <p style="white-space: pre-line">${content}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -142,15 +158,17 @@
         <div class="form-header">
           <span class="bold">댓글</span> - 번개모임 참여를 원하시면 댓글을 남겨주세요.
         </div>
-        <textarea name="content" class="form-control"></textarea>
+        <textarea name="content" class="form-control" style="resize:none;"></textarea>
         <div style="text-align:right; margin-top:10px">
-          <button type="button" class="btn btn-light btnSendReply">댓글 등록</button>
+          <button type="button" class="btn btn-light btnSendReply btn-s">댓글 등록</button>
         </div>
       </form>
     </div>
-
+	<br>
     <div id="listReply"></div>
   </div>
+
+
 
   <script>
     function loadReplyList(page) {
